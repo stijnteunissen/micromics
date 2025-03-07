@@ -63,8 +63,12 @@ alpha_diversity = function(physeq = physeq,
         mutate(!!date_factor := as.Date(.data[[date_factor]], format = "%d/%m/%Y")) %>%
         arrange(.data[[date_factor]])
 
-      alpha_data = alpha_data %>%
-        mutate(grouping_factor = do.call(paste, c(across(all_of(present_factors)), sep = "_")))
+      if (is.null(present_factors) || length(present_factors) == 0) {
+        alpha_data <- alpha_data %>% mutate(grouping_factor = "all")
+      } else {
+        alpha_data <- alpha_data %>%
+          mutate(grouping_factor = do.call(paste, c(across(all_of(present_factors)), sep = "_")))
+      }
 
       plot = ggplot(alpha_data, aes(x = !!sym(x_value), y = !!sym(y_value), group = grouping_factor)) +
         #geom_jitter(aes(color = .data[[date_factor]]), size = 2, width = 0.2, show.legend = FALSE) +
@@ -87,8 +91,12 @@ alpha_diversity = function(physeq = physeq,
         expand_limits(y = c(min(alpha_data[[y_value]]) - 1, max(alpha_data[[y_value]]) + 1))  # Correct placement outside theme
 
     } else {
-      alpha_data = alpha_data %>%
-        mutate(grouping_factor = do.call(paste, c(across(all_of(present_factors)), sep = "_")))
+      if (is.null(present_factors) || length(present_factors) == 0) {
+        alpha_data <- alpha_data %>% mutate(grouping_factor = "all")
+      } else {
+        alpha_data <- alpha_data %>%
+          mutate(grouping_factor = do.call(paste, c(across(all_of(present_factors)), sep = "_")))
+      }
 
       plot = ggplot(alpha_data, aes(x = !!sym(x_value), y = !!sym(y_value), group = grouping_factor)) +
         #geom_jitter(aes(color = grouping_factor), size = 2, width = 0.2, show.legend = FALSE) +
