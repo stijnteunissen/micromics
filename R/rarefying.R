@@ -69,7 +69,7 @@ rarefying = function(physeq = physeq,
 
   avgrarefy = function(x, sample, iterations = iteration, seed = 711) {
     set.seed(seed)
-    cl = makeCluster(detectCores() -4) # all cores minus two
+    cl = makeCluster(detectCores()) # all cores minus two "makeCluster(detectCores() -2)"
     clusterEvalQ(cl, library(vegan)) # load vegan on all worker nodes
 
     tablist = parLapply(cl, seq_len(iterations), function(i) {
