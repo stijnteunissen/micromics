@@ -188,7 +188,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
     inner_join(genus_abund_rel, genus_pool_rel, by = "Tax_label") %>%
     mutate(Tax_label = if_else(Tax_label %in% legend_cutoff_names_rel, Tax_label,
                                glue("Other max.<{round(legend_cutoff_value_rel, 2)}%"))) %>%
-    group_by(Sample, Kingdom, Phylum, Class, Order, Family, Genus, Tax_label, na_type, !!!syms(present_factors)) %>%
+    group_by(Sample, Kingdom, Phylum, Class, Order, Family, Tax_label, na_type, !!!syms(present_factors)) %>%
     summarise(mean_rel_abund = sum(mean_rel_abund),
               median = median(mean), .groups = "drop") %>%
     mutate(Tax_label = factor(Tax_label),
@@ -312,7 +312,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
     norm_taxa = inner_join(genus_abund_norm, genus_pool_norm, by = "Tax_label") %>%
       mutate(Tax_label = if_else(Tax_label %in% legend_cutoff_names_norm, Tax_label,
                                  glue("Other max.<{scaled_legend_cutoff_value_norm}x10^{log10(scale_legend_cutoff_value_norm)}\ncell equivalents"))) %>%
-      group_by(Sample, Kingdom, Phylum, Class, Order, Family, Genus, Tax_label, na_type, !!!syms(present_factors)) %>%
+      group_by(Sample, Kingdom, Phylum, Class, Order, Family, Tax_label, na_type, !!!syms(present_factors)) %>%
       summarise(norm_abund = sum(norm_abund),
                 median = median(mean), .groups = "drop") %>%
       mutate(Tax_label = factor(Tax_label),
@@ -335,7 +335,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
       inner_join(genus_abund_norm, genus_pool_norm, by = "Tax_label") %>%
       mutate(Tax_label = if_else(Tax_label %in% legend_cutoff_names_norm, Tax_label,
                                  glue("Other max.<{scaled_legend_cutoff_value_norm}x10^{log10(scale_legend_cutoff_value_norm)}\ncell equivalents"))) %>%
-      group_by(Sample, Kingdom, Phylum, Class, Order, Family, Genus, Tax_label, na_type, !!!syms(present_factors)) %>%
+      group_by(Sample, Kingdom, Phylum, Class, Order, Family, Tax_label, na_type, !!!syms(present_factors)) %>%
       summarise(norm_abund = sum(norm_abund),
                 median = median(mean), .groups = "drop") %>%
       mutate(Tax_label = factor(Tax_label),
