@@ -59,7 +59,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
             #strip.text = element_text(face = "bold", angle = 90, vjust = 0.5, hjust = 0),
             ggh4x.facet.nestline = element_line(colour = "black"))
 
-    if (ntax > 23) {
+    if (ntaxa > 23) {
       base_barplot = base_barplot +
         guides(fill = guide_legend(nrow = 14))
     } else {
