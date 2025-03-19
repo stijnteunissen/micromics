@@ -131,7 +131,6 @@ alpha_diversity = function(physeq = physeq,
   project_folder = paste0(base_path, project_name)
   figure_folder = paste0(project_folder, "/figures/")
   output_folder_csv_files = paste0(project_folder, "/output_data/csv_files/")
-  output_folder_rds_files = paste0(project_folder, "/output_data/rds_files/")
 
   if (tolower(taxrank[1]) == "asv") {
     log_message("Processing ASV-level alpha diversity", log_file)
@@ -159,10 +158,10 @@ alpha_diversity = function(physeq = physeq,
     metadata = sample_data(psdata) %>% data.frame() %>% as_tibble()
     alpha_data_full = inner_join(metadata, alpha_data, by = "sampleid")
 
-    if ("Sample_Date" %in% present_factors) {
-      alpha_data_full = alpha_data_full %>%
-        mutate(Sample_Date = as.Date(Sample_Date, format = "%d/%m/%Y")) %>%
-        arrange(Sample_Date)
+    if (!is.null(date_factor) && date_factor %in% present_factors) {
+      alpha_data_full <- alpha_data_full %>%
+        mutate(!!sym(date_factor) := as.Date(!!sym(date_factor), format = "%d/%m/%Y")) %>%
+        arrange(!!sym(date_factor))
     }
 
     # # adding dummy data to the dataset.
@@ -251,7 +250,7 @@ alpha_diversity = function(physeq = physeq,
     print(combined_plot)
 
     figure_file_path = paste0(asv_folder, project_name, "_alpha_diversity_asv_level.pdf")
-    ggsave(filename = figure_file_path, plot = combined_plot, width = 30, height = 8)
+    ggsave(filename = figure_file_path, plot = combined_plot, width = 14, height = 6)
     log_message(paste("alpha diversity asv level saved as .pdf object in", figure_file_path), log_file)
   } else {
 
@@ -281,10 +280,10 @@ alpha_diversity = function(physeq = physeq,
       metadata = sample_data(psdata) %>% data.frame() %>% as_tibble()
       alpha_data_full = inner_join(metadata, alpha_data, by = "sampleid")
 
-      if ("Sample_Date" %in% present_factors) {
-        alpha_data_full = alpha_data_full %>%
-          mutate(Sample_Date = as.Date(Sample_Date, format = "%d/%m/%Y")) %>%
-          arrange(Sample_Date)
+      if (!is.null(date_factor) && date_factor %in% present_factors) {
+        alpha_data_full <- alpha_data_full %>%
+          mutate(!!sym(date_factor) := as.Date(!!sym(date_factor), format = "%d/%m/%Y")) %>%
+          arrange(!!sym(date_factor))
       }
 
       # # adding dummy data to the dataset.

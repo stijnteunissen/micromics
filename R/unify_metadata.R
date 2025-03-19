@@ -1,7 +1,7 @@
 #' Unify and Format Metadata
 #'
 #' This function merges and formats metadata from various sources, including
-#' QIIME metadata, extra sample metadata and qPCR data or FCM data, to create a unified
+#' QIIME metadata, experimental sample metadata and qPCR data or FCM data, to create a unified
 #' metadata file for downstream analyses.
 #'
 #' @inheritParams create_folders

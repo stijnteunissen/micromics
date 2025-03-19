@@ -1,7 +1,7 @@
 #' Resolve Multichotomies in Phyloseq Object's Tree
 #'
 #' This function processes a `phyloseq` object to resolve multichotomies (non-binary nodes) in the phylogenetic tree
-#' using the `ape` package. It ensures the tree is binary and saves the updated `phyloseq` object as an RDS file.
+#' using the `ape` package. This is inmportant for accurate evolutionary analysis. It ensures the tree is binary and saves the updated `phyloseq` object as an RDS file.
 #'
 #' @inheritParams tax_clean
 #'

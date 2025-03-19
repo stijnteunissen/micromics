@@ -94,7 +94,7 @@ create_folders = function(projects) {
     }
 
     # Check for optional files - only warning if missing
-    optional_files = c("dna-sequences.*\\.csv$", "qPCR.*\\.csv$", "fcm.*\\.csv$", "metadata_extra\\.tsv$", "pantaxa_stats_NCBI.*\\.tsv$", "prediction*\\.RDS$")
+    optional_files = c("qPCR.*\\.csv$", "fcm.*\\.csv$", "metadata_extra\\.tsv$", "pantaxa_stats_NCBI.*\\.tsv$", "prediction*\\.RDS$")
     for (file_pattern in optional_files) {
       if (!any(grepl(file_pattern, files))) {  # Use 'files' instead of 'file'
         warning_message = paste("Warning:", file_pattern, "does not exist in", source_folder, "for project:", project, "\n")

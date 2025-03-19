@@ -5,8 +5,7 @@
 #' data or qPCR data. The funciton accounts for DNA and RNA normalization,
 #' considering extra steps involved in prodessing RNA. Additionally, it
 #' incorporates RasperGade16S correction to adjust ASV counts based on predicted copy
-#' numbers. The normalized data can later be used for relative abundance
-#' calculations.
+#' numbers. The normalized data can later be used for relative abundance calculations.
 #'
 #' @inheritParams remove_mock
 #'
@@ -70,7 +69,8 @@
 #'
 #' @export
 normalise_data = function(physeq = without_mock_physeq,
-                          norm_method = NULL) {
+                          norm_method = NULL,
+                          copy_correction = TRUE) {
 
   psdata = physeq
   project_name = projects
@@ -83,6 +83,10 @@ normalise_data = function(physeq = without_mock_physeq,
   output_asv_rds_files = paste0(output_folder_rds_files_after, "ASV/")
   if(!dir.exists(output_asv_rds_files)){dir.create(output_asv_rds_files)}
 
+  if (copy_correction == FALSE) {
+    psdata = psdata
+  } else if (copy_correction == TRUE) {
+
   # raspergate
   df_psdata = data.frame(otu_table(psdata))
   df_psdata$OTU = rownames(df_psdata)
@@ -94,7 +98,7 @@ normalise_data = function(physeq = without_mock_physeq,
   rasperGade16S_rds = readRDS(rasperGade16S_file)
 
   raspergade_df = rasperGade16S_rds$discrete %>%
-    rename(OTU = label,
+    dplyr::rename(OTU = label,
            copy_number = x,
            probability = probs) %>%
     select(OTU, copy_number, probability) %>%
@@ -302,6 +306,7 @@ normalise_data = function(physeq = without_mock_physeq,
     psdata_qpcr_norm = psdata
     otu_table(psdata_qpcr_norm) = otu_qpcr_norm
   }
+}
 
   # modify tax table
   modify_tax_table = function(psdata) {
@@ -371,7 +376,9 @@ normalise_data = function(physeq = without_mock_physeq,
     stop("Error: Invalid normalization method specified. Use 'fcm' or 'qpcr'.")
   }
 
-  #  # database folder toeveogen
+  if (copy_correction == FALSE) {
+
+  # database folder
   rrndb_database_tsv_file = list.files(destination_folder, pattern = "rrnDB-5.9_pantaxa_stats_NCBI.tsv", full.names = TRUE)
   rrndb_database_tsv = read_tsv(rrndb_database_tsv_file)
   rrndb_database = rrndb_database_tsv %>% filter(rank == "genus") %>% select(Genus = "name", everything())
@@ -409,4 +416,5 @@ normalise_data = function(physeq = without_mock_physeq,
   figure_file_path = paste0(figure_folder, project_name, "_copy_number_comparison.pdf")
   ggsave(filename = figure_file_path, plot = copy_number_comparison, width = 14, height = 7)
   log_message(paste("Copy number comparison saved as .pdf object in", figure_file_path), log_file)
+  }
 }

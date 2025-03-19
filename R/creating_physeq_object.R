@@ -1,8 +1,8 @@
 #' Create a Phyloseq Object
 #'
-#' This function creates a `phyloseq` object using input data files associated with a specified project.
-#' It consolidates feature tables, taxonomic assignments, phylogenetic trees, and unified metadata into a single
-#' `phyloseq` object for downstream analysis.
+#' This function creates a `phyloseq` object using input data files such as
+#' feature tables, taxonomic assignments, phylogenetic tree, and unified
+#' metadata into a single `phyloseq` object for downstream analysis.
 #'
 #' @inheritParams create_folders
 #'

@@ -1,9 +1,9 @@
 #' Remove Mock ASVs from Phyloseq Object
 #'
-#' This function removes mock ASVs (amplicon sequence variants) from a `phyloseq` object.
-#' Mock ASVs are typically used for decontamination purposes and are identified by their genus names.
-#' The function also filters the dataset to retain only samples with `sample_type == "sample`.
-#' The user can choose whether to filter out the mock ASVs from the dataset by setting the `mock` parameter.
+# This function removes mock ASVs (amplicon sequence variants) from a `phyloseq` object.
+# Mock ASVs are typically used for decontamination purposes and are identified by their genus names.
+# The function also filters the dataset to retain only samples with `sample_type == "sample`.
+# The user can choose whether to filter out the mock ASVs from the dataset by setting the `mock` parameter.
 #'
 #' @inheritParams decontam
 #'

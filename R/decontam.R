@@ -1,9 +1,9 @@
 #' Decontaminate a phyloseq object using specified methods
 #'
-#' This function performs contamination removal from a phyloseq object using either
-#' frequency, prevalence, or both methods. It first checks for the presence of blank
-#' samples and processes the contamination based on the specified method. The function
-#' generates and saves plots showing the read counts and prevalence of contaminants.
+# This function removes contamination from a phyloseq object using either
+# frequency, prevalence, or both methods.
+# It first checks for blank samples and processes the contamination based on the specified method.
+# The function also generates and saves plots showing the read counts and prevalence of contaminants.
 #'
 #' @inheritParams resolve_tree
 #' @param decon_method A character string specifying the decontamination method.

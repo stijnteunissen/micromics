@@ -1,11 +1,7 @@
 #' Convert Phyloseq Data to Tibble and Export by Taxonomic Level
 #'
-#' This function converts a phyloseq object into a tibble for each specified taxonomic level by using the \code{psmelt} function. The resulting tibbles are then saved as RDS files in a designated output folder. Depending on the provided normalization method, the function processes:
-#' \itemize{
-#'   \item \code{NULL} (default): Exports only the copy number corrected counts.
-#'   \item \code{"fcm"}: Exports both the copy number corrected counts and flow cytometry-normalized counts.
-#'   \item \code{"qpcr"}: Exports both the copy number corrected counts and qPCR-normalized counts.
-#' }
+#' This function transforms a phyloseq object into a tibble for each specified taxonomic level using the
+#' \code{psmelt} function from the \pkg{phyloseq} package.
 #'
 #' @param physeq A phyloseq object containing genus-level data. The default is \code{rarefied_genus_physeq}.
 #' @param norm_method A character string specifying the normalization method to use. Options include:
@@ -27,6 +23,11 @@
 #' }
 #'
 #' @return A list containing the psmelt tibble data for each taxonomic level. The list names indicate both the processing method and the taxonomic level.
+#' \itemize{
+#'   \item \code{NULL} (default): Exports only the copy number corrected counts.
+#'   \item \code{"fcm"}: Exports both the copy number corrected counts and flow cytometry-normalized counts.
+#'   \item \code{"qpcr"}: Exports both the copy number corrected counts and qPCR-normalized counts.
+#' }
 #'
 #' @examples
 #' \dontrun{

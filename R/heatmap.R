@@ -1,6 +1,11 @@
 #' Generate a Heatmap of Relative Abundance
 #'
-#' This function creates a heatmap of relative abundance data from a phyloseq object (or similar data frame) at the genus level. It calculates the relative abundance of each taxon per sample and groups taxa with low relative abundance (below a defined threshold) into an "Other" category. The heatmap is then facetted based on additional sample metadata if available and saved as a PDF.
+#' This function creates a heatmap of relative abundance data from a phyloseq
+#' object (or similar data frame) at the genus level. It calculates the relative
+#' abundance of each taxon per sample and groups taxa with low relative
+#' abundance (below a defined threshold) into an "Other" category. The heatmap
+#' is then facetted based on additional sample metadata if available and saved
+#' as a PDF.
 #'
 #' @param physeq A phyloseq object containing normalized genus-level data. The default is \code{rarefied_genus_psmelt}.
 #' @param ntaxa An integer specifying the maximum number of taxa to display individually. Taxa below the threshold are grouped into "Other". If \code{NULL}, \code{ntaxa} is set to 23.
@@ -111,11 +116,10 @@ heatmap = function(physeq = rarefied_genus_psmelt,
     )) %>%
     ungroup()
 
-  if ("Sample_Date" %in% present_factors) {
-    genus_abund_rel = genus_abund_rel %>%
-      mutate(Sample_Date = as.Date(Sample_Date, format = "%d/%m/%Y"))
-    genus_abund_rel = genus_abund_rel %>%
-      arrange(Sample_Date)
+  if (!is.null(date_factor) && date_factor %in% present_factors) {
+    genus_abund_rel <- genus_abund_rel %>%
+      mutate(!!sym(date_factor) := as.Date(!!sym(date_factor), format = "%d/%m/%Y")) %>%
+      arrange(!!sym(date_factor))
   }
 
   legend_cutoff_rel =

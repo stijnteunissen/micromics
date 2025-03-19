@@ -83,7 +83,6 @@ beta_diversity <- function(physeq = physeq,
   figure_folder <- paste0(project_folder, "/figures/")
   destination_folder <- paste0(project_folder, "/input_data/")
   output_folder_csv_files <- paste0(project_folder, "/output_data/csv_files/")
-  output_folder_rds_files <- paste0(project_folder, "/output_data/rds_files/")
 
   # Function for creating the base beta-diversity plot
   base_beta_plot <- function(psdata, ordination_method, distance_method, title,
