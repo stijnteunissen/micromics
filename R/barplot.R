@@ -45,7 +45,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
                    taxrank = "Tax_label") {
 
   base_barplot = function(plot_data, x_value, y_value, colorset, x_label = "Sample", y_label = "Cell equivalents (Cells/ml) sample") {
-    ggplot(plot_data, aes(x = !!sym(x_value), y = !!sym(y_value), fill = Tax_label)) +
+    p = ggplot(plot_data, aes(x = !!sym(x_value), y = !!sym(y_value), fill = Tax_label)) +
       geom_bar(stat = "identity") +
       scale_fill_manual(name = "Genus", values = colorset) +
       theme_classic(base_size = 14) +
@@ -60,19 +60,15 @@ barplot = function(physeq = rarefied_genus_psmelt,
             ggh4x.facet.nestline = element_line(colour = "black"))
 
     if (ntaxa > 23) {
-      base_barplot = base_barplot +
-        guides(fill = guide_legend(nrow = 14))
+      p = p + guides(fill = guide_legend(nrow = 14))
     } else {
-      base_barplot = base_barplot +
-        guides(fill = guide_legend(nrow = 8))
+      p = p + guides(fill = guide_legend(nrow = 8))
     }
 
     if (!is.null(present_factors)) {
-      base_barplot = base_barplot +
-        theme(axis.text.x = element_blank())
+      p = p + theme(axis.text.x = element_blank())
     } else {
-      base_barplot = base_barplot +
-        theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0))
+      p = p + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0))
     }
   }
 
