@@ -153,7 +153,7 @@ heatmap = function(physeq = rarefied_genus_psmelt,
     distinct(Sample) %>%
     nrow()
 
-  base_width = 5
+  base_width = 6
   width_increment = 0.5
   plot_width = base_width + (number_samples * width_increment)
 
@@ -210,7 +210,7 @@ heatmap = function(physeq = rarefied_genus_psmelt,
   print(heatmap_relative)
 
   figure_file_path = paste0(heatmap_folder, project_name, "_heatmap_relative.pdf")
-  ggsave(filename = figure_file_path, plot = heatmap_relative, width = plot_width, height = 10, limitsize = FALSE)
+  ggsave(filename = figure_file_path, plot = heatmap_relative, width = plot_width, height = 8, limitsize = FALSE)
   log_message(paste("Relative heatmap saved as .pdf object in", figure_file_path), log_file)
 }
 

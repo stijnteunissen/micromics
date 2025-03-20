@@ -15,7 +15,7 @@ A \code{phyloseq} object with a binary phylogenetic tree.
 }
 \description{
 This function processes a \code{phyloseq} object to resolve multichotomies (non-binary nodes) in the phylogenetic tree
-using the \code{ape} package. It ensures the tree is binary and saves the updated \code{phyloseq} object as an RDS file.
+using the \code{ape} package. This is inmportant for accurate evolutionary analysis. It ensures the tree is binary and saves the updated \code{phyloseq} object as an RDS file.
 }
 \details{
 This function performs the following steps:

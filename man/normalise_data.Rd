@@ -4,7 +4,11 @@
 \alias{normalise_data}
 \title{Normalize Phyloseq Data}
 \usage{
-normalise_data(physeq = without_mock_physeq, norm_method = NULL)
+normalise_data(
+  physeq = without_mock_physeq,
+  norm_method = NULL,
+  copy_correction = TRUE
+)
 }
 \arguments{
 \item{physeq}{A \code{phyloseq} object containing the microbiome data.
@@ -32,8 +36,7 @@ conversion of data to absolute values based on either flow cytometry (FCM)
 data or qPCR data. The funciton accounts for DNA and RNA normalization,
 considering extra steps involved in prodessing RNA. Additionally, it
 incorporates RasperGade16S correction to adjust ASV counts based on predicted copy
-numbers. The normalized data can later be used for relative abundance
-calculations.
+numbers. The normalized data can later be used for relative abundance calculations.
 }
 \details{
 The function performs the following steps based on the chosen normalization method:

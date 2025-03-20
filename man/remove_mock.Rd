@@ -26,10 +26,7 @@ If \code{mock = TRUE}, mock ASVs are removed. If \code{mock = FALSE}, mock ASVs 
 The object is also saved as an RDS file for future use.
 }
 \description{
-This function removes mock ASVs (amplicon sequence variants) from a \code{phyloseq} object.
-Mock ASVs are typically used for decontamination purposes and are identified by their genus names.
-The function also filters the dataset to retain only samples with \verb{sample_type == "sample}.
-The user can choose whether to filter out the mock ASVs from the dataset by setting the \code{mock} parameter.
+Remove Mock ASVs from Phyloseq Object
 }
 \details{
 The function performs the following steps:

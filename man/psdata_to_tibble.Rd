@@ -24,14 +24,15 @@ psdata_to_tibble(
 }
 \value{
 A list containing the psmelt tibble data for each taxonomic level. The list names indicate both the processing method and the taxonomic level.
-}
-\description{
-This function converts a phyloseq object into a tibble for each specified taxonomic level by using the \code{psmelt} function. The resulting tibbles are then saved as RDS files in a designated output folder. Depending on the provided normalization method, the function processes:
 \itemize{
 \item \code{NULL} (default): Exports only the copy number corrected counts.
 \item \code{"fcm"}: Exports both the copy number corrected counts and flow cytometry-normalized counts.
 \item \code{"qpcr"}: Exports both the copy number corrected counts and qPCR-normalized counts.
 }
+}
+\description{
+This function transforms a phyloseq object into a tibble for each specified taxonomic level using the
+\code{psmelt} function from the \pkg{phyloseq} package.
 }
 \details{
 For each taxonomic level specified in \code{taxrank}, the function performs the following steps:

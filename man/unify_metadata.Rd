@@ -21,7 +21,7 @@ A data frame containing the unified metadata, which is also saved as
 }
 \description{
 This function merges and formats metadata from various sources, including
-QIIME metadata, extra sample metadata and qPCR data or FCM data, to create a unified
+QIIME metadata, experimental sample metadata and qPCR data or FCM data, to create a unified
 metadata file for downstream analyses.
 }
 \details{

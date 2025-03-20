@@ -30,9 +30,12 @@ depend on the specified normalization method:
 }
 }
 \description{
-This function performs rarefaction on a normalized \code{phyloseq} object. Rarefaction is applied either based on
-flow cytometry (FCM) data or qPCR data, depending on the specified normalization method. The rarefied data is
-saved as \code{.rds} files for downstream analysis.
+This function performs rarefaction on a normalized \code{phyloseq} object.
+Rarefaction is based on the biomass of each sample to identify the minimum
+sampling depth across the dataset. By rarefying all samples to this sampling
+depth, we ensure that the data are normalized for sequencing effort. This
+step prevents an overestimation of genus abundance in samples with higher
+sequencing depths, allowing for more accurate and comparable results.
 }
 \details{
 \itemize{

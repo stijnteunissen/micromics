@@ -46,10 +46,7 @@ A phyloseq object after decontamination. Contaminant taxa are removed based on
 the chosen decontamination method.
 }
 \description{
-This function performs contamination removal from a phyloseq object using either
-frequency, prevalence, or both methods. It first checks for the presence of blank
-samples and processes the contamination based on the specified method. The function
-generates and saves plots showing the read counts and prevalence of contaminants.
+Decontaminate a phyloseq object using specified methods
 }
 \details{
 The function checks if the "sample_type" column is present in the sample data of the

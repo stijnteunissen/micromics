@@ -24,7 +24,12 @@ heatmap(
 A \code{ggplot} object representing the heatmap of relative abundance.
 }
 \description{
-This function creates a heatmap of relative abundance data from a phyloseq object (or similar data frame) at the genus level. It calculates the relative abundance of each taxon per sample and groups taxa with low relative abundance (below a defined threshold) into an "Other" category. The heatmap is then facetted based on additional sample metadata if available and saved as a PDF.
+This function creates a heatmap of relative abundance data from a phyloseq
+object (or similar data frame) at the genus level. It calculates the relative
+abundance of each taxon per sample and groups taxa with low relative
+abundance (below a defined threshold) into an "Other" category. The heatmap
+is then facetted based on additional sample metadata if available and saved
+as a PDF.
 }
 \details{
 The function performs the following steps:

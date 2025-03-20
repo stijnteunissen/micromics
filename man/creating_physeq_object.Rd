@@ -20,9 +20,9 @@ A \code{phyloseq} object that integrates feature tables, taxonomy, phylogenetic 
 This object is also saved as an RDS file for further usage in downstream analyses.
 }
 \description{
-This function creates a \code{phyloseq} object using input data files associated with a specified project.
-It consolidates feature tables, taxonomic assignments, phylogenetic trees, and unified metadata into a single
-\code{phyloseq} object for downstream analysis.
+This function creates a \code{phyloseq} object using input data files such as
+feature tables, taxonomic assignments, phylogenetic tree, and unified
+metadata into a single \code{phyloseq} object for downstream analysis.
 }
 \details{
 This function performs the following steps:
