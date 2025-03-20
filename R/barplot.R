@@ -52,7 +52,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
       labs(x = x_label, y = y_label, fill = "Genus") +
       theme(axis.ticks.x = element_blank(),
             legend.text = element_markdown(),
-            legend.key.size = unit(7, "pt"),
+            legend.key.size = unit(5, "pt"),
             legend.position = "bottom",
             strip.background = element_rect(colour = "white"),
             strip.text = element_text(face = "bold"),
@@ -223,7 +223,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
     print(barplot_relative)
 
     figure_file_path = paste0(barplot_folder, project_name, "_barplot_relative.pdf")
-    ggsave(filename = figure_file_path, plot = barplot_relative, width = 10, height = 8)
+    ggsave(filename = figure_file_path, plot = barplot_relative, width = 12, height = 8)
     log_message(paste("Relative barplot saved as .pdf object in", figure_file_path), log_file)
 
   } else if (length(na_types) == 2) {
@@ -250,13 +250,13 @@ barplot = function(physeq = rarefied_genus_psmelt,
     print(barplot_relative_dna)
 
     figure_file_path = paste0(barplot_folder, project_name, "_barplot_relative_dna_level.pdf")
-    ggsave(filename = figure_file_path, plot = barplot_relative_dna, width = 10, height = 8)
+    ggsave(filename = figure_file_path, plot = barplot_relative_dna, width = 12, height = 8)
     log_message(paste("Relative barplot saved as .pdf object in", figure_file_path), log_file)
 
     print(barplot_relative_rna)
 
     figure_file_path = paste0(barplot_folder, project_name, "_barplot_relative_rna_level.pdf")
-    ggsave(filename = figure_file_path, plot = barplot_relative_rna, width = 10, height = 8)
+    ggsave(filename = figure_file_path, plot = barplot_relative_rna, width = 12, height = 8)
     log_message(paste("Relative barplot saved as .pdf object in", figure_file_path), log_file)
 
   }
@@ -412,7 +412,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
       print(barplot_absolute)
 
       figure_file_path = paste0(barplot_folder, project_name, "_barplot_absolute.pdf")
-      ggsave(filename = figure_file_path, plot = barplot_absolute, width = 10, height = 8)
+      ggsave(filename = figure_file_path, plot = barplot_absolute, width = 12, height = 8)
       log_message(paste("Absolute barplot saved as .pdf object in", figure_file_path), log_file)
 
     } else if (length(na_types) == 2) {
@@ -526,13 +526,13 @@ barplot = function(physeq = rarefied_genus_psmelt,
       print(barplot_absolute_dna)
 
       figure_file_path = paste0(barplot_folder, project_name, "_barplot_absolute_dna_level.pdf")
-      ggsave(filename = figure_file_path, plot = barplot_absolute_dna, width = 10, height = 8)
+      ggsave(filename = figure_file_path, plot = barplot_absolute_dna, width = 12, height = 8)
       log_message(paste("Absolute barplot saved as .pdf object in", figure_file_path), log_file)
 
       print(barplot_absolute_rna)
 
       figure_file_path = paste0(barplot_folder, project_name, "_barplot_absolute_rna_level.pdf")
-      ggsave(filename = figure_file_path, plot = barplot_absolute_rna, width = 10, height = 8)
+      ggsave(filename = figure_file_path, plot = barplot_absolute_rna, width = 12, height = 8)
       log_message(paste("Absolute barplot saved as .pdf object in", figure_file_path), log_file)
 
     }

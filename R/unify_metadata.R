@@ -1,53 +1,41 @@
 #' Unify and Format Metadata
 #'
 #' This function merges and formats metadata from various sources, including
-#' QIIME metadata, experimental sample metadata and qPCR data or FCM data, to create a unified
+#' QIIME metadata, experimental sample metadata, and qPCR or FCM data, to create a unified
 #' metadata file for downstream analyses.
 #'
 #' @inheritParams create_folders
 #'
 #' @details
-#' This function ensures that the metadata is unified and formatted correctly
-#' for further analysis by performing the following steps:
+#' The function ensures that the metadata is unified and correctly formatted for further analysis by:
 #' \itemize{
-#' \item Reads and processes the `metadata_extra.tsv` file, which must contain
-#'       at least the following columns:
-#'       \itemize{
+#'   \item Reading and processing the `metadata_extra.tsv` file, which must contain at least:
+#'     \itemize{
 #'       \item `SampleID`: A unique identifier for each sample.
 #'       \item `sample_type`: Indicates whether the sample is a `sample`, `mock`, or `blank`.
 #'       \item `DNA_Concentration`: The DNA concentration (in ng/µl).
-#'       }
-#' \item Optionally processes and integrates qPCR or FCM data:
-#'       \itemize{
-#'       \item If qPCR data is available, it calculates the mean for duplicates and merges it with the `metadata_extra`.
-#'       \item If FCM data is available, it calculates the mean for duplicates and merges it with the `metadata_extra`.
-#'       }
-#' \item Reads the `metadata.tsv` file (QIIME metadata), ensures it includes the
-#'       `SampleID` column, and combines it with the processed `metadata_extra`.
-#' \item Writes the final combined metadata to a new file named
-#'       `metadata_formatted.tsv`.
+#'     }
+#'   \item Optionally processing and integrating qPCR or FCM data:
+#'     \itemize{
+#'       \item If qPCR data is available, calculating the mean for duplicates and merging it with `metadata_extra`.
+#'       \item If FCM data is available, calculating the mean for duplicates and merging it with `metadata_extra`.
+#'     }
+#'   \item Reading the `metadata.tsv` file (QIIME metadata), ensuring it contains the `SampleID` column, and combining it with the processed `metadata_extra`.
+#'   \item Writing the final combined metadata to a file. Note that the output file is named by concatenating the project name with `_metadata_formatted.tsv` and is saved in the project's `input_data` folder.
 #' }
 #'
-#' All metadata files (QIIME metadata, extra sample metadata and qPCR or FCM) must include
-#' the `SampleID` column to allow merging. The `SampleID` column acts as the key
-#' to align data across multiple sources.
+#' All metadata files (QIIME metadata, experimental sample metadata, and qPCR/FCM data) must include
+#' the `SampleID` column for proper merging. This column serves as the key to align data from multiple sources.
 #'
 #' @note
-#' This function requires that the `metadata_extra.tsv` file is located in the
-#' `input_data` folder of the project directory. If optional qPCR or FCM data
-#' is included, these files should also be placed in the `input_data` folder.
+#' This function requires that the folder structure has been set up (using the `create_folders` function) before running.
 #'
-#' @return A data frame containing the unified metadata, which is also saved as
-#'         `metadata_formatted.tsv` in the projects `input_data` folder.
+#' @return A data frame containing the unified metadata. The data frame is also saved as a file in the project's `input_data` folder.
 #'
 #' @examples
 #' \dontrun{
-#' # Define the base path and process metadata for a project
-#' base_path <- "path/to/projects"
-#' log_file <- "path/to/logfile.txt"
-#'
 #' # Process and unify metadata for a project
-#' unified_metadata <- unify_metadata("Project1")
+#' unified_metadata <- unify_metadata(projects)
 #' }
 #'
 #' @export

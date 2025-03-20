@@ -2,8 +2,8 @@
 #'
 #' This function cleans and filters the taxonomy table within a `phyloseq` object.
 #' It removes unclassified or ambiguous names, and replaces these and missing taxon names at genus level with placeholders derived from higher
-#' taxonomic ranks. Optionally  this function filters specific taxa (e.g., chloroplasts, mitochondria, and ASVs unclassified at Kingdom and Phylum levels).
-#' The cleaned taxonomy enables taxonomic agglomeration (`tax_glom`) to genus level without merging unclassified taxa from diverse ancestry.
+#' taxonomic ranks. Optionally  this function filters specific taxa (e.g., Eukaryota, chloroplasts, mitochondria, and ASVs unclassified at Kingdom and Phylum levels).
+#' The cleaned taxonomy enables taxonomic agglomeration (`tax_glom` form the package `phyloseq`) to genus level without merging unclassified taxa from diverse ancestry.
 #'
 #' @param physeq A `phyloseq` object containing the microbiome data.
 #'               This is the input object that the function processes.
@@ -58,12 +58,6 @@ tax_clean = function(physeq = physeq,
   project_folder = paste0(base_path, projects)
   output_folder_csv_files = paste0(project_folder, "/output_data/csv_files/")
   output_folder_rds_files = paste0(project_folder, "/output_data/rds_files/Before_cleaning_rds_files/")
-
-
-  # save uncleaned psdata
-  output_file_path = paste0(output_folder_rds_files, project_name, "_phyloseq_uncleaned.rds")
-  saveRDS(psdata, file = output_file_path)
-  log_message(paste("Uncleaned phyloseq object saved as .rds object in", output_file_path), log_file)
 
   # ASV count start
   psdata_in = psdata

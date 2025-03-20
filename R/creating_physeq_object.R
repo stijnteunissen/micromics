@@ -11,7 +11,7 @@
 #' \itemize{
 #'   \item Defines the paths to the required input files (feature table, rooted tree, taxonomy, and metadata).
 #'   \item Searches for and retrieves these files from the `input_data` directory.
-#'   \item Calls the `qza_to_phyloseq()` function to create a `phyloseq` object using the input files.
+#'   \item Calls the `qza_to_phyloseq()` function from the `qiime2R` package to generate a `phyloseq` object based on the provided input files.
 #'   \item Adds read count information to the sample metadata within the `phyloseq` object.
 #' }
 #'
@@ -24,7 +24,7 @@
 #' }
 #'
 #' The resulting `phyloseq` object is essential for downstream analyses and integrates all input files into a single, structured object.
-#' The created `phyloseq` object is saved as an RDS file named `<project_name>_uncleaned_phyloseq.rds` in the `output_data/rds_files` directory.
+#' The created `phyloseq` object is saved as an RDS file named `<project_name>_uncleaned_phyloseq.rds` in the `output_data/rds_files/Before_cleaning_rds_files` directory.
 #'
 #' @return
 #' A `phyloseq` object that integrates feature tables, taxonomy, phylogenetic trees, and metadata.
@@ -60,6 +60,11 @@ creating_physeq_object = function(projects) {
 
   # Add read counts to metadata
   phyloseq::sample_data(physeq)$read_count = phyloseq::sample_sums(physeq)
+
+  # save uncleaned psdata
+  output_file_path = paste0(output_folder_rds_files, project_name, "_phyloseq_uncleaned.rds")
+  saveRDS(physeq, file = output_file_path)
+  log_message(paste("Uncleaned phyloseq object saved as .rds object in", output_file_path), log_file)
 
   return(physeq)
 

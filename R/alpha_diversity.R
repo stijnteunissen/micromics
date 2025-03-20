@@ -379,7 +379,7 @@ alpha_diversity = function(physeq = physeq,
       print(combined_plot)
 
       if (!is.null(present_factors)) {
-        plot_width <- dynamic_plot_width(alpha_data_full, present_factors)
+        plot_width <- dynamic_plot_width(alpha_data_full, present_factors) + 10
       } else {
         plot_width <- 8
       }

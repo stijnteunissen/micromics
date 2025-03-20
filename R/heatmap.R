@@ -51,7 +51,7 @@ heatmap = function(physeq = rarefied_genus_psmelt,
       labs(x = x_label, y = NULL) +
       theme_classic() +
       theme(axis.text.x = element_blank(),
-            axis.text.y = element_markdown(size = 8),
+            axis.text.y = element_markdown(size = 10),
             axis.ticks.x = element_blank(),
             strip.placement = "outside",
             strip.background = element_blank(),

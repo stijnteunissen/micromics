@@ -1,63 +1,58 @@
 #' Create Project Folder Structure
 #'
-#' This function creates a folder structure for projects, ensuring that
-#' all necessary directories exist and that specific files required for downstream
-#' analysis are copied from the `qiime2_output` folder into the `input_data` folder.
+#' This function creates a folder structure for projects, ensuring that all
+#' necessary directories exist and that specific files required for downstream
+#' analyses are present.
 #'
-#' @param projects A character vector containing the name of the project folders.
-#'                 Each project folder must already exist within the specified
-#'                 base path. The `projects` argument represents the name of the
-#'                 project folder, which must contain a subfolder named `qiime2_output`
-#'                 with the output files generated from QIIME2. This folder structure
-#'                 is necessary for setting up downstream analysis.
-#'                 `projects` is typically reference in a configuration file.
-#' @param base_path A character string indicating the base directory where
-#'                  project folder is located. This path is used to locate
-#'                  the project folder and create the required subfolders.
-#'                  `base_path` is typically referenced in a configuration file.
+#' @param projects A character vector containing the names of the project (folders).
+#' @param base_path A character string indicating the base directory where the project folders are located. This path is used to locate the project folder and create the required subfolders.
+#' @param log_file A character string specifying the path to the log file where warnings and errors will be recorded.
 #'
 #' @details
-#' This function is designed to facilitate the setup of downstream analyses by:
+#' This function facilitates the setup of downstream analyses by:
 #' \itemize{
-#' \item Creating a consistent directory structure for each project, including
-#'       subfolders like `input_data`, `output_data`, `figures`, and `messages`.
-#' \item Copying essential files from the `qiime2_output` folder into the `input_data` folder.
-#'       These essential files include:
-#'       \itemize{
+#'   \item Creating a consistent directory structure for each project, including subfolders such as `input_data`, `output_data`, `figures`, and `messages`.
+#'   \item Copying essential files from the `qiime2_output` folder into the `input_data` folder. These essential files include:
+#'     \itemize{
 #'       \item `table.qza`: The feature table from QIIME2.
 #'       \item `rooted-tree.qza`: The phylogenetic tree used for diversity analysis.
 #'       \item `classifier.qza`: The classifier used for taxonomy assignment.
 #'       \item `metadata.tsv`: The QIIME2 sample metadata file required for analyses.
-#'       \item `dna-sequences.csv`: Contains 16S rRNA gene copy number predictions.
 #'       \item `metadata_extra.tsv`: Any additional metadata provided for the samples.
-#'       }
-#' \item Checking for optional files that enhance analyses, such as:
-#'       \itemize{
+#'       \item `pantaxa_stats_NCBI.tsv`: The reference database for copy number correction from [rrndb](https://rrndb.umms.med.umich.edu/downloads/).
+#'       \item `prediction.RDS`: The predicted 16S copy numbers for each feature.
+#'     }
+#'   \item Checking for optional files that enhance analyses, such as:
+#'     \itemize{
 #'       \item `qPCR.csv`: Contains quantitative PCR data.
 #'       \item `fcm.csv`: Contains flow cytometry data.
-#'       }
-#' \item Logging warnings for missing optional files and errors for missing required files.
+#'     }
+#'   \item Logging warnings for missing optional files and errors for missing required files.
 #' }
 #'
-#' The function ensures that downstream analyses, which rely on specific input files
-#' (e.g., the `table.qza`, `rooted-tree.qza`, etc.), have access to these files in the
-#' correct directory structure. If any required files are missing from the
-#' `qiime2_output` folder, the function stops execution and logs an error message.
+#' The function ensures that downstream analyses—which rely on specific input
+#' files (e.g., `table.qza`, `rooted-tree.qza`, etc.) have access to these files
+#' in the correct directory structure. If any required files are missing from
+#' the `qiime2_output` folder, the function stops execution and logs an error
+#' message.
 #'
 #' @note
-#' Each project folder must already exist within the `base_path` directory and must
-#' contain a subfolder named `qiime2_output`, which holds the outputs of QIIME2 analysis.
-#' The function sets up the folder structure for downstream analysis within this project folder.
+#' Each project folder must already exist within the `base_path` directory and
+#' must contain a subfolder named `qiime2_output`, which holds the outputs of
+#' QIIME2 analysis and other necessary files. The function sets up the folder
+#' structure for downstream analysis within this project folder.
 #'
-#' @return None. This function is called for its side effects.
+#' @return
+#' None. This function is called for its side effects.
 #'
 #' @examples
 #' \dontrun{
 #' # Define the base path and log file location
+#' projects <- "project_name"
 #' base_path <- "path/to/projects"
-#' log_file <- "path/to/logfile.txt"
+#' log_file <- "path/to/log_file.log"
 #'
-#' # Create folder structures for two projects
+#' # Create folder structures for projects
 #' create_folders(projects)
 #' }
 #'
