@@ -153,8 +153,8 @@ heatmap = function(physeq = rarefied_genus_psmelt,
     distinct(Sample) %>%
     nrow()
 
-  base_width = 6
-  width_increment = 0.5
+  base_width = 8
+  width_increment = 0.3
   plot_width = base_width + (number_samples * width_increment)
 
   heatmap_folder = paste0(figure_folder, "Heatmap/")
