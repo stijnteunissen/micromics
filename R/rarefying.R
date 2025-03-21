@@ -178,8 +178,10 @@ rarefying = function(physeq = physeq,
     ps_matrix = as(t(otu_table(psdata_qpcr)), "matrix")
 
     # Determine the scaling factor based on the maxium value in the otu matrix
-    max_sample_sum = max(sample_sums(psdata_qpcr))
+    #max_sample_sum = max(sample_sums(psdata_qpcr))
     limit = 1e7
+    #scaling_factor = 10 ^ ceiling(log10(max_sample_sum / limit))
+    max_sample_sum = max(sample_data$sq_calc_mean)
     scaling_factor = 10 ^ ceiling(log10(max_sample_sum / limit))
 
     # scale down to OTU matrix and cells per ml
@@ -187,7 +189,7 @@ rarefying = function(physeq = physeq,
     sample_data$sq_calc_mean = sample_data$sq_calc_mean / scaling_factor
 
     sample_size = rowSums(scaled_ps_matrix) # total reads per sample
-    copy_count_table = sample_data$sq_calc_mean # extract copy counts???
+    copy_count_table = round(sample_data$sq_calc_mean, digits = 0) # extract copy counts???
     sampling_dephts = sample_size / copy_count_table # sampling dephts (total reads divided by copy counts??)
     minimum_sampling_depth = min(sampling_dephts) # minimum sampling depht across all samples
     rarefy_to = round(copy_count_table * minimum_sampling_depth, digits = 0) # number of read tot rarefy for each sample
