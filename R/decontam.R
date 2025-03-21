@@ -1,13 +1,10 @@
 #' Decontaminate a phyloseq object using specified methods
 #'
-# This function removes contamination from a phyloseq object using either
-# frequency, prevalence, or both methods.
-# It first checks for blank samples and processes the contamination based on the specified method.
-# The function also generates and saves plots showing the read counts and prevalence of contaminants.
+# This function removes contamination from a phyloseq object using (`decontam`)[https://benjjneb.github.io/decontam/vignettes/decontam_intro.html] package
+#' with either frequency, prevalence, or both methods. the prevalence method make use of the blank sample if this sample is not availble only frequency can be preformd.
 #'
 #' @inheritParams resolve_tree
-#' @param decon_method A character string specifying the decontamination method.
-#'                     this argument determines how the contamination removla will be applied.
+#' @param decon_method A character string specifying the contamination remval method from `decotam.`
 #'                     The possible values are:
 #'                     \itemize{
 #'                     \item `frequency`: This method identifies contaminants based on their frequency of occurrece across samples.
@@ -16,12 +13,10 @@
 #'                     Taxa that are present in both negative control and true samples are flagged as contaminants.
 #'                     \item `both`: This method combines both frequency and prevalence methods. It first applies the frequency
 #'                     method, and then applies the prevalence method to identify additional contaminants. Taxa flagged by either
-#'                     method are considered contaminants.
+#'                     method are considered contaminants. this can only been preformd if there is a blank sample avialbel.
 #'                     }
-#'                     The default is `"both"`. However, if the `blank` parameter is set to `FALSE`, the method
-#'                     is automatically changed to `"frequency"` for decontamination.
 #'
-#' @param blank A logical value indicating whether blank samples were included in the dataset. Default is `TRUE`.
+#' @param blank A logical value indicating whether blank samples were included in the dataset.
 #'              \itemize{
 #'              \item `TRUE`: Blank samples were included in the dataset. This allows the method `both` (frequency + prevalence)
 #'                            to be used for decontamination by default, as blank samples are available for the prevalence based analysis.
@@ -29,11 +24,8 @@
 #'                             for decontamination, as no blank samples are available for the prevalence method.
 #'              }
 #'
-#' @param color_p1 A string specifying the variable to use for coloring the read count plot.
-#'                 Default is NULL, which uses "sample_type".
-#'
-#' @return A phyloseq object after decontamination. Contaminant taxa are removed based on
-#'         the chosen decontamination method.
+#' @return A phyloseq object after contamiantion removal.
+#' The `phyloseq` after contamination removal is saved as an RDS file named `<project_name>_phyloseq_asv_level_decontam.rds` in the `output_data/rds_files/Before_cleaning_rds_files` directory.
 #'
 #' @details
 #' The function checks if the "sample_type" column is present in the sample data of the
@@ -52,8 +44,7 @@
 #' @export
 decontam =  function(physeq = resolved_tree_physeq,
                      decon_method = c("frequency", "prevalence", "both"),
-                     blank = TRUE,
-                     color_p1 = NULL) {
+                     blank = TRUE) {
 
   psdata = physeq
   project_name = projects
@@ -70,12 +61,6 @@ decontam =  function(physeq = resolved_tree_physeq,
     error_message = paste0("error: 'sample_or_control' column is missing from the sample data.")
     log_message(error_message, log_file)
     stop(error_message)
-  }
-
-  if (is.null(color_p1)) {
-    color_p1 = "sample_or_control"
-  } else {
-    message(paste("message: using", color_p1, "for color in the read count plot."))
   }
 
   # error if decon_method is "both" but blank is FALSE or missing

@@ -168,6 +168,8 @@ rarefying = function(physeq = physeq,
     psdata_ccn = physeq[["psdata_asv_copy_number_corrected"]]
     psdata_qpcr = physeq[["psdata_asv_qpcr_norm"]]
 
+    #psdata_qpcr = readRDS("/Users/stijnteunissen/Documents/Wetsus/Data_analysis/Projects/MGAD/MGAD_proj1_Q18279/output_data/rds_files/Before_cleaning_rds_files/MGAD_proj1_Q18279_phyloseq_asv_level_qpcr_normalised_celL_concentration.rds")
+
     psdata_qpcr <- prune_samples(sample_sums(psdata_qpcr) > 0, psdata_qpcr)        # Remove samples with zero counts
     psdata_qpcr <- prune_taxa(rowSums(otu_table(psdata_qpcr)) > 0, psdata_qpcr)
 
@@ -179,11 +181,12 @@ rarefying = function(physeq = physeq,
 
     # Determine the scaling factor based on the maxium value in the otu matrix
     max_sample_sum = max(sample_sums(psdata_qpcr))
+    max_sample_sum = max(taxa_sums(psdata_qpcr))
     limit = 1e7
     scaling_factor = 10 ^ ceiling(log10(max_sample_sum / limit))
 
     # scale down to OTU matrix and cells per ml
-    scaled_ps_matrix = ceiling(ps_matrix / scaling_factor)
+    scaled_ps_matrix = ceiling(ps_matrix / scaling_factor) + 1
     sample_data$sq_calc_mean = sample_data$sq_calc_mean / scaling_factor
 
     sample_size = rowSums(scaled_ps_matrix) # total reads per sample

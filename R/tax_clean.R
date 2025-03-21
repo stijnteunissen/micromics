@@ -8,10 +8,10 @@
 #' @param physeq A `phyloseq` object containing the microbiome data.
 #'               This is the input object that the function processes.
 #'
-#' @param tax_filter A logical value (default `TRUE`) indicating whether to apply additional
+#' @param tax_filter Iindicating whether to apply additional
 #'                   filtering to remove unwanted taxa (e.g., chloroplasts, mitochondria).
 #'                   \itemize{
-#'                   \item `TRUE`: Apply filtering to remove taxa such as chloroplasts, mitochondria, and unclassified taxa.
+#'                   \item `TRUE`: Apply filtering to remove taxa such as Eukaryota, chloroplasts, mitochondria, and unclassified taxa.
 #'                   \item `FALSE`: Skip filtering; the taxonomy table will only be cleaned but no taxa will be removed.
 #'                   }
 #'
@@ -38,6 +38,7 @@
 #' The cleaned `phyloseq` object is returned for further analysis.
 #'
 #' @return A cleaned `phyloseq` object with ambiguous and unwanted taxa removed or replaced.
+#' The cleaned `phyloseq` object is saved as an RDS file named `<project_name>_phyloseq_cleaned.rds` in the `output_data/rds_files/Before_cleaning_rds_files` directory.
 #'
 #' @examples
 #' \dontrun{

@@ -24,7 +24,7 @@
 #' }
 #'
 #' The resulting `phyloseq` object is essential for downstream analyses and integrates all input files into a single, structured object.
-#' The created `phyloseq` object is saved as an RDS file named `<project_name>_uncleaned_phyloseq.rds` in the `output_data/rds_files/Before_cleaning_rds_files` directory.
+#' The created `phyloseq` object is saved as an RDS file named `<project_name>_phyloseq_uncleaned.rds` in the `output_data/rds_files/Before_cleaning_rds_files` directory.
 #'
 #' @return
 #' A `phyloseq` object that integrates feature tables, taxonomy, phylogenetic trees, and metadata.

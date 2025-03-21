@@ -1,7 +1,10 @@
 #' Resolve Multichotomies in Phyloseq Object's Tree
 #'
-#' This function processes a `phyloseq` object to resolve multichotomies (non-binary nodes) in the phylogenetic tree
-#' using the `ape` package. This is inmportant for accurate evolutionary analysis. It ensures the tree is binary and saves the updated `phyloseq` object as an RDS file.
+#' This function processes the phylogenetic tree within a `phyloseq` object by
+#' resolving polytomous branching in the QIIME2 FastTree2 phylogeny, converting
+#' it into a fully bifurcated (binary) tree using the `ape` package for
+#' phylogenetic analysis. This step is essential for accurate evolutionary
+#' analysis, and the updated `phyloseq` object is saved as an RDS file.
 #'
 #' @inheritParams tax_clean
 #'
@@ -16,6 +19,7 @@
 #' }
 #'
 #' @return A `phyloseq` object with a binary phylogenetic tree.
+#' The `phyloseq` with a binary phylogenetic tree is saved as an RDS file named `<project_name>_phyloseq_resolved_tree.rds` in the `output_data/rds_files/Before_cleaning_rds_files` directory.
 #'
 #' @examples
 #' \dontrun{
@@ -24,8 +28,6 @@
 #' }
 #'
 #' @export
-# Define function to process physeq objects for resolving multichotomies using Ape
-# Define function to process physeq objects for resolving multichotomies using Ape
 resolve_tree = function(physeq = cleaned_physeq) {
 
   psdata = physeq
