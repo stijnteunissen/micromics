@@ -444,7 +444,6 @@ beta_diversity <- function(physeq = physeq,
                                          color_factor, shape_factor, size_factor, alpha_factor) +
             theme(legend.position = "right")
           print(plot_man_dna)
-          plots_out[[tax]] <- plot_man_dna
           figure_file_path <- paste0(tax_folder, project_name, "_beta_diversity_absolute_", ordination_method, "_", tax, "_level_dna.pdf")
           ggsave(filename = figure_file_path, plot = plot_man_dna, width = 10, height = 5)
           log_message(paste("Absolute beta diversity DNA plot saved:", figure_file_path), log_file)
