@@ -7,41 +7,33 @@
 create_folders(projects)
 }
 \arguments{
-\item{projects}{A character vector containing the name of the project folders.
-Each project folder must already exist within the specified
-base path. The \code{projects} argument represents the name of the
-project folder, which must contain a subfolder named \code{qiime2_output}
-with the output files generated from QIIME2. This folder structure
-is necessary for setting up downstream analysis.
-\code{projects} is typically reference in a configuration file.}
+\item{projects}{A character vector containing the names of the project (folders).}
 
-\item{base_path}{A character string indicating the base directory where
-project folder is located. This path is used to locate
-the project folder and create the required subfolders.
-\code{base_path} is typically referenced in a configuration file.}
+\item{base_path}{A character string indicating the base directory where the project folders are located. This path is used to locate the project folder and create the required subfolders.}
+
+\item{log_file}{A character string specifying the path to the log file where warnings and errors will be recorded.}
 }
 \value{
 None. This function is called for its side effects.
 }
 \description{
-This function creates a folder structure for projects, ensuring that
-all necessary directories exist and that specific files required for downstream
-analysis are copied from the \code{qiime2_output} folder into the \code{input_data} folder.
+This function creates a folder structure for projects, ensuring that all
+necessary directories exist and that specific files required for downstream
+analyses are present.
 }
 \details{
-This function is designed to facilitate the setup of downstream analyses by:
+This function facilitates the setup of downstream analyses by:
 \itemize{
-\item Creating a consistent directory structure for each project, including
-subfolders like \code{input_data}, \code{output_data}, \code{figures}, and \code{messages}.
-\item Copying essential files from the \code{qiime2_output} folder into the \code{input_data} folder.
-These essential files include:
+\item Creating a consistent directory structure for each project, including subfolders such as \code{input_data}, \code{output_data}, \code{figures}, and \code{messages}.
+\item Copying essential files from the \code{qiime2_output} folder into the \code{input_data} folder. These essential files include:
 \itemize{
 \item \code{table.qza}: The feature table from QIIME2.
 \item \code{rooted-tree.qza}: The phylogenetic tree used for diversity analysis.
 \item \code{classifier.qza}: The classifier used for taxonomy assignment.
 \item \code{metadata.tsv}: The QIIME2 sample metadata file required for analyses.
-\item \code{dna-sequences.csv}: Contains 16S rRNA gene copy number predictions.
 \item \code{metadata_extra.tsv}: Any additional metadata provided for the samples.
+\item \code{pantaxa_stats_NCBI.tsv}: The reference database for copy number correction from \href{https://rrndb.umms.med.umich.edu/downloads/}{rrndb}.
+\item \code{prediction.RDS}: The predicted 16S copy numbers for each feature.
 }
 \item Checking for optional files that enhance analyses, such as:
 \itemize{
@@ -51,23 +43,26 @@ These essential files include:
 \item Logging warnings for missing optional files and errors for missing required files.
 }
 
-The function ensures that downstream analyses, which rely on specific input files
-(e.g., the \code{table.qza}, \code{rooted-tree.qza}, etc.), have access to these files in the
-correct directory structure. If any required files are missing from the
-\code{qiime2_output} folder, the function stops execution and logs an error message.
+The function ensures that downstream analyses—which rely on specific input
+files (e.g., \code{table.qza}, \code{rooted-tree.qza}, etc.) have access to these files
+in the correct directory structure. If any required files are missing from
+the \code{qiime2_output} folder, the function stops execution and logs an error
+message.
 }
 \note{
-Each project folder must already exist within the \code{base_path} directory and must
-contain a subfolder named \code{qiime2_output}, which holds the outputs of QIIME2 analysis.
-The function sets up the folder structure for downstream analysis within this project folder.
+Each project folder must already exist within the \code{base_path} directory and
+must contain a subfolder named \code{qiime2_output}, which holds the outputs of
+QIIME2 analysis and other necessary files. The function sets up the folder
+structure for downstream analysis within this project folder.
 }
 \examples{
 \dontrun{
 # Define the base path and log file location
+projects <- "project_name"
 base_path <- "path/to/projects"
-log_file <- "path/to/logfile.txt"
+log_file <- "path/to/log_file.log"
 
-# Create folder structures for two projects
+# Create folder structures for projects
 create_folders(projects)
 }
 

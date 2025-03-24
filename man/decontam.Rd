@@ -7,16 +7,14 @@
 decontam(
   physeq = resolved_tree_physeq,
   decon_method = c("frequency", "prevalence", "both"),
-  blank = TRUE,
-  color_p1 = NULL
+  blank = TRUE
 )
 }
 \arguments{
 \item{physeq}{A \code{phyloseq} object containing the microbiome data.
 This is the input object that the function processes.}
 
-\item{decon_method}{A character string specifying the decontamination method.
-this argument determines how the contamination removla will be applied.
+\item{decon_method}{A character string specifying the contamination remval method from \code{decotam.}
 The possible values are:
 \itemize{
 \item \code{frequency}: This method identifies contaminants based on their frequency of occurrece across samples.
@@ -25,28 +23,23 @@ Taxa that appear in very few samples (but with high abundace) are flagged as con
 Taxa that are present in both negative control and true samples are flagged as contaminants.
 \item \code{both}: This method combines both frequency and prevalence methods. It first applies the frequency
 method, and then applies the prevalence method to identify additional contaminants. Taxa flagged by either
-method are considered contaminants.
-}
-The default is \code{"both"}. However, if the \code{blank} parameter is set to \code{FALSE}, the method
-is automatically changed to \code{"frequency"} for decontamination.}
+method are considered contaminants. this can only been preformd if there is a blank sample avialbel.
+}}
 
-\item{blank}{A logical value indicating whether blank samples were included in the dataset. Default is \code{TRUE}.
+\item{blank}{A logical value indicating whether blank samples were included in the dataset.
 \itemize{
 \item \code{TRUE}: Blank samples were included in the dataset. This allows the method \code{both} (frequency + prevalence)
 to be used for decontamination by default, as blank samples are available for the prevalence based analysis.
 \item \code{FALSE}: Blank sample were not included in the dataset. In this case, only the \code{frequency} method can be applied
 for decontamination, as no blank samples are available for the prevalence method.
 }}
-
-\item{color_p1}{A string specifying the variable to use for coloring the read count plot.
-Default is NULL, which uses "sample_type".}
 }
 \value{
-A phyloseq object after decontamination. Contaminant taxa are removed based on
-the chosen decontamination method.
+A phyloseq object after contamiantion removal.
+The \code{phyloseq} after contamination removal is saved as an RDS file named \verb{<project_name>_phyloseq_asv_level_decontam.rds} in the \code{output_data/rds_files/Before_cleaning_rds_files} directory.
 }
 \description{
-Decontaminate a phyloseq object using specified methods
+with either frequency, prevalence, or both methods. the prevalence method make use of the blank sample if this sample is not availble only frequency can be preformd.
 }
 \details{
 The function checks if the "sample_type" column is present in the sample data of the

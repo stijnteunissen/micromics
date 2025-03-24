@@ -10,21 +10,22 @@ tax_clean(physeq = physeq, tax_filter = TRUE)
 \item{physeq}{A \code{phyloseq} object containing the microbiome data.
 This is the input object that the function processes.}
 
-\item{tax_filter}{A logical value (default \code{TRUE}) indicating whether to apply additional
+\item{tax_filter}{Iindicating whether to apply additional
 filtering to remove unwanted taxa (e.g., chloroplasts, mitochondria).
 \itemize{
-\item \code{TRUE}: Apply filtering to remove taxa such as chloroplasts, mitochondria, and unclassified taxa.
+\item \code{TRUE}: Apply filtering to remove taxa such as Eukaryota, chloroplasts, mitochondria, and unclassified taxa.
 \item \code{FALSE}: Skip filtering; the taxonomy table will only be cleaned but no taxa will be removed.
 }}
 }
 \value{
 A cleaned \code{phyloseq} object with ambiguous and unwanted taxa removed or replaced.
+The cleaned \code{phyloseq} object is saved as an RDS file named \verb{<project_name>_phyloseq_cleaned.rds} in the \code{output_data/rds_files/Before_cleaning_rds_files} directory.
 }
 \description{
 This function cleans and filters the taxonomy table within a \code{phyloseq} object.
 It removes unclassified or ambiguous names, and replaces these and missing taxon names at genus level with placeholders derived from higher
-taxonomic ranks. Optionally  this function filters specific taxa (e.g., chloroplasts, mitochondria, and ASVs unclassified at Kingdom and Phylum levels).
-The cleaned taxonomy enables taxonomic agglomeration (\code{tax_glom}) to genus level without merging unclassified taxa from diverse ancestry.
+taxonomic ranks. Optionally  this function filters specific taxa (e.g., Eukaryota, chloroplasts, mitochondria, and ASVs unclassified at Kingdom and Phylum levels).
+The cleaned taxonomy enables taxonomic agglomeration (\code{tax_glom} form the package \code{phyloseq}) to genus level without merging unclassified taxa from diverse ancestry.
 }
 \details{
 The function performs the following steps:

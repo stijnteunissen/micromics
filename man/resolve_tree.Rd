@@ -12,10 +12,14 @@ This is the input object that the function processes.}
 }
 \value{
 A \code{phyloseq} object with a binary phylogenetic tree.
+The \code{phyloseq} with a binary phylogenetic tree is saved as an RDS file named \verb{<project_name>_phyloseq_resolved_tree.rds} in the \code{output_data/rds_files/Before_cleaning_rds_files} directory.
 }
 \description{
-This function processes a \code{phyloseq} object to resolve multichotomies (non-binary nodes) in the phylogenetic tree
-using the \code{ape} package. This is inmportant for accurate evolutionary analysis. It ensures the tree is binary and saves the updated \code{phyloseq} object as an RDS file.
+This function processes the phylogenetic tree within a \code{phyloseq} object by
+resolving polytomous branching in the QIIME2 FastTree2 phylogeny, converting
+it into a fully bifurcated (binary) tree using the \code{ape} package for
+phylogenetic analysis. This step is essential for accurate evolutionary
+analysis, and the updated \code{phyloseq} object is saved as an RDS file.
 }
 \details{
 This function performs the following steps:

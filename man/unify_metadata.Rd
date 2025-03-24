@@ -7,62 +7,44 @@
 unify_metadata(projects)
 }
 \arguments{
-\item{projects}{A character vector containing the name of the project folders.
-Each project folder must already exist within the specified
-base path. The \code{projects} argument represents the name of the
-project folder, which must contain a subfolder named \code{qiime2_output}
-with the output files generated from QIIME2. This folder structure
-is necessary for setting up downstream analysis.
-\code{projects} is typically reference in a configuration file.}
+\item{projects}{A character vector containing the names of the project (folders).}
 }
 \value{
-A data frame containing the unified metadata, which is also saved as
-\code{metadata_formatted.tsv} in the projects \code{input_data} folder.
+A data frame containing the unified metadata. The data frame is also saved as a file in the project's \code{input_data} folder.
 }
 \description{
 This function merges and formats metadata from various sources, including
-QIIME metadata, experimental sample metadata and qPCR data or FCM data, to create a unified
+QIIME metadata, experimental sample metadata, and qPCR or FCM data, to create a unified
 metadata file for downstream analyses.
 }
 \details{
-This function ensures that the metadata is unified and formatted correctly
-for further analysis by performing the following steps:
+The function ensures that the metadata is unified and correctly formatted for further analysis by:
 \itemize{
-\item Reads and processes the \code{metadata_extra.tsv} file, which must contain
-at least the following columns:
+\item Reading and processing the \code{metadata_extra.tsv} file, which must contain at least:
 \itemize{
 \item \code{SampleID}: A unique identifier for each sample.
 \item \code{sample_type}: Indicates whether the sample is a \code{sample}, \code{mock}, or \code{blank}.
 \item \code{DNA_Concentration}: The DNA concentration (in ng/µl).
 }
-\item Optionally processes and integrates qPCR or FCM data:
+\item Optionally processing and integrating qPCR or FCM data:
 \itemize{
-\item If qPCR data is available, it calculates the mean for duplicates and merges it with the \code{metadata_extra}.
-\item If FCM data is available, it calculates the mean for duplicates and merges it with the \code{metadata_extra}.
+\item If qPCR data is available, calculating the mean for duplicates and merging it with \code{metadata_extra}.
+\item If FCM data is available, calculating the mean for duplicates and merging it with \code{metadata_extra}.
 }
-\item Reads the \code{metadata.tsv} file (QIIME metadata), ensures it includes the
-\code{SampleID} column, and combines it with the processed \code{metadata_extra}.
-\item Writes the final combined metadata to a new file named
-\code{metadata_formatted.tsv}.
+\item Reading the \code{metadata.tsv} file (QIIME metadata), ensuring it contains the \code{SampleID} column, and combining it with the processed \code{metadata_extra}.
+\item Writing the final combined metadata to a file. Note that the output file is named by concatenating the project name with \verb{_metadata_formatted.tsv} and is saved in the project's \code{input_data} folder.
 }
 
-All metadata files (QIIME metadata, extra sample metadata and qPCR or FCM) must include
-the \code{SampleID} column to allow merging. The \code{SampleID} column acts as the key
-to align data across multiple sources.
+All metadata files (QIIME metadata, experimental sample metadata, and qPCR/FCM data) must include
+the \code{SampleID} column for proper merging. This column serves as the key to align data from multiple sources.
 }
 \note{
-This function requires that the \code{metadata_extra.tsv} file is located in the
-\code{input_data} folder of the project directory. If optional qPCR or FCM data
-is included, these files should also be placed in the \code{input_data} folder.
+This function requires that the folder structure has been set up (using the \code{create_folders} function) before running.
 }
 \examples{
 \dontrun{
-# Define the base path and process metadata for a project
-base_path <- "path/to/projects"
-log_file <- "path/to/logfile.txt"
-
 # Process and unify metadata for a project
-unified_metadata <- unify_metadata("Project1")
+unified_metadata <- unify_metadata(projects)
 }
 
 }
