@@ -1,47 +1,45 @@
-#' Remove Mock ASVs from Phyloseq Object
+#' Remove Mock Features from a Phyloseq Object
 #'
-# This function removes mock ASVs (amplicon sequence variants) from a `phyloseq` object.
-# Mock ASVs are typically used for decontamination purposes and are identified by their genus names.
-# The function also filters the dataset to retain only samples with `sample_type == "sample`.
-# The user can choose whether to filter out the mock ASVs from the dataset by setting the `mock` parameter.
+#' This function removes mock features from a `phyloseq` object.
+#' These mock features, which can appear in other samples due to cross-contamination,
+#' are removed to minimize their impact on the analysis samples.
+#' In addition, the function filters the dataset to retain only samples without controls.
+#' Users can choose whether to remove the mock features by setting the `mock` parameter.
 #'
 #' @inheritParams decontam
 #'
 #' @param mock_genera A vector of genera representing the taxa that make up the mock community.
-#'                    These are the taxa used to identify mock ASVs that can be removed from the `phyloseq` object.
+#'                    These taxa are used to identify mock features to be removed from the `phyloseq` object.
 #'
-#' @param mock A logical value (default `TRUE`) that determines whether or not to filter out the mock ASVs.
-#'             \itemize{
-#'             \item `TRUE`: Remove mock ASVs from the `phyloseq` object and retain only the samples for downstream analysis.
-#'             \item `FALSE`: Retain mock ASVs but filter the dataset to include only samples with `sample_type == "sample"`.
-#'             Use this option if no mock community is present in the dataset.
-#'             }
+#' @param mock A logical value determining whether to filter out mock features.
+#'   \itemize{
+#'     \item `TRUE`: Remove mock features from the `phyloseq` object and retain only samples for downstream analysis.
+#'     \item `FALSE`: Retain mock features. Use this option if no mock community is present in the dataset.
+#'   }
 #'
 #' @details
 #' The function performs the following steps:
 #' \itemize{
-#'   \item If `mock = FALSE`, the function filters the dataset to retain only samples with `sample_type == "sample"`, without removing mock ASVs.
+#'   \item If `mock = FALSE`, the function filters the dataset to retain only samples without controls, leaving the mock features intact.
 #'         This option is suitable for datasets where no mock community is included.
 #'   \item If `mock = TRUE`, the function:
 #'     \itemize{
-#'       \item Identifies mock ASVs based on the provided `mock_genera`.
-#'       \item Removes the mock ASVs from the dataset.
-#'       \item Retains only samples with `sample_type == "sample"`.
+#'       \item Identifies mock features based on the provided `mock_genera`.
+#'       \item Removes the mock features from the dataset.
+#'       \item Retains only samples without controls.
 #'     }
-#'   \item The filtered `phyloseq` object is saved as an RDS file with the name `project_name_phyloseq_asv_level_without_mock.rds`.
 #' }
 #'
 #' @return
-#' A `phyloseq` object with filtered samples.
-#' If `mock = TRUE`, mock ASVs are removed. If `mock = FALSE`, mock ASVs are retained, but the dataset includes only `sample_type == "sample"`.
-#' The object is also saved as an RDS file for future use.
+#' A filtered `phyloseq` object is returned and saved as an RDS file named
+#' `project_name_phyloseq_asv_level_without_mock.rds` in the `output_data/rds_files/Before_cleaning_rds_files/` directory.
 #'
 #' @examples
 #' \dontrun{
 #' # Remove mock ASVs from the phyloseq object
 #' physeq_no_mock <- remove_mock(physeq = physeq, mock_genera = c("Mock_Genus1", "Mock_Genus2"), mock = TRUE)
 #'
-#' # Retain mock ASVs but filter to only 'sample' types (or when no mock community is present)
+#' # Retain mock ASVs but filter to only samples (or when no mock community is present)
 #' physeq_no_filter <- remove_mock(physeq = physeq, mock_genera = c("Mock_Genus1", "Mock_Genus2"), mock = FALSE)
 #' }
 #'
