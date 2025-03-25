@@ -94,7 +94,7 @@ normalise_data = function(physeq = without_mock_physeq,
     as_tibble(df_psdata) %>%
     select(OTU, everything())
 
-  rasperGade16S_file = list.files(destination_folder, pattern = "epa_result.jplace.prediction.RDS", full.names = TRUE)
+  rasperGade16S_file = list.files(destination_folder, pattern = "prediction\\.RDS$", full.names = TRUE)
   rasperGade16S_rds = readRDS(rasperGade16S_file)
 
   raspergade_df = rasperGade16S_rds$discrete %>%
@@ -379,7 +379,7 @@ normalise_data = function(physeq = without_mock_physeq,
   if (copy_correction == FALSE) {
 
   # database folder
-  rrndb_database_tsv_file = list.files(destination_folder, pattern = "rrnDB-5.9_pantaxa_stats_NCBI.tsv", full.names = TRUE)
+  rrndb_database_tsv_file = list.files(destination_folder, pattern = "pantaxa_stats_NCBI\\.tsv$", full.names = TRUE)
   rrndb_database_tsv = read_tsv(rrndb_database_tsv_file)
   rrndb_database = rrndb_database_tsv %>% filter(rank == "genus") %>% select(Genus = "name", everything())
 
