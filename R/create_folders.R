@@ -89,7 +89,7 @@ create_folders = function(projects) {
     }
 
     # Check for optional files - only warning if missing
-    optional_files = c("qPCR.*\\.csv$", "fcm.*\\.csv$", "metadata_extra\\.tsv$", "pantaxa_stats_NCBI.*\\.tsv$", "prediction*\\.RDS$")
+    optional_files = c("qPCR.*\\.csv$", "fcm.*\\.csv$", "metadata_extra\\.tsv$", "prediction*\\.RDS$")
     for (file_pattern in optional_files) {
       if (!any(grepl(file_pattern, files))) {  # Use 'files' instead of 'file'
         warning_message = paste("Warning:", file_pattern, "does not exist in", source_folder, "for project:", project, "\n")
@@ -100,7 +100,7 @@ create_folders = function(projects) {
     # Copy the relevant files
     files_for_phyloseq_object =
       list.files(source_folder,
-                 pattern = "table.*\\.qza$|rooted-tree.*\\.qza$|classifier.*\\.qza|metadata\\.tsv$|metadata_extra\\.tsv$|dna-sequences.*\\.csv$|fcm.*\\.csv$|qPCR.*\\.csv$|pantaxa_stats_NCBI.*\\.tsv$|prediction*\\.RDS$",
+                 pattern = "table.*\\.qza$|rooted-tree.*\\.qza$|classifier.*\\.qza|metadata\\.tsv$|metadata_extra\\.tsv$|dna-sequences.*\\.csv$|fcm.*\\.csv$|qPCR.*\\.csv$|prediction*\\.RDS$",
                  full.names = TRUE)
 
     file.copy(files_for_phyloseq_object, destination_folder, overwrite = TRUE)

@@ -219,47 +219,67 @@ normalise_data = function(physeq = without_mock_physeq,
       joined_pstibble_qpcr_norm_dna =
         joined_pstibble_qpcr_copy_number %>%
         filter(na_type == "dna") %>%
-        group_by(SampleID) %>%
-        mutate(a = (sq_mean / insert_volume) * dilution_factor,
-               b = a * elution_volume_ul,
-               sq_calc_mean = b / dry_sample_mass_g) %>%
-        ungroup()
-      results_list$dna = joined_pstibble_qpcr_norm_dna
+        group_by(SampleID)
+
+      if (!("sq_calc_mean" %in% colnames(joined_pstibble_qpcr_norm_dna))) {
+        joined_pstibble_qpcr_norm_dna =
+          joined_pstibble_qpcr_norm_dna %>%
+          mutate(a = (sq_mean / insert_volume) * dilution_factor,
+                 b = a * elution_volume_ul,
+                 sq_calc_mean = b / sample_volume_or_mass) %>%
+          ungroup()
+        results_list$dna = joined_pstibble_qpcr_norm_dna
+      } else {
+        results_list$dna = joined_pstibble_qpcr_norm_dna %>% ungroup()
+        log_message(paste("sq_calc_mean already exists, skipping its calculation for dna samples."), log_file)
+      }
 
       # Add sq_calc_mean to sample_data
       df = data.frame(sample_data(psdata))
+      if (!("sq_calc_mean" %in% colnames(df))) {
       df = df %>% mutate(SampleID = rownames(df))
       df_2 = df %>% left_join(joined_pstibble_qpcr_norm_dna %>% select(SampleID, sq_calc_mean) %>% distinct(), by = "SampleID")
 
       original_sample_names <- sample_names(psdata)
       rownames(df_2) <- original_sample_names
       sample_data(psdata) = sample_data(df_2)
+      }
     }
 
     if ("rna" %in% joined_pstibble_qpcr_copy_number$na_type) {
       joined_pstibble_qpcr_norm_rna =
         joined_pstibble_qpcr_copy_number %>%
         filter(na_type == "rna") %>%
-        group_by(SampleID) %>%
+        group_by(SampleID)
+
+      if (!("sq_calc_mean" %in% colnames(joined_pstibble_qpcr_norm_rna))) {
+      joined_pstibble_qpcr_norm_rna =
+        joined_pstibble_qpcr_norm_rna %>%
         mutate(a = (sq_mean / insert_volume) * dilution_factor,
                b = a * Final_volume_of_cDNA,
                c = b * (RNA_volume_used_Dnase_treatment / Dnase_Volume_used_cDNA_synthesis),
                d = c * (elution_volume_ul / RNA_volume_used_Dnase_treatment),
-               sq_calc_mean = d / dry_sample_mass_g) %>%
+               sq_calc_mean = d / sample_volume_or_mass) %>%
         ungroup()
       results_list$rna = joined_pstibble_qpcr_norm_rna
+      } else {
+        results_list$rna = joined_pstibble_qpcr_norm_rna %>% ungroup()
+        log_message("sq_calc_mean already exists, skipping its calculation for RNA samples.", log_file)
+      }
 
       # Add sq_calc_mean to sample_data
       df = data.frame(sample_data(psdata))
+      if (!("sq_calc_mean" %in% colnames(df))) {
       df = df %>% mutate(SampleID = rownames(df))
       df_2 = df %>% left_join(joined_pstibble_qpcr_norm_rna %>% select(SampleID, sq_calc_mean) %>% distinct(), by = "SampleID")
 
       original_sample_names <- sample_names(psdata)
       rownames(df_2) <- original_sample_names
       sample_data(psdata) = sample_data(df_2)
+      }
     }
 
-    if ("dna" %in% joined_pstibble_qpcr_copy_number$na_type & "rna" %in% joined_pstibble_qpcr_copy_number$na_type) {
+    if ("dna" %in% joined_pstibble_qpcr_copy_number$na_type & "rna" %in% joined_pstibble_qpcr_copy_number$na_type & all(c("sq_calc_mean.x", "sq_calc_mean.y") %in% colnames(df))) {
       df = data.frame(sample_data(psdata))
       df_2 = df %>%
         mutate(sq_calc_mean = coalesce(sq_calc_mean.x, sq_calc_mean.y)) %>%
@@ -379,6 +399,8 @@ normalise_data = function(physeq = without_mock_physeq,
   if (copy_correction == FALSE) {
 
   # database folder
+  download.file("https://rrndb.umms.med.umich.edu/downloads/rrnDB-5.9_pantaxa_stats_NCBI.tsv.zip", destfile = paste0(destination_folder, "rrnDB-5.9_pantaxa_stats_NCBI.tsv.zip"))
+  unzip(file.path(destination_folder, "rrnDB-5.9_pantaxa_stats_NCBI.tsv.zip"), exdir = destination_folder)
   rrndb_database_tsv_file = list.files(destination_folder, pattern = "pantaxa_stats_NCBI\\.tsv$", full.names = TRUE)
   rrndb_database_tsv = read_tsv(rrndb_database_tsv_file)
   rrndb_database = rrndb_database_tsv %>% filter(rank == "genus") %>% select(Genus = "name", everything())

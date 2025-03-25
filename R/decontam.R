@@ -1,46 +1,44 @@
-#' Decontaminate a phyloseq object using specified methods
+#' Decontaminate a Phyloseq Object Using Specified Methods
 #'
-# This function removes contamination from a phyloseq object using (`decontam`)[https://benjjneb.github.io/decontam/vignettes/decontam_intro.html] package
-#' with either frequency, prevalence, or both methods. the prevalence method make use of the blank sample if this sample is not availble only frequency can be preformd.
+#' This function removes contamination from a phyloseq object using the
+#' [`decontam`](https://benjjneb.github.io/decontam/vignettes/decontam_intro.html) package.
+#' It supports the frequency, prevalence, or both methods for contaminant identification.
+#' Note that the prevalence method relies on the presence of blank samples;
+#' if blank samples are not available, only the frequency method can be performed.
 #'
 #' @inheritParams resolve_tree
-#' @param decon_method A character string specifying the contamination remval method from `decotam.`
-#'                     The possible values are:
-#'                     \itemize{
-#'                     \item `frequency`: This method identifies contaminants based on their frequency of occurrece across samples.
-#'                     Taxa that appear in very few samples (but with high abundace) are flagged as contaminants.
-#'                     \item `prevalence`: This method identifies contamnants based on their prevalence in negative control sample (e.g., blank samples).
-#'                     Taxa that are present in both negative control and true samples are flagged as contaminants.
-#'                     \item `both`: This method combines both frequency and prevalence methods. It first applies the frequency
-#'                     method, and then applies the prevalence method to identify additional contaminants. Taxa flagged by either
-#'                     method are considered contaminants. this can only been preformd if there is a blank sample avialbel.
-#'                     }
-#'
+#' @param decon_method A character string specifying the contamination removal method.
+#'   Possible values are:
+#'   \itemize{
+#'     \item `frequency`: Identifies contaminants by examining the distribution of sequence feature frequencies
+#'           as a function of the input DNA concentration.
+#'     \item `prevalence`: Identifies contaminants by comparing the prevalence (presence/absence across samples)
+#'           of sequence features in true samples versus negative controls (blanks).
+#'     \item `both`: Applies both frequency and prevalence methods sequentially.
+#'           Taxa flagged by either method are considered contaminants.
+#'           This option requires that blank samples are available.
+#'   }
 #' @param blank A logical value indicating whether blank samples were included in the dataset.
-#'              \itemize{
-#'              \item `TRUE`: Blank samples were included in the dataset. This allows the method `both` (frequency + prevalence)
-#'                            to be used for decontamination by default, as blank samples are available for the prevalence based analysis.
-#'              \item `FALSE`: Blank sample were not included in the dataset. In this case, only the `frequency` method can be applied
-#'                             for decontamination, as no blank samples are available for the prevalence method.
-#'              }
+#'   \itemize{
+#'     \item `TRUE`: Blank samples are present, allowing the use of the `both` method.
+#'     \item `FALSE`: No blank samples are available; in this case, only the `frequency` method can be applied.
+#'   }
 #'
-#' @return A phyloseq object after contamiantion removal.
-#' The `phyloseq` after contamination removal is saved as an RDS file named `<project_name>_phyloseq_asv_level_decontam.rds` in the `output_data/rds_files/Before_cleaning_rds_files` directory.
+#' @return A phyloseq object with contaminants removed. The decontaminated object is saved as an RDS file named
+#' `<project_name>_phyloseq_asv_level_decontam.rds` in the `output_data/rds_files/Before_cleaning_rds_files` directory.
 #'
 #' @details
-#' The function checks if the "sample_type" column is present in the sample data of the
-#' phyloseq object. It then proceeds to decontaminate the data using the specified
-#' method. If 'both' is chosen as the decontamination method, both frequency and
-#' prevalence methods are applied. The resulting decontaminated phyloseq object is returned,
-#' and plots showing the read count and prevalence of contaminants are saved as PDF files.
+#' The function uses the `decontam` package to remove contaminants based on the specified method.
+#' If `both` is chosen, the function applies the frequency method first and then the prevalence method,
+#' flagging any taxa identified by either method as contaminants.
+#' In addition, diagnostic plots (showing read counts and contaminant prevalence) are generated and saved as PDF files.
 #'
 #' @examples
+#' \dontrun{
 #' # Example usage:
-#' decontam(physeq = my_phyloseq_data, decon_method = "both", blank = TRUE)
+#' decontam(physeq = phyloseq_data, decon_method = "both", blank = TRUE)
+#' }
 #'
-#' @seealso \code{\link{isContaminant}}, \code{\link{phyloseq}}, \code{\link{ggplot2}}
-#'
-#' @import ggplot2 phyloseq
 #' @export
 decontam =  function(physeq = resolved_tree_physeq,
                      decon_method = c("frequency", "prevalence", "both"),
