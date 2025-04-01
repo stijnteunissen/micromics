@@ -83,10 +83,6 @@ normalise_data = function(physeq = without_mock_physeq,
   output_asv_rds_files = paste0(output_folder_rds_files_after, "ASV/")
   if(!dir.exists(output_asv_rds_files)){dir.create(output_asv_rds_files)}
 
-  if (copy_correction == FALSE) {
-    psdata = psdata
-  } else if (copy_correction == TRUE) {
-
   # raspergate
   df_psdata = data.frame(otu_table(psdata))
   df_psdata$OTU = rownames(df_psdata)
@@ -148,42 +144,40 @@ normalise_data = function(physeq = without_mock_physeq,
   # psdata_anna16_corrected = psdata
   # otu_table(psdata_anna16_corrected) = otu_corrected
 
-  # FCM normalisatie
+  # FCM Normalization
   if (!is.null(norm_method) && norm_method == "fcm") {
 
-    df_psdata_fcm = data.frame(otu_table(psdata_copy_number_corrected))
-    df_psdata_fcm$OTU = rownames(df_psdata_fcm)
+    # Use copy number corrected data if copy_correction is TRUE, otherwise use the original psdata
+    fcm_input <- if (copy_correction) psdata_copy_number_corrected else psdata
 
-    psdata_fcm_long =
-      df_psdata_fcm %>%
+    df_psdata_fcm <- data.frame(otu_table(fcm_input))
+    df_psdata_fcm$OTU <- rownames(df_psdata_fcm)
+
+    psdata_fcm_long <- df_psdata_fcm %>%
       pivot_longer(cols = -OTU,
                    names_to = "SampleID",
                    values_to = "Abundance")
 
-    df_sample_data_fcm = data.frame(sample_data(psdata_copy_number_corrected))
-    df_sample_data_fcm$SampleID = rownames(df_sample_data_fcm)
+    df_sample_data_fcm <- data.frame(sample_data(fcm_input))
+    df_sample_data_fcm$SampleID <- rownames(df_sample_data_fcm)
 
-    joined_pstibble_fcm =
-      psdata_fcm_long %>%
-      inner_join(., df_sample_data_fcm, by = "SampleID")
+    joined_pstibble_fcm <- psdata_fcm_long %>%
+      inner_join(df_sample_data_fcm, by = "SampleID")
 
-    joined_pstibble_fcm_norm =
-      joined_pstibble_fcm %>%
+    joined_pstibble_fcm_norm <- joined_pstibble_fcm %>%
       rowwise() %>%
-      #mutate(cells_per_ml = cells_per_ml / sample_volume_ml) %>%
       mutate(norm_abund = ceiling(Abundance * cells_per_ml)) %>%
       select(OTU, norm_abund, SampleID)
 
-    fcm_norm_wide =
-      joined_pstibble_fcm_norm %>%
+    fcm_norm_wide <- joined_pstibble_fcm_norm %>%
       pivot_wider(names_from = SampleID,
                   values_from = norm_abund)
 
-    otu_fcm_norm = otu_table(data.frame(fcm_norm_wide[, -1]), taxa_are_rows = TRUE)
-    taxa_names(otu_fcm_norm) = fcm_norm_wide$OTU
+    otu_fcm_norm <- otu_table(data.frame(fcm_norm_wide[, -1]), taxa_are_rows = TRUE)
+    taxa_names(otu_fcm_norm) <- fcm_norm_wide$OTU
 
-    psdata_fcm_norm = psdata_copy_number_corrected
-    otu_table(psdata_fcm_norm) = otu_fcm_norm
+    psdata_fcm_norm <- fcm_input
+    otu_table(psdata_fcm_norm) <- otu_fcm_norm
 
     # qpcr normalisatie
   } else if (!is.null(norm_method) && norm_method == "qpcr") {
@@ -326,7 +320,6 @@ normalise_data = function(physeq = without_mock_physeq,
     psdata_qpcr_norm = psdata
     otu_table(psdata_qpcr_norm) = otu_qpcr_norm
   }
-}
 
   # modify tax table
   modify_tax_table = function(psdata) {
@@ -362,11 +355,20 @@ normalise_data = function(physeq = without_mock_physeq,
     return(psdata)
   }
 
+  if (copy_correction == FALSE) {
+  psdata_copy_number_corrected = modify_tax_table(psdata)
+
+  output_file_path = paste0(output_asv_rds_files, project_name, "_phyloseq_asv_level_without_copy_number_corrected_counts.rds")
+  saveRDS(psdata_copy_number_corrected, file = output_file_path)
+  log_message(paste("phyloseq data without copy number corrected counts asv level saved as .rds object in", output_file_path), log_file)
+
+  } else if (copy_correction == TRUE) {
   psdata_copy_number_corrected = modify_tax_table(psdata_copy_number_corrected)
 
   output_file_path = paste0(output_asv_rds_files, project_name, "_phyloseq_asv_level_copy_number_corrected_counts.rds")
   saveRDS(psdata_copy_number_corrected, file = output_file_path)
   log_message(paste("phyloseq data copy number corrected counts asv level saved as .rds object in", output_file_path), log_file)
+  }
 
   if (is.null(norm_method)) {
     log_message("No normalization method specified for absolute data. Only copy number correction applied.", log_file)
@@ -395,8 +397,6 @@ normalise_data = function(physeq = without_mock_physeq,
     log_message("Error: Invalid normalization method specified. Use 'fcm' or 'qpcr'.")
     stop("Error: Invalid normalization method specified. Use 'fcm' or 'qpcr'.")
   }
-
-  if (copy_correction == FALSE) {
 
   # database folder
   download.file("https://rrndb.umms.med.umich.edu/downloads/rrnDB-5.9_pantaxa_stats_NCBI.tsv.zip", destfile = paste0(destination_folder, "rrnDB-5.9_pantaxa_stats_NCBI.tsv.zip"))
@@ -439,4 +439,4 @@ normalise_data = function(physeq = without_mock_physeq,
   ggsave(filename = figure_file_path, plot = copy_number_comparison, width = 14, height = 7)
   log_message(paste("Copy number comparison saved as .pdf object in", figure_file_path), log_file)
   }
-}
+

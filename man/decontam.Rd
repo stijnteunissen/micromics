@@ -2,7 +2,7 @@
 % Please edit documentation in R/decontam.R
 \name{decontam}
 \alias{decontam}
-\title{Decontaminate a phyloseq object using specified methods}
+\title{Decontaminate a Phyloseq Object Using Specified Methods}
 \usage{
 decontam(
   physeq = resolved_tree_physeq,
@@ -14,45 +14,45 @@ decontam(
 \item{physeq}{A \code{phyloseq} object containing the microbiome data.
 This is the input object that the function processes.}
 
-\item{decon_method}{A character string specifying the contamination remval method from \code{decotam.}
-The possible values are:
+\item{decon_method}{A character string specifying the contamination removal method.
+Possible values are:
 \itemize{
-\item \code{frequency}: This method identifies contaminants based on their frequency of occurrece across samples.
-Taxa that appear in very few samples (but with high abundace) are flagged as contaminants.
-\item \code{prevalence}: This method identifies contamnants based on their prevalence in negative control sample (e.g., blank samples).
-Taxa that are present in both negative control and true samples are flagged as contaminants.
-\item \code{both}: This method combines both frequency and prevalence methods. It first applies the frequency
-method, and then applies the prevalence method to identify additional contaminants. Taxa flagged by either
-method are considered contaminants. this can only been preformd if there is a blank sample avialbel.
+\item \code{frequency}: Identifies contaminants by examining the distribution of sequence feature frequencies
+as a function of the input DNA concentration.
+\item \code{prevalence}: Identifies contaminants by comparing the prevalence (presence/absence across samples)
+of sequence features in true samples versus negative controls (blanks).
+\item \code{both}: Applies both frequency and prevalence methods sequentially.
+Taxa flagged by either method are considered contaminants.
+This option requires that blank samples are available.
 }}
 
 \item{blank}{A logical value indicating whether blank samples were included in the dataset.
 \itemize{
-\item \code{TRUE}: Blank samples were included in the dataset. This allows the method \code{both} (frequency + prevalence)
-to be used for decontamination by default, as blank samples are available for the prevalence based analysis.
-\item \code{FALSE}: Blank sample were not included in the dataset. In this case, only the \code{frequency} method can be applied
-for decontamination, as no blank samples are available for the prevalence method.
+\item \code{TRUE}: Blank samples are present, allowing the use of the \code{both} method.
+\item \code{FALSE}: No blank samples are available; in this case, only the \code{frequency} method can be applied.
 }}
 }
 \value{
-A phyloseq object after contamiantion removal.
-The \code{phyloseq} after contamination removal is saved as an RDS file named \verb{<project_name>_phyloseq_asv_level_decontam.rds} in the \code{output_data/rds_files/Before_cleaning_rds_files} directory.
+A phyloseq object with contaminants removed. The decontaminated object is saved as an RDS file named
+\verb{<project_name>_phyloseq_asv_level_decontam.rds} in the \code{output_data/rds_files/Before_cleaning_rds_files} directory.
 }
 \description{
-with either frequency, prevalence, or both methods. the prevalence method make use of the blank sample if this sample is not availble only frequency can be preformd.
+This function removes contamination from a phyloseq object using the
+\href{https://benjjneb.github.io/decontam/vignettes/decontam_intro.html}{\code{decontam}} package.
+It supports the frequency, prevalence, or both methods for contaminant identification.
+Note that the prevalence method relies on the presence of blank samples;
+if blank samples are not available, only the frequency method can be performed.
 }
 \details{
-The function checks if the "sample_type" column is present in the sample data of the
-phyloseq object. It then proceeds to decontaminate the data using the specified
-method. If 'both' is chosen as the decontamination method, both frequency and
-prevalence methods are applied. The resulting decontaminated phyloseq object is returned,
-and plots showing the read count and prevalence of contaminants are saved as PDF files.
+The function uses the \code{decontam} package to remove contaminants based on the specified method.
+If \code{both} is chosen, the function applies the frequency method first and then the prevalence method,
+flagging any taxa identified by either method as contaminants.
+In addition, diagnostic plots (showing read counts and contaminant prevalence) are generated and saved as PDF files.
 }
 \examples{
+\dontrun{
 # Example usage:
-decontam(physeq = my_phyloseq_data, decon_method = "both", blank = TRUE)
-
+decontam(physeq = phyloseq_data, decon_method = "both", blank = TRUE)
 }
-\seealso{
-\code{\link{isContaminant}}, \code{\link{phyloseq}}, \code{\link{ggplot2}}
+
 }

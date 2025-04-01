@@ -2,7 +2,7 @@
 % Please edit documentation in R/remove_mock.R
 \name{remove_mock}
 \alias{remove_mock}
-\title{Remove Mock ASVs from Phyloseq Object}
+\title{Remove Mock Features from a Phyloseq Object}
 \usage{
 remove_mock(physeq = decontam_physeq, mock_genera = mock_genera, mock = TRUE)
 }
@@ -11,35 +11,36 @@ remove_mock(physeq = decontam_physeq, mock_genera = mock_genera, mock = TRUE)
 This is the input object that the function processes.}
 
 \item{mock_genera}{A vector of genera representing the taxa that make up the mock community.
-These are the taxa used to identify mock ASVs that can be removed from the \code{phyloseq} object.}
+These taxa are used to identify mock features to be removed from the \code{phyloseq} object.}
 
-\item{mock}{A logical value (default \code{TRUE}) that determines whether or not to filter out the mock ASVs.
+\item{mock}{A logical value determining whether to filter out mock features.
 \itemize{
-\item \code{TRUE}: Remove mock ASVs from the \code{phyloseq} object and retain only the samples for downstream analysis.
-\item \code{FALSE}: Retain mock ASVs but filter the dataset to include only samples with \code{sample_type == "sample"}.
-Use this option if no mock community is present in the dataset.
+\item \code{TRUE}: Remove mock features from the \code{phyloseq} object and retain only samples for downstream analysis.
+\item \code{FALSE}: Retain mock features. Use this option if no mock community is present in the dataset.
 }}
 }
 \value{
-A \code{phyloseq} object with filtered samples.
-If \code{mock = TRUE}, mock ASVs are removed. If \code{mock = FALSE}, mock ASVs are retained, but the dataset includes only \code{sample_type == "sample"}.
-The object is also saved as an RDS file for future use.
+A filtered \code{phyloseq} object is returned and saved as an RDS file named
+\code{project_name_phyloseq_asv_level_without_mock.rds} in the \verb{output_data/rds_files/Before_cleaning_rds_files/} directory.
 }
 \description{
-Remove Mock ASVs from Phyloseq Object
+This function removes mock features from a \code{phyloseq} object.
+These mock features, which can appear in other samples due to cross-contamination,
+are removed to minimize their impact on the analysis samples.
+In addition, the function filters the dataset to retain only samples without controls.
+Users can choose whether to remove the mock features by setting the \code{mock} parameter.
 }
 \details{
 The function performs the following steps:
 \itemize{
-\item If \code{mock = FALSE}, the function filters the dataset to retain only samples with \code{sample_type == "sample"}, without removing mock ASVs.
+\item If \code{mock = FALSE}, the function filters the dataset to retain only samples without controls, leaving the mock features intact.
 This option is suitable for datasets where no mock community is included.
 \item If \code{mock = TRUE}, the function:
 \itemize{
-\item Identifies mock ASVs based on the provided \code{mock_genera}.
-\item Removes the mock ASVs from the dataset.
-\item Retains only samples with \code{sample_type == "sample"}.
+\item Identifies mock features based on the provided \code{mock_genera}.
+\item Removes the mock features from the dataset.
+\item Retains only samples without controls.
 }
-\item The filtered \code{phyloseq} object is saved as an RDS file with the name \code{project_name_phyloseq_asv_level_without_mock.rds}.
 }
 }
 \examples{
@@ -47,7 +48,7 @@ This option is suitable for datasets where no mock community is included.
 # Remove mock ASVs from the phyloseq object
 physeq_no_mock <- remove_mock(physeq = physeq, mock_genera = c("Mock_Genus1", "Mock_Genus2"), mock = TRUE)
 
-# Retain mock ASVs but filter to only 'sample' types (or when no mock community is present)
+# Retain mock ASVs but filter to only samples (or when no mock community is present)
 physeq_no_filter <- remove_mock(physeq = physeq, mock_genera = c("Mock_Genus1", "Mock_Genus2"), mock = FALSE)
 }
 
