@@ -355,6 +355,49 @@ normalise_data = function(physeq = without_mock_physeq,
     return(psdata)
   }
 
+  if (copy_correction == TRUE) {
+  # database folder
+  download.file("https://rrndb.umms.med.umich.edu/downloads/rrnDB-5.9_pantaxa_stats_NCBI.tsv.zip", destfile = paste0(destination_folder, "rrnDB-5.9_pantaxa_stats_NCBI.tsv.zip"))
+  unzip(file.path(destination_folder, "rrnDB-5.9_pantaxa_stats_NCBI.tsv.zip"), exdir = destination_folder)
+  rrndb_database_tsv_file = list.files(destination_folder, pattern = "pantaxa_stats_NCBI\\.tsv$", full.names = TRUE)
+  rrndb_database_tsv = read_tsv(rrndb_database_tsv_file)
+  rrndb_database = rrndb_database_tsv %>% filter(rank == "genus") %>% select(Genus = "name", everything())
+
+  psmelt = psdata %>% psmelt() %>% as_tibble()
+  psmelt = psmelt %>% select(OTU, Genus)
+
+  proj_tabel = left_join(psmelt, raspergade_df, by = "OTU")
+  final_tabel = left_join(proj_tabel, rrndb_database, by = "Genus")
+
+  plot_data = final_tabel %>%
+    select(OTU, Genus, mean, copy_number, probability) %>%
+    filter(!is.na(mean) & !is.na(copy_number)) %>%
+    mutate(probability_rate = case_when(
+      probability > 0.9 ~ "High (> 0.9)",
+      probability >= 0.5 & probability <= 0.9 ~ "Medium (>= 0.5 & <= 0.9)",
+      probability < 0.5 ~ "Low (< 0.5)"))
+
+  copy_number_comparison =
+    ggplot(plot_data, aes(x = mean, y = copy_number, color = probability_rate)) +
+    geom_point(aes(color = probability_rate), size = 1) +
+    geom_smooth(method = "lm", se = FALSE, color = "black", aes(group = 1)) +
+    geom_abline(intercept = 0, slope = 1, color = "red") +
+    scale_color_manual(values = c("High (> 0.9)" = "darkgreen", "Medium (>= 0.5 & <= 0.9)" = "orange", "Low (< 0.5)" = "red4")) +
+    #facet_wrap(~ probability_rate) +
+    xlim(0, 15) +
+    ylim(0, 15) +
+    theme_bw() +
+    labs(
+      title = "OTU copy number comparison",
+      x = "mean reference rrnDB",
+      y = "Predicted copy number",
+      color = "Probability rate")
+
+  figure_file_path = paste0(figure_folder, project_name, "_copy_number_comparison.pdf")
+  ggsave(filename = figure_file_path, plot = copy_number_comparison, width = 14, height = 7)
+  log_message(paste("Copy number comparison saved as .pdf object in", figure_file_path), log_file)
+  }
+
   if (copy_correction == FALSE) {
   psdata_copy_number_corrected = modify_tax_table(psdata)
 
@@ -397,46 +440,6 @@ normalise_data = function(physeq = without_mock_physeq,
     log_message("Error: Invalid normalization method specified. Use 'fcm' or 'qpcr'.")
     stop("Error: Invalid normalization method specified. Use 'fcm' or 'qpcr'.")
   }
+}
 
-  # database folder
-  download.file("https://rrndb.umms.med.umich.edu/downloads/rrnDB-5.9_pantaxa_stats_NCBI.tsv.zip", destfile = paste0(destination_folder, "rrnDB-5.9_pantaxa_stats_NCBI.tsv.zip"))
-  unzip(file.path(destination_folder, "rrnDB-5.9_pantaxa_stats_NCBI.tsv.zip"), exdir = destination_folder)
-  rrndb_database_tsv_file = list.files(destination_folder, pattern = "pantaxa_stats_NCBI\\.tsv$", full.names = TRUE)
-  rrndb_database_tsv = read_tsv(rrndb_database_tsv_file)
-  rrndb_database = rrndb_database_tsv %>% filter(rank == "genus") %>% select(Genus = "name", everything())
-
-  psmelt = psdata %>% psmelt() %>% as_tibble()
-  psmelt = psmelt %>% select(OTU, Genus)
-
-  proj_tabel = left_join(psmelt, raspergade_df, by = "OTU")
-  final_tabel = left_join(proj_tabel, rrndb_database, by = "Genus")
-
-  plot_data = final_tabel %>%
-    select(OTU, Genus, mean, copy_number, probability) %>%
-    filter(!is.na(mean) & !is.na(copy_number)) %>%
-    mutate(probability_rate = case_when(
-      probability > 0.9 ~ "High (> 0.9)",
-      probability >= 0.5 & probability <= 0.9 ~ "Medium (>= 0.5 & <= 0.9)",
-      probability < 0.5 ~ "Low (< 0.5)"))
-
-  copy_number_comparison =
-    ggplot(plot_data, aes(x = mean, y = copy_number, color = probability_rate)) +
-    geom_point(aes(color = probability_rate), size = 1) +
-    geom_smooth(method = "lm", se = FALSE, color = "black", aes(group = 1)) +
-    geom_abline(intercept = 0, slope = 1, color = "red") +
-    scale_color_manual(values = c("High (> 0.9)" = "darkgreen", "Medium (>= 0.5 & <= 0.9)" = "orange", "Low (< 0.5)" = "red4")) +
-    #facet_wrap(~ probability_rate) +
-    xlim(0, 15) +
-    ylim(0, 15) +
-    theme_bw() +
-    labs(
-      title = "OTU copy number comparison",
-      x = "mean reference rrnDB",
-      y = "Predicted copy number",
-      color = "Probability rate")
-
-  figure_file_path = paste0(figure_folder, project_name, "_copy_number_comparison.pdf")
-  ggsave(filename = figure_file_path, plot = copy_number_comparison, width = 14, height = 7)
-  log_message(paste("Copy number comparison saved as .pdf object in", figure_file_path), log_file)
-  }
 
