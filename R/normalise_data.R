@@ -76,7 +76,7 @@ normalise_data = function(physeq = without_mock_physeq,
   project_name = projects
 
   project_folder = paste0(base_path, project_name)
-  destination_folder = paste0(project_folder, "/input_data")
+  destination_folder = paste0(project_folder, "/input_data/")
   figure_folder = paste0(project_folder, "/figures/")
   output_folder_rds_files_before = paste0(project_folder, "/output_data/rds_files/Before_cleaning_rds_files/")
   output_folder_rds_files_after = paste0(project_folder, "/output_data/rds_files/After_cleaning_rds_files/")
