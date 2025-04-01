@@ -357,8 +357,16 @@ normalise_data = function(physeq = without_mock_physeq,
 
   if (copy_correction == TRUE) {
   # database folder
-  download.file("https://rrndb.umms.med.umich.edu/downloads/rrnDB-5.9_pantaxa_stats_NCBI.tsv.zip", destfile = paste0(destination_folder, "rrnDB-5.9_pantaxa_stats_NCBI.tsv.zip"))
-  unzip(file.path(destination_folder, "rrnDB-5.9_pantaxa_stats_NCBI.tsv.zip"), exdir = destination_folder)
+  zip_file_path <- file.path(destination_folder, "rrnDB-5.9_pantaxa_stats_NCBI.tsv.zip")
+  download.file("https://rrndb.umms.med.umich.edu/downloads/rrnDB-5.9_pantaxa_stats_NCBI.tsv.zip",
+                destfile = zip_file_path, mode = "wb")
+
+  # Controleer of het bestand bestaat en een niet-nul bestandsgrootte heeft
+  if (!file.exists(zip_file_path) || file.info(zip_file_path)$size == 0) {
+    stop("Error: Downloaded ZIP file is missing or corrupted.")
+  }
+
+  unzip(zip_file_path, exdir = destination_folder)
   rrndb_database_tsv_file = list.files(destination_folder, pattern = "pantaxa_stats_NCBI\\.tsv$", full.names = TRUE)
   rrndb_database_tsv = read_tsv(rrndb_database_tsv_file)
   rrndb_database = rrndb_database_tsv %>% filter(rank == "genus") %>% select(Genus = "name", everything())
