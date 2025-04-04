@@ -41,75 +41,87 @@
 #' @export
 unify_metadata <- function(projects) {
   # Define the project folder and destination folder paths
-  project_name = projects
-  project_folder = paste0(base_path, project_name)
-  destination_folder = paste0(project_folder, "/input_data/")
+  project_name <- projects
+  project_folder <- paste0(base_path, project_name)
+  destination_folder <- paste0(project_folder, "/input_data/")
 
-  # Add metadata
-  metadata_extra_file = list.files(destination_folder, pattern = "metadata_extra\\.tsv$", full.names = TRUE)
-  metadata_extra = read_delim(metadata_extra_file, col_names = TRUE, show_col_types = FALSE)
+  # Read additional metadata
+  metadata_extra_file <- list.files(destination_folder, pattern = "metadata_extra\\.tsv$", full.names = TRUE)
+  metadata_extra <- read_delim(metadata_extra_file, col_names = TRUE, show_col_types = FALSE)
 
   # Initialize flags and data holders
-  data_available = FALSE
-  qPCR_combined = NULL
-  FCM_combined = NULL
+  data_available <- FALSE
+  qPCR_combined <- NULL
+  FCM_combined <- NULL
 
   # Process multiple qPCR files
-  qPCR_files = list.files(destination_folder, pattern = "qPCR.*\\.csv$", full.names = TRUE)
+  qPCR_files <- list.files(destination_folder, pattern = "qPCR.*\\.csv$", full.names = TRUE)
   if (length(qPCR_files) > 0) {
-    qPCR_combined = qPCR_files %>%
+    qPCR_data <- qPCR_files %>%
       lapply(read_delim, col_names = TRUE, show_col_types = FALSE) %>%
-      bind_rows() %>%
-      group_by(SampleID) %>%
-      summarise(sq_mean = mean(SQ, na.rm = TRUE), .groups = "drop")
+      bind_rows()
 
-    metadata_extra = metadata_extra %>%
+    # Check if the column 'sq_calc_mean' exists in the qPCR data
+    if ("sq_calc_mean" %in% colnames(qPCR_data)) {
+      # If it exists, use the existing sq_calc_mean values (taking the first occurrence per SampleID)
+      qPCR_combined <- qPCR_data %>%
+        group_by(SampleID) %>%
+        summarise(sq_calc_mean = first(sq_calc_mean), .groups = "drop")
+    } else {
+      # Otherwise, calculate the mean of SQ values and name the result 'sq_mean'
+      qPCR_combined <- qPCR_data %>%
+        group_by(SampleID) %>%
+        summarise(sq_mean = mean(SQ, na.rm = TRUE), .groups = "drop")
+    }
+
+    # Merge the qPCR results with the extra metadata
+    metadata_extra <- metadata_extra %>%
       left_join(qPCR_combined, by = "SampleID")
 
-    data_available = TRUE
+    data_available <- TRUE
   } else {
     log_message(paste("No qPCR data found for project:", project_name), log_file)
   }
 
   # Process multiple FCM files
-  FCM_files = list.files(destination_folder, pattern = "fcm.*\\.csv$", full.names = TRUE)
+  FCM_files <- list.files(destination_folder, pattern = "fcm.*\\.csv$", full.names = TRUE)
 
   if (length(FCM_files) > 0) {
-    FCM_combined = FCM_files %>%
+    FCM_combined <- FCM_files %>%
       lapply(read_delim, col_names = TRUE, show_col_types = FALSE) %>%
       bind_rows() %>%
       group_by(SampleID) %>%
       summarise(cells_per_ml = mean(cells_per_ml, na.rm = TRUE), .groups = "drop")
 
-    metadata_extra = metadata_extra %>%
+    metadata_extra <- metadata_extra %>%
       left_join(FCM_combined, by = "SampleID")
 
-    data_available = TRUE
+    data_available <- TRUE
   } else {
     log_message(paste("No FCM data found for project:", project_name), log_file)
   }
 
-  # If no data was available, print a warning and leave metadata unchanged
+  # If no data was available, log a warning and leave metadata unchanged
   if (!data_available) {
-    warning_message = paste("Warning: No qPCR or FCM data available for project:", project_name, "\n")
+    warning_message <- paste("Warning: No qPCR or FCM data available for project:", project_name, "\n")
     log_message(warning_message, log_file)
   } else {
-    # If data was available, write the updated metadata back to a file
+    # Write the updated metadata_extra back to a file
     write_delim(metadata_extra, file = paste0(destination_folder, "/metadata_extra_updated.tsv"), delim = "\t", col_names = TRUE)
-    message = paste("Message: Metadata updated with available qPCR and/or FCM data for project:", project_name)
+    message <- paste("Message: Metadata updated with available qPCR and/or FCM data for project:", project_name)
     log_message(message, log_file)
   }
 
-  # Process metadata
-  metadata_files = list.files(destination_folder, pattern = "metadata\\.tsv$", full.names = TRUE)
+  # Process main metadata files
+  metadata_files <- list.files(destination_folder, pattern = "metadata\\.tsv$", full.names = TRUE)
 
   # Combine metadata files
   if (length(metadata_files) > 0) {
-    metadata = metadata_files %>%
+    metadata <- metadata_files %>%
       lapply(read_delim, col_names = TRUE, show_col_types = FALSE) %>%
       bind_rows()
   } else {
-    error_message = paste("Error: metadata.tsv file does not exist.")
+    error_message <- paste("Error: metadata.tsv file does not exist.")
     log_message(error_message, log_file)
     stop(error_message)
   }
@@ -119,20 +131,20 @@ unify_metadata <- function(projects) {
     colnames(metadata)[colnames(metadata) == "#SampleID"] <- "SampleID"
   }
 
-  # Ensure both files have 'SampleID' column
+  # Ensure both files have a 'SampleID' column
   if (!("SampleID" %in% colnames(metadata))) {
-    error_message = paste0("Error: 'SampleID' column is missing in the metadata file.")
+    error_message <- paste0("Error: 'SampleID' column is missing in the metadata file.")
     log_message(error_message, log_file)
     stop(error_message)
   }
   if (!("SampleID" %in% colnames(metadata_extra))) {
-    error_message = paste0("Error: 'SampleID' column is missing in the metadata_extra file.")
+    error_message <- paste0("Error: 'SampleID' column is missing in the metadata_extra file.")
     log_message(error_message, log_file)
     stop(error_message)
   }
 
-  # Combine the metadata using a left join on SampleID
-  combined_metadata = inner_join(metadata, metadata_extra, by = "SampleID")
+  # Combine the metadata using an inner join on SampleID
+  combined_metadata <- inner_join(metadata, metadata_extra, by = "SampleID")
 
   # Write the formatted metadata to a file
   write.table(combined_metadata, file = paste0(destination_folder, project_name, "_metadata_formatted.tsv"), sep = "\t", row.names = FALSE, quote = FALSE)
