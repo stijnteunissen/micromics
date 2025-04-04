@@ -66,7 +66,7 @@ unify_metadata <- function(projects) {
       # If it exists, use the existing sq_calc_mean values (taking the first occurrence per SampleID)
       qPCR_combined <- qPCR_data %>%
         group_by(SampleID) %>%
-        summarise(sq_calc_mean = first(sq_calc_mean), .groups = "drop")
+        summarise(sq_calc_mean = sq_calc_mean, .groups = "drop")
     } else {
       # Otherwise, calculate the mean of SQ values and name the result 'sq_mean'
       qPCR_combined <- qPCR_data %>%
