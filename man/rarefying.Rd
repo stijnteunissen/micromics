@@ -10,11 +10,11 @@ rarefying(physeq = physeq, norm_method = NULL, iteration = 100)
 \item{physeq}{A \code{phyloseq} object containing the microbiome data.
 This is the input object that the function processes.}
 
-\item{norm_method}{A string specifying the normalization method. Acceptable values:
+\item{norm_method}{A character string specifying the normalization method. Acceptable values are:
 \itemize{
-\item \code{NULL}: Returns the \code{psdata_asv_copy_number_corrected} object without modifications.
-\item \code{"fcm"}: Rarefied data using FCM normalized.
-\item \code{"qpcr"}: Rarefied data using qPCR normalized.
+\item \code{NULL}: Use this option if no FCM or qPCR data is available, or if you wish to retain only relative abundances.
+\item \code{"fcm"}: Use this option if the data have been normalized using flow cytometry (FCM).
+\item \code{"qpcr"}: Use this option if the data have been normalized using quantitative PCR (qPCR).
 }}
 }
 \value{

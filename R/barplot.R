@@ -226,10 +226,6 @@ barplot = function(physeq = rarefied_genus_psmelt,
     ggsave(filename = figure_file_path, plot = barplot_relative, width = 12, height = 8)
     log_message(paste("Relative barplot saved as .pdf object in", figure_file_path), log_file)
 
-    figure_file_path = paste0(barplot_folder, project_name, "_barplot_relative.png")
-    ggsave(filename = figure_file_path, plot = barplot_relative, width = 12, height = 8)
-    log_message(paste("Relative barplot saved as .pdf object in", figure_file_path), log_file)
-
   } else if (length(na_types) == 2) {
     plot_data_rel_dna =
       plot_data_rel %>%
