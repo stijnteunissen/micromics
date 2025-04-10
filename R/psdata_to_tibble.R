@@ -1,37 +1,41 @@
 #' Convert Phyloseq Data to Tibble and Export by Taxonomic Level
 #'
-#' This function transforms a phyloseq object into a tibble for each specified taxonomic level using the
-#' \code{psmelt} function from the \pkg{phyloseq} package.
+#' This function transforms a `phyloseq` object into a tibble for each specified taxonomic level
+#' using the \code{psmelt} function from the \pkg{phyloseq} package.
 #'
-#' @param physeq A phyloseq object containing genus-level data. The default is \code{rarefied_genus_physeq}.
-#' @param norm_method A character string specifying the normalization method to use. Options include:
-#'   \itemize{
-#'     \item \code{NULL} (default): Process and export copy number corrected counts.
-#'     \item \code{"fcm"}: Process and export both copy number corrected counts and flow cytometry-normalized counts.
-#'     \item \code{"qpcr"}: Process and export both copy number corrected counts and qPCR-normalized counts.
-#'   }
-#' @param taxrank A character vector indicating the taxonomic levels to process. The default is \code{c("Phylum", "Class", "Order", "Family", "Tax_label")}.
+#' @inheritParams group_tax
 #'
 #' @details
-#' For each taxonomic level specified in \code{taxrank}, the function performs the following steps:
-#' \enumerate{
-#'   \item Logs a message indicating the taxonomic level currently being processed.
-#'   \item Creates a folder for that taxonomic level under the project's \code{After_cleaning_rds_files} directory if it does not already exist.
-#'   \item Converts the phyloseq data (or a subset thereof) into a tibble via \code{psmelt()} and \code{as_tibble()}.
-#'   \item Saves the resulting tibble as an RDS file with a filename that includes the project name, taxonomic level, and normalization method.
-#'   \item Stores each exported tibble in a list with names that reflect the data type (e.g., \code{"psmelt_copy_number_corrected_Phylum"}, \code{"psmelt_fcm_norm_rarefied_Class"}, etc.).
-#' }
+#' The primary task of this function is to convert a `phyloseq` object into a tibble at each specified
+#' taxonomic level using the \code{psmelt} function.
 #'
-#' @return A list containing the psmelt tibble data for each taxonomic level. The list names indicate both the processing method and the taxonomic level.
-#' \itemize{
-#'   \item \code{NULL} (default): Exports only the copy number corrected counts.
-#'   \item \code{"fcm"}: Exports both the copy number corrected counts and flow cytometry-normalized counts.
-#'   \item \code{"qpcr"}: Exports both the copy number corrected counts and qPCR-normalized counts.
-#' }
+#' @return
+#' The function saves multiple `phyloseq`-derived tibbles as RDS files and returns a list of tibbles:
+#'   \itemize{
+#'     \item **If \code{norm_method} is \code{NULL}:**
+#'           A tibble of copy number–corrected counts is saved as
+#'           \code{<project_name>_psmelt_<tax>_level_copy_number_corrected_counts.rds} for each taxonomic level.
+#'
+#'     \item **If \code{norm_method = "fcm"}:**
+#'           Two tibbles are saved for each taxonomic level:
+#'           \itemize{
+#'             \item A tibble of copy number–corrected counts.
+#'             \item A tibble of FCM-normalized, rarefied counts saved as
+#'                   \code{<project_name>_psmelt_<tax>_level_fcm_normalised_cell_concentration_rarefied.rds}.
+#'           }
+#'
+#'     \item **If \code{norm_method = "qpcr"}:**
+#'           Two tibbles are saved for each taxonomic level:
+#'           \itemize{
+#'             \item A tibble of copy number–corrected counts.
+#'             \item A tibble of qPCR-normalized, rarefied counts saved as
+#'                   \code{<project_name>_psmelt_<tax>_level_qpcr_normalised_cell_concentration_rarefied.rds}.
+#'           }
+#'   }
 #'
 #' @examples
 #' \dontrun{
-#'   # Export data without normalization (copy number corrected counts only)
+#'   # Export data without normalization (copy number–corrected counts only)
 #'   result <- psdata_to_tibble(physeq = rarefied_genus_physeq)
 #'
 #'   # Export data with flow cytometry normalization

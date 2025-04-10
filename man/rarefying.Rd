@@ -7,12 +7,8 @@
 rarefying(physeq = physeq, norm_method = NULL, iteration = 100)
 }
 \arguments{
-\item{physeq}{A list containing the \code{phyloseq} objects. Required components:
-\itemize{
-\item \code{psdata_asv_copy_number_corrected}: With copy number corrected phyloseq data.
-\item \code{psdata_asv_fcm_norm}: Required if \code{norm_method} = "fcm".
-\item \code{psdata_asv_qpcr_norm}: Required if \code{norm_method} = "qpcr".
-}}
+\item{physeq}{A \code{phyloseq} object containing the microbiome data.
+This is the input object that the function processes.}
 
 \item{norm_method}{A string specifying the normalization method. Acceptable values:
 \itemize{

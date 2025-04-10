@@ -7,19 +7,14 @@
 #' step prevents an overestimation of genus abundance in samples with higher
 #' sequencing depths, allowing for more accurate and comparable results.
 #'
-#' @param physeq A list containing the `phyloseq` objects. Required components:
-#'               \itemize{
-#'               \item `psdata_asv_copy_number_corrected`: With copy number corrected phyloseq data.
-#'               \item `psdata_asv_fcm_norm`: Required if `norm_method` = "fcm".
-#'               \item `psdata_asv_qpcr_norm`: Required if `norm_method` = "qpcr".
-#'               }
+#' @inheritParams normalise_data
 #'
-#' @param norm_method A string specifying the normalization method. Acceptable values:
-#'                    \itemize{
-#'                    \item `NULL`: Returns the `psdata_asv_copy_number_corrected` object without modifications.
-#'                    \item `"fcm"`: Rarefied data using FCM normalized.
-#'                    \item `"qpcr"`: Rarefied data using qPCR normalized.
-#'                    }
+#' @param norm_method A character string specifying the normalization method. Acceptable values are:
+#'   \itemize{
+#'     \item `NULL`: Use this option if no FCM or qPCR data is available, or if you wish to retain only relative abundances.
+#'     \item `"fcm"`: Use this option if the data have been normalized using flow cytometry (FCM).
+#'     \item `"qpcr"`: Use this option if the data have been normalized using quantitative PCR (qPCR).
+#'   }
 #'
 #' @details
 #' - For `"fcm"` normalization:

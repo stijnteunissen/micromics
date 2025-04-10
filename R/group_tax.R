@@ -1,45 +1,27 @@
 #' Aggregate Phyloseq Data by Taxonomic Level
 #'
-#' This function aggregates a phyloseq object to higher taxonomic levels (e.g.,
-#' Phylum, Class, Order, Family, or Tax_label) using the \code{tax_glom}
-#' function. Depending on the specified normalization method, the function
-#' processes and saves both copy number corrected data and normalized data (using
-#' flow cytometry or qPCR) as RDS files in dedicated directories.
+#' This function aggregates ASV data at specified taxonomic levels (e.g., Phylum, Class, Order, Family, or Tax_label)
+#' using the \code{tax_glom} function from the \pkg{phyloseq} package.
 #'
-#' @param physeq A phyloseq object containing ASV-level data. For example, \code{rarefied_asv_physeq}.
-#' @param norm_method A character string specifying the normalization method. Options are:
-#'   \itemize{
-#'     \item \code{NULL} (default): Process copy number corrected counts only.
-#'     \item \code{"fcm"}: Process both copy number corrected counts and flow cytometry-normalized data.
-#'     \item \code{"qpcr"}: Process both copy number corrected counts and qPCR-normalized data.
-#'   }
-#' @param taxrank A character vector indicating the taxonomic levels at which to aggregate the data. The default is \code{c("Phylum", "Class", "Order", "Family", "Tax_label")}.
+#' @inheritParams rarefying
+#'
+#' @param taxrank A character vector indicating the taxonomic levels at which to group the data.
 #'
 #' @details
-#' For each taxonomic level specified in \code{taxrank}, the function:
-#' \enumerate{
-#'   \item Logs a message indicating the taxonomic level being processed.
-#'   \item Creates a subfolder (if it does not already exist) under the project's \code{After_cleaning_rds_files} directory.
-#'   \item Aggregates the data at the specified taxonomic level using \code{tax_glom}.
-#'   \item Saves the aggregated phyloseq object as an RDS file. The filename and folder structure reflect the taxonomic level and the normalization method used.
-#'   \item If a normalization method is provided (\code{"fcm"} or \code{"qpcr"}), both the copy number corrected data and the corresponding normalized data are processed and saved.
-#' }
+#' The function applies the \code{tax_glom} function to group ASVs at each specified taxonomic level. It creates
+#' a dedicated folder for each taxonomic level under the output directory and saves the aggregated data as RDS files.
 #'
-#' @return A list of aggregated phyloseq objects. The list elements are named
-#'   according to the data type and taxonomic level (e.g.,
-#'   \code{"psdata_copy_number_corrected_Phylum"},
-#'   \code{"psdata_fcm_norm_rarefied_Class"}, etc.).
+#' @return
+#' The function saves multiple `phyloseq` objects as RDS files.
+#' The aggregated objects are saved in the output directory `output_data/rds_files/After_cleaning_rds_files/`.
 #'
 #' @examples
 #' \dontrun{
-#'   # Aggregate data at default taxonomic levels using only copy number corrected counts
-#'   result <- group_tax(physeq = rarefied_asv_physeq)
+#' # Aggregate data using flow cytometry normalization
+#' result <- group_tax(physeq = rarefied_asv_physeq, norm_method = "fcm")
 #'
-#'   # Aggregate data using flow cytometry normalization
-#'   result <- group_tax(physeq = rarefied_asv_physeq, norm_method = "fcm")
-#'
-#'   # Aggregate data using qPCR normalization
-#'   result <- group_tax(physeq = rarefied_asv_physeq, norm_method = "qpcr")
+#' # Aggregate data using qPCR normalization
+#' result <- group_tax(physeq = rarefied_asv_physeq, norm_method = "qpcr")
 #' }
 #'
 #' @export
@@ -50,6 +32,12 @@ group_tax = function(physeq = rarefied_asv_physeq,
   project_name = projects
   project_folder = paste0(base_path, project_name)
   output_folder_rds_files = paste0(project_folder, "/output_data/rds_files/After_cleaning_rds_files/")
+
+  if (copy_correction == TRUE) {
+    cc = ""
+  } else if (copy_correction == FALSE) {
+    cc = "without_"
+  }
 
   results = list()
 
@@ -62,7 +50,7 @@ group_tax = function(physeq = rarefied_asv_physeq,
       psdata = physeq
       psdata_tax = tax_glom(psdata, taxrank = tax)
 
-      output_file_path = paste0(tax_folder, "/", project_name, "_phyloseq_", tax, "_level_copy_number_corrected_counts.rds")
+      output_file_path = paste0(tax_folder, "/", project_name, "_phyloseq_", tax, "_level_", cc, "copy_number_corrected_counts.rds")
       saveRDS(psdata_tax, file = output_file_path)
       log_message(paste("phyloseq data copy number corrected counts", tax, "level saved as .rds object in", output_file_path), log_file)
 

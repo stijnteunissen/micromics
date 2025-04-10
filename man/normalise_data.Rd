@@ -14,61 +14,79 @@ normalise_data(
 \item{physeq}{A \code{phyloseq} object containing the microbiome data.
 This is the input object that the function processes.}
 
-\item{norm_method}{A character string specifying the normalization method to use. Options are:
+\item{norm_method}{A character string specifying the normalization method. Options are:
 \itemize{
-\item \code{"fcm"}: Normalize based on flow cytometry data, converting abundances to cell concentrations (cells/mL or gram sample).
-\item \code{"qpcr"}: Normalize based on qPCR data, converting abundances to cell equivalents (cells/ml or gram sample).
-\item \code{NULL}: Apply only copy number correction without additional normalization.
+\item \code{"fcm"}: Normalize based on flow cytometry data, converting abundances to cell concentrations (cells/mL or per gram sample).
+\item \code{"qpcr"}: Normalize based on qPCR data, converting abundances to cell equivalents (cells/mL or per gram sample).
+\item \code{NULL}: Apply only copy number correction without further normalization.
+}}
+
+\item{copy_correction}{A logical value indicating whether the data should be corrected for
+the predicted 16S rRNA copy numbers prior to biomass normalization. Options are:
+\itemize{
+\item \code{TRUE}: Both relative and absolute abundances are corrected using the predicted copy numbers.
+\item \code{FALSE}: Abundances are not corrected by copy number. Note that qPCR normalization requires
+copy number correction to provide absolute data.
 }}
 }
 \value{
-A list containing one or more \code{phyloseq} objects:
+The function saves multiple \code{phyloseq} objects as RDS files:
 \itemize{
-\item \code{psdata_copy_number_corrected}: Phyloseq object after copy number correction.
-\item \code{psdata_fcm_norm}: (if \code{norm_method = "fcm"}) Phyloseq object with FCM-normalized cell concentrations.
-\item \code{psdata_qpcr_norm}: (if \code{norm_method = "qpcr"}) Phyloseq object with qPCR-normalized cell equivalents.
+\item \verb{<project_name>_phyloseq_asv_level_without_copy_number_corrected_counts.rds}: if \code{copy_correction = FALSE};
+a phyloseq object with uncorrected counts.
+\item \verb{<project_name>_phyloseq_asv_level_copy_number_corrected_counts.rds}: if \code{copy_correction = TRUE};
+a phyloseq object with counts corrected by predicted 16S copy numbers.
+\item \verb{<project_name>_phyloseq_asv_level_fcm_normalised_cell_concentration.rds}: if \code{norm_method = "fcm"} and \code{copy_correction = TRUE};
+a phyloseq object with abundances normalized based on FCM data and copy number correction.
+\item \verb{<project_name>_phyloseq_asv_level_fcm_normalised_cell_concentration_without_copy_number_corrected_count.rds}: if \code{norm_method = "fcm"} and \code{copy_correction = FALSE};
+a phyloseq object with FCM normalization applied without copy number correction.
+\item \verb{<project_name>_phyloseq_asv_level_qpcr_normalised_cell_concentration.rds}: if \code{norm_method = "qpcr"};
+a phyloseq object with abundances normalized to cell equivalents using qPCR data.
 }
-The normalized objects are also saved as \code{.rds} files in the specified output directory.
+
+The relative phyloseq object (without biomass normalization) is saved in the
+\code{output_data/rds_files/After_cleaning_rds_files/ASV} directory, and all biomass-normalized
+phyloseq objects are saved in the \code{output_data/rds_files/Before_cleaning_rds_files} directory.
 }
 \description{
-This function applies normalization to a \code{phyloseq} object, allowing the
-conversion of data to absolute values based on either flow cytometry (FCM)
-data or qPCR data. The funciton accounts for DNA and RNA normalization,
-considering extra steps involved in prodessing RNA. Additionally, it
-incorporates RasperGade16S correction to adjust ASV counts based on predicted copy
-numbers. The normalized data can later be used for relative abundance calculations.
+This function applies normalization to a \code{phyloseq} object, converting
+data to absolute values based on 16S rRNA copy numbers and sample biomass,
+using either flow cytometry (FCM) data or qPCR data. The function can apply
+copy number correction prior to biomass normalization.
 }
 \details{
-The function performs the following steps based on the chosen normalization method:
+The function follows these steps based on the chosen parameters:
 \enumerate{
-\item \strong{Copy number correction (applied in all cases):}
+\item \strong{Copy Number Correction (if \code{copy_correction = TRUE}):}
 \itemize{
-\item Correct ASV abundances by dividing each count by the predicted copy number. The predicted 16S rRNA gene copy numbers are
-based on the method described in
+\item Correct ASV abundances by dividing each count by its predicted 16S rRNA copy number.
+The prediction is based on the method described in
 \href{https://dx.doi.org/10.1038/s43705-023-00266-0}{"Accounting for 16S rRNA copy number prediction uncertainty and its implications in bacterial diversity analyses"}.
-\item This prediction enables the calculation of cell equivalents by adjusting for variablility in 16S rRNA gene copy numbers across taxa.
+\item This correction adjusts for variability in 16S rRNA gene copy numbers across taxa, enabling
+the calculation of cell equivalents.
 }
 \item \strong{FCM Normalization (\code{norm_method = "fcm"}):}
 \itemize{
-\item Combine sample metadata (e.g., \code{cells_per_ml}) with corrected abundances.
-\item Calculate absolute abundances as \code{cells_per_ml_sample} and adjust ASV abundances accordingly.
+\item When \code{copy_correction = TRUE}: The copy number–corrected abundances are multiplied by the FCM data,
+where FCM data (cells per mL or per gram) is included in the metadata or a file with "fcm" in the name,
+with the column \code{cells_per_ml}.
+\item When \code{copy_correction = FALSE}: The raw abundances are multiplied by the FCM data without prior copy number correction.
 }
 \item \strong{qPCR Normalization (\code{norm_method = "qpcr"}):}
 \itemize{
-\item Use qPCR-derived \code{sq_calc_mean} and predicted copy numbers to calculate absolute abundances.
-\item Normalize abundances to represent cell equivalents, ensuring compatibility with downstream analysis.
+\item The qPCR data, provided in 16S copies per mL or per gram sample (included in the metadata or
+a file with "qpcr" in the name and column \code{sq_calc_mean}), is used together with copy number
+predictions to calculate absolute abundances.
 }
 }
-\subsection{DNA vs RNA Normalization}{
+\subsection{DNA vs. RNA Normalization}{
 
-The interpretation of normalized data depends on the type of nucleic acid (DNA or RNA):
+The interpretation of normalized data depends on the nucleic acid type:
 \itemize{
-\item \strong{DNA:} Normalized abundances typically represent \strong{cells per ml (or gram)}. This assumes one genome copy per cell.
-\item \strong{RNA:} Normalized abundances often represent \strong{copies per cell equivalent per ml (or gram)}.
-RNA reflects transcriptional activity and can vary widely depending on the condition of the cells.
+\item \strong{DNA:} Normalized abundances usually represent \strong{cells per mL (or per gram)}, assuming one genome copy per cell.
+\item \strong{RNA:} Normalized abundances often represent \strong{copies per cell equivalent per mL (or per gram)};
+RNA reflects transcriptional activity and may vary considerably with cell condition.
 }
-
-When working with RNA data, ensure that metadata contains information about RNA extraction efficiency or other factors influencing RNA copy numbers.
 }
 }
 \examples{
@@ -77,15 +95,15 @@ When working with RNA data, ensure that metadata contains information about RNA 
 result <- normalize_data(physeq = physeq, norm_method = NULL)
 
 # Normalize using flow cytometry (FCM) data
-result <- normalize_data(physeq = physeq, norm_method = "fcm")
+result <- normalize_data(physeq = physeq, norm_method = "fcm", copy_correction = TRUE)
 
 # Normalize using qPCR data
-result <- normalize_data(physeq = physeq, norm_method = "qpcr")
+result <- normalize_data(physeq = physeq, norm_method = "qpcr", copy_correction = TURE)
 }
 
 }
 \references{
-Gao, Y., & Wu, M. (2023). Accounting for 16S rRNA copy number prediction
-uncertainty and its implications in bacterial diversity analyses. ISME
-communications, 3(1), 59. doi:\href{https://dx.doi.org/10.1038/s43705-023-00266-0}{10.1038/s43705-023-00266-0}
+Gao, Y., & Wu, M. (2023). Accounting for 16S rRNA copy number prediction uncertainty
+and its implications in bacterial diversity analyses. \emph{ISME Communications, 3}(1), 59.
+doi:\href{https://dx.doi.org/10.1038/s43705-023-00266-0}{10.1038/s43705-023-00266-0}
 }

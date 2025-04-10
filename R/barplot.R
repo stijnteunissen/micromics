@@ -5,14 +5,14 @@
 #' The resulting plots can be saved as PDF files, and the underlying data can be exported as
 #' CSV and RDS files.
 #'
-#' @param physeq A phyloseq object containing microbial data. Default is `rarefied_genus_psmelt`.
+#' @inheritParams group_tax
+#'
 #' @param ntaxa An integer specifying the maximum number of taxa to display in the barplot. Default is 23.
-#' @param colorset A named vector of colors used to represent different taxa in the plot.
-#' Colors for new taxa are assigned automatically if not provided.
 #' @param norm_method A string indicating the normalization method used for absolute abundance
-#' data. Options are `"fcm"` (flow cytometry) or `"qpcr"` (quantitative PCR). Default is `NULL`
+#' data. Options are `"fcm"` (flow cytometry) or `"qpcr"` (quantitative PCR).
 #' (relative abundance only).
-#' @param sample_matrix An optional matrix specifying the sample structure or metadata. Default is `NULL`.
+#' @param sample_matrix An optional matrix specifying the sample structure or metadata.
+#' @param group_by_factor with this option you can separtate de barplot for factors
 #'
 #' @details
 #' - Relative abundance plots show proportions of taxa in each sample, with taxa having a mean
