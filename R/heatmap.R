@@ -36,19 +36,22 @@
 #'     physeq = rarefied_genus_psmelt,
 #'     ntaxa = 20,
 #'     norm_method = "fcm",
-#'     taxrank = "Tax_label"
+#'     taxrank = c("Phylum", "Class", "Order", "Family", "Tax_label")
 #'   )
 #' }
 #'
 #' @export
 heatmap = function(physeq = rarefied_genus_psmelt,
-                   ntaxa = NULL, norm_method = NULL, taxrank = "Tax_label") {
+                   ntaxa = NULL,
+                   norm_method = NULL,
+                   taxrank = c("Phylum", "Class", "Order", "Family", "Tax_label")) {
 
   base_heatmap = function(plot_data, x_value, abund_value, legend_name, x_label = "Sample") {
-    ggplot(plot_data, aes(x = Sample, y = Tax_label)) +
+    ggplot(plot_data, aes(x = Sample,
+                          y = !!sym(tax))) +
       geom_tile(aes(fill = !!sym(abund_value)), color = NA) +
       scale_fill_gradient(low = "white", high = "darkred", name = legend_name) +
-      labs(x = x_label, y = NULL) +
+      labs(x = x_label, y = !!sym(tax)) +
       theme_classic() +
       theme(axis.text.x = element_blank(),
             axis.text.y = element_markdown(size = 10),
@@ -89,11 +92,21 @@ heatmap = function(physeq = rarefied_genus_psmelt,
     ntaxa = 23
   }
 
-  if (is.null(norm_method)) {
-    copy_number_corrected_data = physeq
-  } else if (norm_method == "fcm" || norm_method == "qpcr") {
-    copy_number_corrected_data = physeq[[paste0("psmelt_copy_number_corrected_", taxrank)]]
-  }
+  for (tax in taxrank) {
+    log_message(paste("Processing taxonomic level:", tax), log_file)
+
+    # Choose the appropriate dataset based on norm_method
+    if (is.null(norm_method)) {
+      copy_number_corrected_data = physeq[[paste0("psmelt_copy_number_corrected_", tax)]]
+    } else if (norm_method == "fcm" || norm_method == "qpcr") {
+      copy_number_corrected_data = physeq[[paste0("psmelt_copy_number_corrected_", tax)]]
+    }
+
+    # Create output folders (barplot folder and tax folder)
+    heatmap_folder = paste0(figure_folder, "Heatmap/")
+    if(!dir.exists(heatmap_folder)) { dir.create(heatmap_folder) }
+    tax_folder = paste0(heatmap_folder, tax, "/")
+    if(!dir.exists(tax_folder)) { dir.create(tax_folder) }
 
   variable_columns = intersect(present_variable_factors, colnames(copy_number_corrected_data))
   factor_columns = unique(c(variable_columns))
@@ -102,19 +115,18 @@ heatmap = function(physeq = rarefied_genus_psmelt,
   # relatieve abudnatie onder 1% wordt geroepeerd onder "Others"
   genus_abund_rel =
     copy_number_corrected_data %>%
-    group_by(Sample, Tax_label, na_type, !!!syms(present_factors)) %>% # Sample, Kingdom, Phylum, Class, Order, Family, Genus, Tax_label, na_type, !!!syms(present_factors)
+    group_by(Sample, !!!syms(tax), na_type, !!!syms(present_factors)) %>%
     summarise(abund = sum(Abundance), .groups = "drop") %>%
     group_by(Sample) %>%
     mutate(mean_rel_abund = abund/sum(abund) * 100) %>%
     ungroup() %>%
-    group_by(Sample, Tax_label) %>%
-    mutate(Tax_label = str_replace(Tax_label, "(.*)_unclassified", "Unclassified *\\1*")) %>%
-    mutate(Tax_label = case_when(
-      str_detect(Tax_label, "Genus of") ~ str_replace(Tax_label, "Genus of (\\S+)", "Genus of *\\1*"),
-      str_detect(Tax_label, "(\\S+)\\s+(\\S+)") ~ str_replace(Tax_label, "(\\S+)\\s+(\\S+)", "*\\1* (*\\2*)"),
-      TRUE ~ str_replace(Tax_label, "^(\\S*)$", "*\\1*")
-    )) %>%
-    ungroup()
+    group_by(Sample, !!sym(tax)) %>%
+    mutate(!!sym(tax) := str_replace(!!sym(tax), "(.*)_unclassified", "Unclassified *\\1*")) %>%
+    mutate(!!sym(tax) := case_when(
+      str_detect(!!sym(tax), "Genus of") ~ str_replace(!!sym(tax), "Genus of (\\S+)", "Genus of *\\1*"),
+      str_detect(!!sym(tax), "(\\S+)\\s+(\\S+)") ~ str_replace(!!sym(tax), "(\\S+)\\s+(\\S+)", "*\\1* (*\\2*)"),
+      TRUE ~ str_replace(!!sym(tax), "^(\\S*)$", "*\\1*")
+    ))
 
   if (!is.null(date_factor) && date_factor %in% present_factors) {
     genus_abund_rel <- genus_abund_rel %>%
@@ -124,29 +136,29 @@ heatmap = function(physeq = rarefied_genus_psmelt,
 
   legend_cutoff_rel =
     genus_abund_rel %>%
-    group_by(Tax_label) %>%
+    group_by(!!sym(tax)) %>%
     summarise(mean_rel_abund = mean(mean_rel_abund, na.rm = TRUE), .groups = "drop") %>%
     arrange(desc(mean_rel_abund)) %>%
     slice_head(n = ntaxa)
 
-  legend_cutoff_names_rel = legend_cutoff_rel %>% pull(Tax_label)
+  legend_cutoff_names_rel = legend_cutoff_rel %>% pull(!!sym(tax))
   legend_cutoff_value_rel = legend_cutoff_rel %>% pull(mean_rel_abund) %>% min()
 
   genus_pool_rel =
     genus_abund_rel %>%
-    group_by(Tax_label) %>%
+    group_by(!!sym(tax)) %>%
     summarise(pool = max(mean_rel_abund) < legend_cutoff_value_rel,
               mean = mean(mean_rel_abund), .groups = "drop")
 
   plot_data_rel =
-    inner_join(genus_abund_rel, genus_pool_rel, by = "Tax_label") %>%
-    mutate(Tax_label = if_else(Tax_label %in% legend_cutoff_names_rel, Tax_label,
+    inner_join(genus_abund_rel, genus_pool_rel, by = tax) %>%
+    mutate(!!sym(tax) = if_else(!!sym(tax) %in% legend_cutoff_names_rel, !!sym(tax),
                                glue("Other max.<{round(legend_cutoff_value_rel, 1)}%"))) %>%
-    group_by(Sample, Tax_label, na_type, !!!syms(present_factors)) %>%
+    group_by(Sample, !!sym(tax), na_type, !!!syms(present_factors)) %>%
     summarise(mean_rel_abund = sum(mean_rel_abund),
               median = median(mean), .groups = "drop") %>%
-    mutate(Tax_label = factor(Tax_label),
-           Tax_label = fct_reorder(Tax_label, median, .desc = FALSE))
+    mutate(!!sym(tax) = factor(!!sym(tax)),
+           !!sym(tax) = fct_reorder(!!sym(tax), median, .desc = FALSE))
 
   number_samples =
     plot_data_rel %>%
@@ -156,9 +168,6 @@ heatmap = function(physeq = rarefied_genus_psmelt,
   base_width = 8
   width_increment = 0.3
   plot_width = base_width + (number_samples * width_increment)
-
-  heatmap_folder = paste0(figure_folder, "Heatmap/")
-  if(!dir.exists(heatmap_folder)){dir.create(heatmap_folder)}
 
   na_types = unique(plot_data_rel$na_type)
 
@@ -209,8 +218,10 @@ heatmap = function(physeq = rarefied_genus_psmelt,
 
   print(heatmap_relative)
 
-  figure_file_path = paste0(heatmap_folder, project_name, "_heatmap_relative.pdf")
+  figure_file_path = paste0(tax_folder, project_name, "_heatmap_relative.pdf")
   ggsave(filename = figure_file_path, plot = heatmap_relative, width = plot_width, height = 8, limitsize = FALSE)
   log_message(paste("Relative heatmap saved as .pdf object in", figure_file_path), log_file)
+  }
 }
+
 
