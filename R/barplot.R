@@ -146,7 +146,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
     taxonomy_order <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Tax_label")
     current_tax <- tax   # current taxonomic column (e.g., "Family" or "Tax_label")
     current_index <- match(current_tax, taxonomy_order)
-    higher_levels <- taxonomy_order[1:(current_index - 1)]
+    higher_levels <- taxonomy_order[1:(current_index)]
 
     # Calculate relative abundance and modify taxonomic labels
     genus_abund_rel =
@@ -208,6 +208,8 @@ barplot = function(physeq = rarefied_genus_psmelt,
       summarise(pool = max(mean_rel_abund) < legend_cutoff_value_rel,
                 mean = mean(mean_rel_abund), .groups = "drop")
 
+    colorset <- unique(c(dark2_colors, paired_colors, set_colors, set1_colors, spectral_colors, additional_palette))
+
     inner_join(genus_abund_rel, genus_pool_rel, by = current_tax) %>%
       mutate(!!sym(current_tax) := if_else(!!sym(current_tax) %in% legend_cutoff_names_rel,
                                            !!sym(current_tax),
@@ -234,9 +236,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
       mutate(!!sym(current_tax) := factor(!!sym(current_tax)),
              !!sym(current_tax) := fct_reorder(!!sym(current_tax), median, .desc = TRUE))
 
-    barplot_rds_folder = paste0(output_folder_rds_files, "Barplot/")
-    if(!dir.exists(barplot_rds_folder)) { dir.create(barplot_rds_folder) }
-    tax_rds_folder = paste0(barplot_rds_folder, tax, "/")
+    tax_rds_folder = paste0(output_folder_rds_files, tax, "/")
     if(!dir.exists(tax_rds_folder)) { dir.create(tax_rds_folder) }
 
     output_file_path = paste0(tax_rds_folder, project_name, "_pstibble_relative_data.rds")
@@ -304,7 +304,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
       taxonomy_order <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Tax_label")
       current_tax <- tax
       current_index <- match(current_tax, taxonomy_order)
-      higher_levels <- taxonomy_order[1:(current_index - 1)]
+      higher_levels <- taxonomy_order[1:(current_index)]
 
       genus_abund_norm =
         absolute_data %>%
@@ -363,7 +363,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
         mutate(!!sym(current_tax) := if_else(!!sym(current_tax) %in% legend_cutoff_names_norm,
                                              !!sym(current_tax),
                                              glue("Other max.<{scaled_legend_cutoff_value_norm}x10^{log10(scale_legend_cutoff_value_norm)}\ncell equivalents"))) %>%
-        group_by(Sample, Kingdom, Phylum, Class, Order, Family, !!sym(current_tax), na_type, !!!syms(present_factors)) %>%
+        group_by(Sample, !!!syms(higher_levels), na_type, !!!syms(present_factors)) %>%
         summarise(norm_abund = sum(norm_abund),
                   median = median(mean), .groups = "drop") %>%
         mutate(!!sym(current_tax) := factor(!!sym(current_tax)),
@@ -391,9 +391,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
         mutate(!!sym(current_tax) := factor(!!sym(current_tax)),
                !!sym(current_tax) := fct_reorder(!!sym(current_tax), median, .desc = TRUE))
 
-      barplot_rds_folder = paste0(output_folder_rds_files, "Barplot/")
-      if(!dir.exists(barplot_rds_folder)) { dir.create(barplot_rds_folder) }
-      tax_rds_folder = paste0(barplot_rds_folder, tax, "/")
+      tax_rds_folder = paste0(output_folder_rds_files, tax, "/")
       if(!dir.exists(tax_rds_folder)) { dir.create(tax_rds_folder) }
 
       output_file_path = paste0(tax_rds_folder, project_name, "_pstibble_absolute_data_", tax, "_level.rds")
