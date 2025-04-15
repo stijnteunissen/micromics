@@ -218,7 +218,7 @@ heatmap = function(physeq = rarefied_genus_psmelt,
 
   print(heatmap_relative)
 
-  figure_file_path = paste0(tax_folder, project_name, "_heatmap_relative.pdf")
+  figure_file_path = paste0(tax_folder, project_name, "_heatmap_relative_", tax, "_level.pdf")
   ggsave(filename = figure_file_path, plot = heatmap_relative, width = plot_width, height = 8, limitsize = FALSE)
   log_message(paste("Relative heatmap saved as .pdf object in", figure_file_path), log_file)
   }
