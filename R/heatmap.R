@@ -46,12 +46,13 @@ heatmap = function(physeq = rarefied_genus_psmelt,
                    norm_method = NULL,
                    taxrank = c("Phylum", "Class", "Order", "Family", "Tax_label")) {
 
-  base_heatmap = function(plot_data, x_value, abund_value, legend_name, x_label = "Sample") {
+  base_heatmap = function(plot_data, x_value, abund_value, legend_name, x_label = "Sample", tax_column) {
     ggplot(plot_data, aes(x = Sample,
-                          y = !!sym(tax))) +
+                          y = !!sym(tax_column))) +
       geom_tile(aes(fill = !!sym(abund_value)), color = NA) +
       scale_fill_gradient(low = "white", high = "darkred", name = legend_name) +
-      labs(x = x_label, y = !!sym(tax)) +
+      labs(x = x_label,
+           y = tax_column) +
       theme_classic() +
       theme(axis.text.x = element_blank(),
             axis.text.y = element_markdown(size = 10),
@@ -101,6 +102,8 @@ heatmap = function(physeq = rarefied_genus_psmelt,
     } else if (norm_method == "fcm" || norm_method == "qpcr") {
       copy_number_corrected_data = physeq[[paste0("psmelt_copy_number_corrected_", tax)]]
     }
+    tax = "Tax_label"
+    copy_number_corrected_data = readRDS("~/Documents/Wetsus/Data_analysis/Projects/ABOR/Dataset_workshop_fcm/Workshop_run1_true/output_data/rds_files/After_cleaning_rds_files/Tax_label/Workshop_run1_true_psmelt_Tax_label_level_copy_number_corrected_counts.rds")
 
     # Create output folders (barplot folder and tax folder)
     heatmap_folder = paste0(figure_folder, "Heatmap/")
@@ -152,13 +155,14 @@ heatmap = function(physeq = rarefied_genus_psmelt,
 
   plot_data_rel =
     inner_join(genus_abund_rel, genus_pool_rel, by = tax) %>%
-    mutate(!!sym(tax) = if_else(!!sym(tax) %in% legend_cutoff_names_rel, !!sym(tax),
-                               glue("Other max.<{round(legend_cutoff_value_rel, 1)}%"))) %>%
-    group_by(Sample, !!sym(tax), na_type, !!!syms(present_factors)) %>%
+    mutate(!!sym(tax) := if_else(!!sym(tax) %in% legend_cutoff_names_rel,
+                                         !!sym(tax),
+                                         glue("Other max.<{round(legend_cutoff_value_rel, 1)}%"))) %>%
+    group_by(Sample, !!!syms(tax), na_type, !!!syms(present_factors)) %>%
     summarise(mean_rel_abund = sum(mean_rel_abund),
               median = median(mean), .groups = "drop") %>%
-    mutate(!!sym(tax) = factor(!!sym(tax)),
-           !!sym(tax) = fct_reorder(!!sym(tax), median, .desc = FALSE))
+    mutate(!!sym(tax) := factor(!!sym(tax)),
+           !!sym(tax) := fct_reorder(!!sym(tax), median, .desc = TRUE))
 
   number_samples =
     plot_data_rel %>%
@@ -173,7 +177,7 @@ heatmap = function(physeq = rarefied_genus_psmelt,
 
   if (length(na_types) == 1) {
     heatmap_relative =
-      base_heatmap(plot_data_rel, "Sample", "mean_rel_abund", legend_name = "Relative\nAbundance (%)", x_label = "Sample") +
+      base_heatmap(plot_data_rel, "Sample", "mean_rel_abund", legend_name = "Relative\nAbundance (%)", x_label = "Sample", tax) +
       scale_color_identity() +
       facet_add(present_factors)
 
@@ -183,7 +187,7 @@ heatmap = function(physeq = rarefied_genus_psmelt,
       filter(na_type == "dna")
 
     heatmap_relative_dna =
-      base_heatmap(plot_data_rel_dna, "Sample", "mean_rel_abund", legend_name = "Relative\nAbundance (%)", x_label = "Sample") +
+      base_heatmap(plot_data_rel_dna, "Sample", "mean_rel_abund", legend_name = "Relative\nAbundance (%)", x_label = "Sample", tax) +
       scale_color_identity() +
       facet_add(present_factors, include_na_type = TRUE) +
       theme(legend.position = "none")
@@ -193,7 +197,7 @@ heatmap = function(physeq = rarefied_genus_psmelt,
       filter(na_type == "rna")
 
     heatmap_relative_rna =
-      base_heatmap(plot_data_rel_rna, "Sample", "mean_rel_abund", legend_name = "Relative\nAbundance (%)", x_label = "Sample") +
+      base_heatmap(plot_data_rel_rna, "Sample", "mean_rel_abund", legend_name = "Relative\nAbundance (%)", x_label = "Sample", tax) +
       scale_color_identity() +
       facet_add(present_factors, include_na_type = TRUE) +
       theme(axis.text.y = element_blank(),
