@@ -102,8 +102,6 @@ heatmap = function(physeq = rarefied_genus_psmelt,
     } else if (norm_method == "fcm" || norm_method == "qpcr") {
       copy_number_corrected_data = physeq[[paste0("psmelt_copy_number_corrected_", tax)]]
     }
-    tax = "Tax_label"
-    copy_number_corrected_data = readRDS("~/Documents/Wetsus/Data_analysis/Projects/ABOR/Dataset_workshop_fcm/Workshop_run1_true/output_data/rds_files/After_cleaning_rds_files/Tax_label/Workshop_run1_true_psmelt_Tax_label_level_copy_number_corrected_counts.rds")
 
     # Create output folders (barplot folder and tax folder)
     heatmap_folder = paste0(figure_folder, "Heatmap/")
