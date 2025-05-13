@@ -27,7 +27,8 @@
 #' @export
 group_tax = function(physeq = rarefied_asv_physeq,
                      norm_method = NULL,
-                     taxrank = c("Phylum", "Class", "Order", "Family", "Tax_label")) {
+                     taxrank = c("Phylum", "Class", "Order", "Family", "Tax_label"),
+                     copy_correction = TRUE) {
 
   log_message(paste("Step 10: Tax glom: ASVs are merged at taxonomic ranks.", paste(projects, collapse = ", ")), log_file)
 
