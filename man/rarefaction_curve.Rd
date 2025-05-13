@@ -11,19 +11,12 @@ rarefaction_curve(
 )
 }
 \arguments{
-\item{physeq}{A phyloseq object containing OTU data and associated metadata.}
+\item{physeq}{A \code{phyloseq} object containing the microbiome data.
+This is the input object that the function processes.}
 
 \item{color}{A character string specifying the column in the sample metadata to use for
 coloring the samples. Default is \code{NULL}, which automatically sets the color
 to \code{"sample_or_control"}.}
-
-\item{base_path}{A character string specifying the base directory for saving output files.
-Default is \code{"./"}.}
-
-\item{rank}{The rank level at which taxa should be aggregated. Default is \code{rank}.}
-
-\item{processing_stage}{A character string describing the processing stage (e.g., "raw" or "filtered").
-This string will be included in the saved PDF file name.}
 }
 \value{
 The rarefaction curve plot object.
@@ -38,5 +31,6 @@ sample metadata. It then generates a rarefaction curve using the \code{amp_rarec
 function and saves the plot as a PDF file in the specified directory.
 }
 \examples{
-rarefaction_curve(physeq = physeq, rank = "Genus", processing_stage = "filtered", color = "Treatment")
+rarefaction_curve(physeq = physeq)
+
 }

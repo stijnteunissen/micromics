@@ -69,8 +69,12 @@ rarefying = function(physeq = physeq,
 
   avgrarefy = function(x, sample, iterations = iteration, seed = 711) {
     set.seed(seed)
-    cl = makeCluster(detectCores()) # all cores minus two "makeCluster(detectCores() -2)"
-    clusterEvalQ(cl, library(vegan)) # load vegan on all worker nodes
+    ncores = parallel::detectCores()
+    nworkers = max(1, ncores - 2) # subtract 2, but never below 1
+    cl = parallel::makeCluster(nworkers)
+    clusterEvalQ(cl, {
+      install.packages("vegan", quiet = TRUE)
+      library(vegan)}) # load vegan on all worker nodes
 
     tablist = parLapply(cl, seq_len(iterations), function(i) {
       rarefied_sample = suppressWarnings(rrarefy(x, sample = sample))
