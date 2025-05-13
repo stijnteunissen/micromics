@@ -42,7 +42,8 @@ barplot = function(physeq = rarefied_genus_psmelt,
                    norm_method = NULL,
                    sample_matrix = NULL,
                    group_by_factor = NULL,
-                   taxrank = c("Phylum", "Class", "Order", "Family", "Tax_label")) {
+                   taxrank = c("Phylum", "Class", "Order", "Family", "Tax_label"),
+                   date_factor = NULL) {
 
   log_message(paste("Step 12: Creating barplot.", paste(projects, collapse = ", ")), log_file)
 
