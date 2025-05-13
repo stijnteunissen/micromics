@@ -46,6 +46,8 @@ heatmap = function(physeq = rarefied_genus_psmelt,
                    norm_method = NULL,
                    taxrank = c("Phylum", "Class", "Order", "Family", "Tax_label")) {
 
+  log_message(paste("Step 13: Creating heatmap.", paste(projects, collapse = ", ")), log_file)
+
   base_heatmap = function(plot_data, x_value, abund_value, legend_name, x_label = "Sample", tax_column) {
     ggplot(plot_data, aes(x = Sample,
                           y = !!sym(tax_column))) +
@@ -224,6 +226,8 @@ heatmap = function(physeq = rarefied_genus_psmelt,
   ggsave(filename = figure_file_path, plot = heatmap_relative, width = plot_width, height = 8, limitsize = FALSE)
   log_message(paste("Relative heatmap saved as .pdf object in", figure_file_path), log_file)
   }
+
+  log_message("Heatmap successfully plotted.", log_file)
 }
 
 

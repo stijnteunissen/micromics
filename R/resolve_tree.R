@@ -30,6 +30,8 @@
 #' @export
 resolve_tree = function(physeq = cleaned_physeq) {
 
+  log_message(paste("Step 5: Resolving tree.", paste(projects, collapse = ", ")), log_file)
+
   psdata = physeq
   project_name = projects
 
@@ -73,4 +75,6 @@ resolve_tree = function(physeq = cleaned_physeq) {
   log_message(paste("Phyloseq object saved as .rds object in", output_file_path), log_file)
 
   return(new_tree)
+
+  log_message("Tree successfully resolved", log_file)
 }

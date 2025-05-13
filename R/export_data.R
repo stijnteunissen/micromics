@@ -27,6 +27,9 @@
 #'
 #' @export
 export_data <- function() {
+
+  log_message(paste("Step 16: Export figures and rds files.", paste(projects, collapse = ", ")), log_file)
+
   # Check that the required global variables exist
   if (!exists("base_path") || !exists("projects")) {
     stop("Ensure that 'base_path' and 'projects' are defined.")
@@ -105,4 +108,6 @@ export_data <- function() {
   # utils::zip(zipfile = zip_file, files = files_to_zip)
   #
   # message("Export completed! Zip file created: ", zip_file)
+
+  log_message("Export completed.", log_file)
 }

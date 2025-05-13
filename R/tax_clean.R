@@ -53,6 +53,8 @@
 tax_clean = function(physeq = physeq,
                      tax_filter = TRUE) {
 
+  log_message(paste("Step 4: Tax clean: phyloseq are cleaned.", paste(projects, collapse = ", ")), log_file)
+
   psdata = physeq
   project_name = projects
 
@@ -115,4 +117,6 @@ tax_clean = function(physeq = physeq,
   log_message(paste("taxonomy table cleaned: ",  removed_ASV_count, " ASVs removed.  Phyloseq object saved as .rds object in", output_file_path), log_file)
 
   return(psdata)
+
+  log_message("Successfully Tax cleaned.", log_file)
 }

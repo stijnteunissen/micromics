@@ -44,6 +44,8 @@ decontam =  function(physeq = resolved_tree_physeq,
                      decon_method = c("frequency", "prevalence", "both"),
                      blank = TRUE) {
 
+  log_message(paste("Step 7: Decontam: Removing contamination.", paste(projects, collapse = ", ")), log_file)
+
   psdata = physeq
   project_name = projects
 
@@ -191,4 +193,6 @@ decontam =  function(physeq = resolved_tree_physeq,
   }
 
   return(physeq_no_contam)
+
+  log_message("Decontam successfully executed.", log_file)
 }

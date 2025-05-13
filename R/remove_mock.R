@@ -48,6 +48,8 @@ remove_mock = function(physeq = decontam_physeq,
                        mock_genera = mock_genera,
                        mock = TRUE) {
 
+  log_message(paste("Step 8: Removing mock: Mock samples en mock ASVs are removed fropm phyloseq object.", paste(projects, collapse = ", ")), log_file)
+
   psdata = physeq
   project_name = projects
 
@@ -65,7 +67,7 @@ remove_mock = function(physeq = decontam_physeq,
     # } else
     #   mock_genera = mock_genera
 
-    # extract mock OTU mock_genera
+    # extract mock ASV mock_genera
     mock_ASVs =
       psdata %>%
       subset_taxa(Genus %in% mock_genera) %>%
@@ -87,4 +89,6 @@ remove_mock = function(physeq = decontam_physeq,
   log_message(paste("Phyloseq object without mock saved as .rds object in", output_file_path), log_file)
 
   return(physeq_filtered)
+
+  log_message("Mock ASVs successfully removed.", log_file)
 }

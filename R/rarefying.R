@@ -56,6 +56,8 @@ rarefying = function(physeq = physeq,
                      norm_method = NULL,
                      iteration = 100) {
 
+  log_message(paste("Step 9: rarefied data", paste(projects, collapse = ", ")), log_file)
+
   project_name = projects
 
   project_folder = paste0(base_path, project_name)
@@ -233,4 +235,6 @@ rarefying = function(physeq = physeq,
     log_message(paste("Error: Invalid normalization method specified. Use 'fcm' or 'qpcr'."), log_file)
     stop("Error: Invalid normalization method specified. Use 'fcm' or 'qpcr'.")
   }
+
+  log_message("Data is successfully rarefied.", log_file)
 }

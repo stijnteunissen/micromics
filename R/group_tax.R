@@ -29,6 +29,8 @@ group_tax = function(physeq = rarefied_asv_physeq,
                      norm_method = NULL,
                      taxrank = c("Phylum", "Class", "Order", "Family", "Tax_label")) {
 
+  log_message(paste("Step 10: Tax glom: ASVs are merged at taxonomic ranks.", paste(projects, collapse = ", ")), log_file)
+
   project_name = projects
   project_folder = paste0(base_path, project_name)
   output_folder_rds_files = paste0(project_folder, "/output_data/rds_files/After_cleaning_rds_files/")
@@ -93,4 +95,6 @@ group_tax = function(physeq = rarefied_asv_physeq,
   }
 
   return(results)
+
+  log_message("Tax glom successfully aplied", log_file)
 }

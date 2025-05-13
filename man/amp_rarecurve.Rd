@@ -11,7 +11,6 @@ amp_rarecurve(
   xlim = NULL,
   label = FALSE,
   color = NULL,
-  rank = rank,
   legend = TRUE,
   color.vector = NULL,
   legend.position = "topleft"
@@ -34,8 +33,6 @@ plot. Default is \code{FALSE}.}
 \item{color}{A character string specifying the column in the sample metadata to use for
 coloring the samples. Default is \code{NULL} (no color applied).}
 
-\item{rank}{An optional rank level for taxa aggregation. Default is \code{rank}.}
-
 \item{legend}{A logical value indicating whether to display a legend on the plot.
 Default is \code{TRUE}.}
 
@@ -44,6 +41,8 @@ the \code{color} column. Default is \code{NULL} (default colors are used).}
 
 \item{legend.position}{A character string specifying the position of the legend. Default
 is \code{"topleft"}.}
+
+\item{rank}{An optional rank level for taxa aggregation. Default is \code{rank}.}
 }
 \value{
 A rarefaction curve plot.
@@ -53,5 +52,5 @@ This function generates rarefaction curves for visualizing species richness
 at different sequencing depths, based on the OTU table in a phyloseq object.
 }
 \examples{
-amp_rarecurve(data = physeq, step = 200, color = "sample_type", legend.position = "topright")
+amp_rarecurve(data = physeq, step = 200, color = "sample_or_control", legend.position = "topright")
 }

@@ -10,7 +10,7 @@ barplot(
   norm_method = NULL,
   sample_matrix = NULL,
   group_by_factor = NULL,
-  taxrank = "Tax_label"
+  taxrank = c("Phylum", "Class", "Order", "Family", "Tax_label")
 )
 }
 \arguments{

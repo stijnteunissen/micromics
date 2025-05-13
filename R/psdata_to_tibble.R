@@ -50,6 +50,8 @@ psdata_to_tibble = function(physeq = rarefied_genus_physeq,
                             norm_method = NULL,
                             taxrank = c("Phylum", "Class", "Order", "Family", "Tax_label")) {
 
+  log_message(paste("Step 11: Convert psdata to tibble.", paste(projects, collapse = ", ")), log_file)
+
   project_name = projects
   project_folder = paste0(base_path, project_name)
   output_folder_rds_files = paste0(project_folder, "/output_data/rds_files/After_cleaning_rds_files/")
@@ -107,4 +109,6 @@ psdata_to_tibble = function(physeq = rarefied_genus_physeq,
     }
   }
   return(results)
+
+  log_message("Successfully converted to a tibble.", log_file)
 }

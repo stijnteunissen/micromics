@@ -90,6 +90,8 @@ normalise_data = function(physeq = without_mock_physeq,
                           norm_method = NULL,
                           copy_correction = TRUE) {
 
+  log_message(paste("Step 9: Copy number correction: Correct the copy number for relative data and biomass normalisation for absolute data.", paste(projects, collapse = ", ")), log_file)
+
   psdata = physeq
   project_name = projects
 
@@ -480,6 +482,13 @@ normalise_data = function(physeq = without_mock_physeq,
     log_message("Error: Invalid normalization method specified. Use 'fcm' or 'qpcr'.")
     stop("Error: Invalid normalization method specified. Use 'fcm' or 'qpcr'.")
   }
+
+  if (copy_correction == TRUE){
+  log_message("Copy number correction successfully applied.", log_file)
+  } else if (copy_correction == FALSE) {
+    log_message("Copy number correction has not been applied.", log_file)
+  }
+
 }
 
 

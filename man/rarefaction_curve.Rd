@@ -6,8 +6,6 @@
 \usage{
 rarefaction_curve(
   physeq = resolved_tree_physeq,
-  rank = "ASV",
-  processing_stage,
   color = NULL,
   base_path = "./"
 )
@@ -15,17 +13,17 @@ rarefaction_curve(
 \arguments{
 \item{physeq}{A phyloseq object containing OTU data and associated metadata.}
 
+\item{color}{A character string specifying the column in the sample metadata to use for
+coloring the samples. Default is \code{NULL}, which automatically sets the color
+to \code{"sample_or_control"}.}
+
+\item{base_path}{A character string specifying the base directory for saving output files.
+Default is \code{"./"}.}
+
 \item{rank}{The rank level at which taxa should be aggregated. Default is \code{rank}.}
 
 \item{processing_stage}{A character string describing the processing stage (e.g., "raw" or "filtered").
 This string will be included in the saved PDF file name.}
-
-\item{color}{A character string specifying the column in the sample metadata to use for
-coloring the samples. Default is \code{NULL}, which automatically sets the color
-to \code{"sample_type"}.}
-
-\item{base_path}{A character string specifying the base directory for saving output files.
-Default is \code{"./"}.}
 }
 \value{
 The rarefaction curve plot object.
@@ -35,7 +33,7 @@ This function creates a rarefaction curve for a given phyloseq object and
 saves the plot as a PDF.
 }
 \details{
-This function first checks whether the \code{sample_type} column exists in the
+This function first checks whether the \code{sample_or_control} column exists in the
 sample metadata. It then generates a rarefaction curve using the \code{amp_rarecurve}
 function and saves the plot as a PDF file in the specified directory.
 }

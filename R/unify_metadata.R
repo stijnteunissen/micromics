@@ -40,6 +40,9 @@
 #'
 #' @export
 unify_metadata <- function(projects) {
+
+  log_message(paste("Step 2: Merge metadata: adding biomass (fcm or qpcr) data to the original metadata.", paste(projects, collapse = ", ")), log_file)
+
   # Define the project folder and destination folder paths
   project_name <- projects
   project_folder <- paste0(base_path, project_name)
@@ -150,4 +153,6 @@ unify_metadata <- function(projects) {
   write.table(combined_metadata, file = paste0(destination_folder, project_name, "_metadata_formatted.tsv"), sep = "\t", row.names = FALSE, quote = FALSE)
 
   return(combined_metadata)
+
+  log_message("Metadata successfully merged.", log_file)
 }

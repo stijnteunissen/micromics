@@ -39,6 +39,8 @@
 #' @export
 creating_physeq_object = function(projects) {
 
+  log_message(paste("Step 3: Creating phyloseq object (physeq): physeq is created using the table, rooted tree, classifier and metadata.", paste(projects, collapse = ", ")), log_file)
+
   project_name = projects
   project_folder = paste0(base_path, project_name)
   destination_folder = paste0(project_folder, "/input_data")
@@ -67,5 +69,7 @@ creating_physeq_object = function(projects) {
   log_message(paste("Uncleaned phyloseq object saved as .rds object in", output_file_path), log_file)
 
   return(physeq)
+
+  log_message("Phyloseq successfully created.", log_file)
 
 }

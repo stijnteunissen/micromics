@@ -8,7 +8,7 @@ heatmap(
   physeq = rarefied_genus_psmelt,
   ntaxa = NULL,
   norm_method = NULL,
-  taxrank = "Tax_label"
+  taxrank = c("Phylum", "Class", "Order", "Family", "Tax_label")
 )
 }
 \arguments{
@@ -53,7 +53,7 @@ The function performs the following steps:
     physeq = rarefied_genus_psmelt,
     ntaxa = 20,
     norm_method = "fcm",
-    taxrank = "Tax_label"
+    taxrank = c("Phylum", "Class", "Order", "Family", "Tax_label")
   )
 }
 

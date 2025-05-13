@@ -77,6 +77,8 @@ beta_diversity <- function(physeq = physeq,
                            size_factor = NULL,
                            alpha_factor = NULL) {
 
+  log_message(paste("Step 15: Creating beta diversity.", paste(projects, collapse = ", ")), log_file)
+
   # Set up project and folder paths
   project_name <- projects
   project_folder <- paste0(base_path, project_name)
@@ -490,4 +492,5 @@ beta_diversity <- function(physeq = physeq,
       }
     } # end for loop
   }
+  log_message("Beta diversity successfully plotted.", log_file)
 }

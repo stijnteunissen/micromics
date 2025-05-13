@@ -56,6 +56,8 @@ alpha_diversity = function(physeq = physeq,
                            taxrank = c("Phylum", "Class", "Order", "Family", "Tax_label"),
                            date_factor = NULL) {
 
+  log_message(paste("Step 14: Creating alpha diversity.", paste(projects, collapse = ", ")), log_file)
+
   base_alpha_plot = function(alpha_data, x_value, y_value, x_label, y_label) {
 
     if (!is.null(date_factor)) {
@@ -390,4 +392,6 @@ alpha_diversity = function(physeq = physeq,
     }
   }
   return(combined_plot)
+
+  log_message("Alpha diversity successfully plotted.", log_file)
 }
