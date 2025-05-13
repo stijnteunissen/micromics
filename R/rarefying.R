@@ -120,7 +120,7 @@ rarefying = function(physeq = physeq,
     minimum_sampling_depth = min(sampling_depths) # minimum sampling depth across all samples
     rarefy_to = round(cell_count_table * minimum_sampling_depth, digits = 0) # number of reads to rarefy for each sample
 
-    #psdata_phyloseq = otu_table(psdata_fcm, taxa_are_rows = FALSE)
+    # psdata_phyloseq = otu_table(psdata_fcm, taxa_are_rows = FALSE)
     psdata_phyloseq = t(scaled_ps_matrix)
 
     # rarefy each sample based on the calculated rarefying targets (rarfy_to)
