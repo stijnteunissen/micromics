@@ -44,7 +44,8 @@
 heatmap = function(physeq = rarefied_genus_psmelt,
                    ntaxa = NULL,
                    norm_method = NULL,
-                   taxrank = c("Phylum", "Class", "Order", "Family", "Tax_label")) {
+                   taxrank = c("Phylum", "Class", "Order", "Family", "Tax_label"),
+                   date_factor = NULL) {
 
   log_message(paste("Step 13: Creating heatmap.", paste(projects, collapse = ", ")), log_file)
 
