@@ -252,7 +252,7 @@ alpha_diversity = function(physeq = physeq,
     print(combined_plot)
 
     figure_file_path = paste0(asv_folder, project_name, "_alpha_diversity_asv_level.pdf")
-    ggsave(filename = figure_file_path, plot = combined_plot, width = 10, height = 5)
+    ggsave(filename = figure_file_path, plot = combined_plot, width = 12, height = 5)
     log_message(paste("alpha diversity asv level saved as .pdf object in", figure_file_path), log_file)
 
   } else {
@@ -375,7 +375,7 @@ alpha_diversity = function(physeq = physeq,
       print(combined_plot)
 
       figure_file_path = paste0(tax_folder, project_name, "_alpha_diversity_", tax, "_level.pdf")
-      ggsave(filename = figure_file_path, plot = combined_plot, width = 10, height = 5)
+      ggsave(filename = figure_file_path, plot = combined_plot, width = 12, height = 5)
       log_message(paste("alpha diversity", tax, "level saved as .pdf object in", figure_file_path), log_file)
     }
   }
