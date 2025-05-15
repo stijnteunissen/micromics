@@ -149,19 +149,19 @@ unify_metadata <- function(projects) {
   # Combine the metadata using an inner join on SampleID
   combined_metadata <- inner_join(metadata, metadata_extra, by = "SampleID")
 
-  if (any(grepl("\\s", colnames(combined_metadata)))) {
-    error_message = paste0("Error: Spaces detected in metadata column names.")
-    log_message(error_message, log_file)
-    stop(error_message)
-  }
-
-  bad_cells = which(apply(combined_metadata, 2, function(col)
-    any(grepl("\\s", as.character(col)))))
-  if (length(bad_cells) > 0) {
-    error_message = paste0("Error: Spaces detected in metadata values.")
-    log_message(error_message, log_file)
-    stop(error_message)
-  }
+  # if (any(grepl("\\s", colnames(combined_metadata)))) {
+  #   error_message = paste0("Error: Spaces detected in metadata column names.")
+  #   log_message(error_message, log_file)
+  #   stop(error_message)
+  # }
+  #
+  # bad_cells = which(apply(combined_metadata, 2, function(col)
+  #   any(grepl("\\s", as.character(col)))))
+  # if (length(bad_cells) > 0) {
+  #   error_message = paste0("Error: Spaces detected in metadata values.")
+  #   log_message(error_message, log_file)
+  #   stop(error_message)
+  # }
 
   for (col in names(combined_metadata)) {
     if (is.character(combined_metadata[[col]])) {
