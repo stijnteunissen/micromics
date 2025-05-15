@@ -54,10 +54,11 @@ unify_metadata <- function(projects) {
 
   # Initialize flags and data holders
   data_available <- FALSE
-  qPCR_combined <- NULL
-  FCM_combined <- NULL
+  qpcr_column = "sq_calc_mean" %in% colnames(metadata_extra)
+  fcm_column = "cells_per_ml" %in% colnames(metadata_extra)
 
   # Process multiple qPCR files
+  if (!qpcr_column) {
   qPCR_files <- list.files(destination_folder, pattern = "qPCR.*\\.csv$", full.names = TRUE)
   if (length(qPCR_files) > 0) {
     qPCR_data <- qPCR_files %>%
@@ -85,10 +86,11 @@ unify_metadata <- function(projects) {
   } else {
     log_message(paste("No qPCR data found for project:", project_name), log_file)
   }
+}
 
+  if (!fcm_column) {
   # Process multiple FCM files
   FCM_files <- list.files(destination_folder, pattern = "fcm.*\\.csv$", full.names = TRUE)
-
   if (length(FCM_files) > 0) {
     FCM_combined <- FCM_files %>%
       lapply(read_delim, col_names = TRUE, show_col_types = FALSE) %>%
@@ -103,6 +105,7 @@ unify_metadata <- function(projects) {
   } else {
     log_message(paste("No FCM data found for project:", project_name), log_file)
   }
+}
 
   # If no data was available, log a warning and leave metadata unchanged
   if (!data_available) {
