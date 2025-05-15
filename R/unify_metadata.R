@@ -155,8 +155,9 @@ unify_metadata <- function(projects) {
     stop(error_message)
   }
 
-  bad_cells = which(apply(combined_metadata, 2, function(col) any(grepl("\\s", as.character(col)))), arr.ind = TRUE)
-  if (nrow(bad_cells) > 0) {
+  bad_cells = which(apply(combined_metadata, 2, function(col)
+    any(grepl("\\s", as.character(col)))))
+  if (length(bad_cells) > 0) {
     error_message = paste0("Error: Spaces detected in metadata values.")
     log_message(error_message, log_file)
     stop(error_message)
