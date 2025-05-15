@@ -149,6 +149,42 @@ unify_metadata <- function(projects) {
   # Combine the metadata using an inner join on SampleID
   combined_metadata <- inner_join(metadata, metadata_extra, by = "SampleID")
 
+  if (any(grepl("\\s", colnames(combined_metadata)))) {
+    error_message = paste0("Error: Spaces detected in metadata column names.")
+    log_message(error_message, log_file)
+    stop(error_message)
+  }
+
+  bad_cells = which(apply(combined_metadata, 2, function(col) any(grepl("\\s", as.character(col)))), arr.ind = TRUE)
+  if (nrow(bad_cells) > 0) {
+    error_message = paste0("Error: Spaces detected in metadata values.")
+    log_message(error_message, log_file)
+    stop(error_message)
+  }
+
+  for (col in names(combined_metadata)) {
+    if (is.character(combined_metadata[[col]])) {
+      has_comma = grepl(",", combined_metadata[[col]])
+      if (any(has_comma)) {
+        combined_metadata[[col]] = gsub(",", ".", combined_metadata[[col]])
+      }
+      if (all(grepl("^[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?$", combined_metadata[[col]]))) {
+        combined_metadata[[col]] <- as.numeric(combined_metadata[[col]])
+      }
+    }
+  }
+
+  if (!"DNA_Concentration" %in% colnames(combined_metadata)) {
+    error_message = paste0("Error: DNA_Concentration column not found in metadata.")
+    log_message(error_message, log_file)
+    stop(error_message)
+  }
+
+  zero = which(combined_metadata$DNA_Concentration == 0, arr.ind = TRUE)
+  if (length(zero) > 0) {
+    combined_metadata$DNA_Concentration[zero] = 0.000001
+  }
+
   # Write the formatted metadata to a file
   write.table(combined_metadata, file = paste0(destination_folder, project_name, "_metadata_formatted.tsv"), sep = "\t", row.names = FALSE, quote = FALSE)
 
