@@ -184,9 +184,16 @@ normalise_data = function(physeq = without_mock_physeq,
     joined_pstibble_fcm <- psdata_fcm_long %>%
       inner_join(df_sample_data_fcm, by = "SampleID")
 
+    # joined_pstibble_fcm_norm <- joined_pstibble_fcm %>%
+    #   rowwise() %>%
+    #   mutate(norm_abund = ceiling(Abundance * cells_per_ml)) %>%
+    #   select(OTU, norm_abund, SampleID)
+
     joined_pstibble_fcm_norm <- joined_pstibble_fcm %>%
-      rowwise() %>%
-      mutate(norm_abund = ceiling(Abundance * cells_per_ml)) %>%
+      group_by(SampleID) %>%
+      mutate(relative_abund = Abundance / sum(Abundance)) %>%
+      ungroup() %>%
+      mutate(norm_abund = ceiling(relative_abund * cells_per_ml)) %>%
       select(OTU, norm_abund, SampleID)
 
     fcm_norm_wide <- joined_pstibble_fcm_norm %>%

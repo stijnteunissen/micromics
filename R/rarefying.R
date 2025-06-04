@@ -73,7 +73,7 @@ rarefying = function(physeq = physeq,
     nworkers = max(1, ncores - 2) # subtract 2, but never below 1
     cl = parallel::makeCluster(nworkers)
     clusterEvalQ(cl, {
-      install.packages("vegan", quiet = TRUE)
+      install.packages("vegan", repos="https://cloud.r-project.org", quiet = TRUE)
       library(vegan)}) # load vegan on all worker nodes
 
     tablist = parLapply(cl, seq_len(iterations), function(i) {
