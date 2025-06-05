@@ -18,7 +18,7 @@
 #' @param taxrank A character vector specifying the taxonomic levels for which
 #'   alpha diversity is to be calculated. If the first element is (taxrank = `asv`),
 #'   ASV-level data is processed. Otherwise, the function
-#'   processes data for each taxonomic level provided default is taxrank = c('Phylum', 'Class', 'Order', 'Family', 'Tax_label').
+#'   processes data for each taxonomic level provided default is taxrank = c('Phylum', 'Class', 'Order', 'Family', 'Genus').
 #' @param date_factor An optional character string indicating the name of the
 #'   date column in the sample metadata. If provided, the column is converted to
 #'   a Date object ("%d/%m/%Y") and used to order the data.
@@ -53,7 +53,7 @@
 #' @export
 alpha_diversity = function(physeq = physeq,
                            norm_method = NULL,
-                           taxrank = c("Phylum", "Class", "Order", "Family", "Tax_label"),
+                           taxrank = c("Phylum", "Class", "Order", "Family", "Genus"),
                            date_factor = NULL) {
 
   log_message(paste("Step 14: Creating alpha diversity.", paste(projects, collapse = ", ")), log_file)

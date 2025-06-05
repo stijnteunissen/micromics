@@ -42,7 +42,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
                    norm_method = NULL,
                    sample_matrix = NULL,
                    group_by_factor = NULL,
-                   taxrank = c("Phylum", "Class", "Order", "Family", "Tax_label"),
+                   taxrank = c("Phylum", "Class", "Order", "Family", "Genus"),
                    date_factor = NULL) {
 
   log_message(paste("Step 12: Creating barplot.", paste(projects, collapse = ", ")), log_file)
@@ -146,7 +146,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
     present_factors = if (length(factor_columns) > 0) factor_columns else NULL
 
     # Define the complete taxonomic order and extract all higher levels than the current tax
-    taxonomy_order <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Tax_label")
+    taxonomy_order <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus")
     current_tax <- tax   # current taxonomic column (e.g., "Family" or "Tax_label")
     current_index <- match(current_tax, taxonomy_order)
     higher_levels <- taxonomy_order[1:(current_index)]
@@ -304,7 +304,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
         absolute_data = physeq[[paste0("psmelt_qpcr_norm_rarefied_", tax)]]
       }
 
-      taxonomy_order <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Tax_label")
+      taxonomy_order <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus")
       current_tax <- tax
       current_index <- match(current_tax, taxonomy_order)
       higher_levels <- taxonomy_order[1:(current_index)]

@@ -10,7 +10,7 @@
 #' @param physeq A phyloseq object containing normalized genus-level data. The default is \code{rarefied_genus_psmelt}.
 #' @param ntaxa An integer specifying the maximum number of taxa to display individually. Taxa below the threshold are grouped into "Other". If \code{NULL}, \code{ntaxa} is set to 23.
 #' @param norm_method A character string specifying the normalization method. If \code{NULL}, the function uses the provided \code{physeq} directly. If set to \code{"fcm"} or \code{"qpcr"}, the function extracts the corresponding \code{psmelt_copy_number_corrected_} data based on the taxonomic rank.
-#' @param taxrank A character string indicating the taxonomic rank to use for grouping taxa. The default is \code{"Tax_label"}.
+#' @param taxrank A character string indicating the taxonomic rank to use for grouping taxa. The default is \code{"Genus"}.
 #'
 #' @details
 #' The function performs the following steps:
@@ -36,7 +36,7 @@
 #'     physeq = rarefied_genus_psmelt,
 #'     ntaxa = 20,
 #'     norm_method = "fcm",
-#'     taxrank = c("Phylum", "Class", "Order", "Family", "Tax_label")
+#'     taxrank = c("Phylum", "Class", "Order", "Family", "Genus")
 #'   )
 #' }
 #'
@@ -44,7 +44,7 @@
 heatmap = function(physeq = rarefied_genus_psmelt,
                    ntaxa = NULL,
                    norm_method = NULL,
-                   taxrank = c("Phylum", "Class", "Order", "Family", "Tax_label"),
+                   taxrank = c("Phylum", "Class", "Order", "Family", "Genus"),
                    date_factor = NULL) {
 
   log_message(paste("Step 13: Creating heatmap.", paste(projects, collapse = ", ")), log_file)

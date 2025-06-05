@@ -3,7 +3,7 @@
 #' This function computes beta diversity using ordination methods (e.g., PCoA) on a phyloseq object and generates corresponding ordination plots. It supports both ASV-level data and data aggregated at various taxonomic levels, and it can handle both relative and, if available, absolute abundance data. Four distance metrics are used for relative abundance plots (Jaccard, Bray-Curtis, Unweighted UniFrac, and Weighted UniFrac), and Manhattan distance is used for absolute abundance plots when a normalization method is provided.
 #'
 #' @param physeq A phyloseq object containing microbial community data.
-#' @param taxrank A character vector specifying the taxonomic levels to process. If the first element (case-insensitive) is \code{"asv"}, ASV-level beta diversity is computed; otherwise, beta diversity is computed for each taxonomic level provided (default: \code{c("Phylum", "Class", "Order", "Family", "Tax_label")}).
+#' @param taxrank A character vector specifying the taxonomic levels to process. If the first element (case-insensitive) is \code{"asv"}, ASV-level beta diversity is computed; otherwise, beta diversity is computed for each taxonomic level provided (default: \code{c("Phylum", "Class", "Order", "Family", "Genus")}).
 #' @param norm_method A character string indicating the normalization method to be used for generating absolute abundance data. Options include:
 #'   \itemize{
 #'     \item \code{"fcm"}: Flow cytometry normalization.
@@ -68,7 +68,7 @@
 #'
 #' @export
 beta_diversity <- function(physeq = physeq,
-                           taxrank = c("Phylum", "Class", "Order", "Family", "Tax_label"),
+                           taxrank = c("Phylum", "Class", "Order", "Family", "Genus"),
                            norm_method = NULL,
                            ordination_method = "PCoA",
                            color_factor = NULL,

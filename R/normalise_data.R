@@ -356,7 +356,7 @@ normalise_data = function(physeq = without_mock_physeq,
     tax_table_df =
       tax_table_df %>%
       rowwise() %>%
-      mutate(Species = case_when(
+      mutate(Genus = case_when(
         grepl("\\d", Genus) ~ {
           first_non_numeric <- case_when(
             !grepl("\\d", Family) ~ paste(Family, Genus, sep = " "),
@@ -371,9 +371,9 @@ normalise_data = function(physeq = without_mock_physeq,
         TRUE ~ Genus)) %>%
       ungroup()
 
-    tax_table_df =
-      tax_table_df %>%
-      dplyr::rename(Tax_label = Species)
+    # tax_table_df =
+    #   tax_table_df %>%
+    #   dplyr::rename(Tax_label = Species)
 
     tax_table_matrix = as.matrix(tax_table_df)
     rownames(tax_table_matrix) = otu_names

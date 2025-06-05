@@ -79,9 +79,9 @@ create_folders = function(projects) {
   files = list.files(source_folder, full.names = TRUE)
 
   # Check for required files - stop if missing
-  required_files = c("table.*\\.qza$", "rooted-tree.*\\.qza$", "classifier.*\\.qza", "metadata\\.tsv$")
+  required_files = c("table.*\\.qza$", "rooted-tree.*\\.qza$", "classifier.*\\.qza", "metadata\\.(tsv|txt|csv)$")
   for (file_pattern in required_files) {
-    if (!any(grepl(file_pattern, files))) {  # Use 'files' instead of 'file'
+    if (!any(grepl(file_pattern, files))) {
       error_message = paste("Error:", file_pattern, "does not exist in", source_folder, "for project:", projects, "\n")
       log_message(error_message, log_file)
       stop(error_message)
@@ -89,22 +89,24 @@ create_folders = function(projects) {
   }
 
   # Check for optional files - only warning if missing
-  optional_files = c("qPCR.*\\.csv$", "fcm.*\\.csv$", "metadata_extra\\.tsv$", "prediction*\\.RDS$")
+  optional_files = c("metadata_extra\\.(tsv|txt|csv)$", "qPCR.*\\.(tsv|txt|csv)$","fcm.*\\.(tsv|txt|csv)$", "prediction*\\.RDS$")
   for (file_pattern in optional_files) {
-    if (!any(grepl(file_pattern, files))) {  # Use 'files' instead of 'file'
+    if (!any(grepl(file_pattern, files))) {
       warning_message = paste("Warning:", file_pattern, "does not exist in", source_folder, "for project:", projects, "\n")
       log_message(warning_message, log_file)
     }
   }
 
   # Copy the relevant files
+  copy_patterns <- paste("table.*\\.qza$", "rooted-tree.*\\.qza$", "classifier.*\\.qza$", "metadata\\.(tsv|txt|csv)$","metadata_extra\\.(tsv|txt|csv)$",
+                         "qPCR.*\\.(tsv|txt|csv)$", "fcm.*\\.(tsv|txt|csv)$", "prediction.*\\.RDS$", sep = "|")
+
   files_for_phyloseq_object =
     list.files(source_folder,
-               pattern = "table.*\\.qza$|rooted-tree.*\\.qza$|classifier.*\\.qza|metadata\\.tsv$|metadata_extra\\.tsv$|dna-sequences.*\\.csv$|fcm.*\\.csv$|qPCR.*\\.csv$|prediction*\\.RDS$",
+               pattern = copy_patterns,
                full.names = TRUE)
 
   file.copy(files_for_phyloseq_object, destination_folder, overwrite = TRUE)
-
   log_message("Folder structure successfully created.", log_file)
 }
 

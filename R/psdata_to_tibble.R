@@ -48,7 +48,7 @@
 #' @export
 psdata_to_tibble = function(physeq = rarefied_genus_physeq,
                             norm_method = NULL,
-                            taxrank = c("Phylum", "Class", "Order", "Family", "Tax_label")) {
+                            taxrank = c("Phylum", "Class", "Order", "Family", "Genus")) {
 
   log_message(paste("Step 11: Convert psdata to tibble.", paste(projects, collapse = ", ")), log_file)
 

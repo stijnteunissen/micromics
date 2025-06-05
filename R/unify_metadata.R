@@ -49,8 +49,19 @@ unify_metadata <- function(projects) {
   destination_folder <- paste0(project_folder, "/input_data/")
 
   # Read additional metadata
-  metadata_extra_file <- list.files(destination_folder, pattern = "metadata_extra\\.tsv$", full.names = TRUE)
-  metadata_extra <- read_delim(metadata_extra_file, col_names = TRUE, show_col_types = FALSE)
+  metadata_extra_file <- list.files(destination_folder, pattern = "metadata_extra\\.(tsv|txt|csv)$", full.names = TRUE)[1]
+  if (is.na(metadata_extra_file)) {
+    message = paste("No metadata file (.tsv/.txt/.csv) found in ", destination_folder)
+    stop(message)
+    log_message(message, log_file)
+  }
+
+  ext = tolower(tools::file_ext(metadata_extra_file))
+  metadata_extra <- if (ext == "csv") {
+    read_csv(metadata_extra_file, col_names = TRUE, show_col_types = FALSE)
+  } else {
+    read_delim(metadata_extra_file, delim = "\t", col_names = TRUE, show_col_types = FALSE)
+  }
 
   # Initialize flags and data holders
   data_available <- FALSE
@@ -58,11 +69,18 @@ unify_metadata <- function(projects) {
   FCM_combined <- NULL
 
   # Process multiple qPCR files
-  qPCR_files <- list.files(destination_folder, pattern = "qPCR.*\\.csv$", full.names = TRUE)
+  qPCR_files <- list.files(destination_folder, pattern = "qPCR.*\\.(csv|tsv|txt)$", full.names = TRUE)
   if (length(qPCR_files) > 0) {
     qPCR_data <- qPCR_files %>%
-      lapply(read_delim, col_names = TRUE, show_col_types = FALSE) %>%
+      lapply(function(f) {
+        ext <- tolower(file_ext(f))
+        if (ext == "csv") {
+          read_csv(f, col_names = TRUE, show_col_types = FALSE)
+        } else {
+          read_delim(f, delim = "\t", col_names = TRUE, show_col_types = FALSE)
+        }}) %>%
       bind_rows()
+  }
 
     # Check if the column 'sq_calc_mean' exists in the qPCR data
     if ("sq_calc_mean" %in% colnames(qPCR_data)) {
@@ -75,7 +93,6 @@ unify_metadata <- function(projects) {
       qPCR_combined <- qPCR_data %>%
         group_by(SampleID) %>%
         summarise(sq_mean = mean(SQ, na.rm = TRUE), .groups = "drop")
-    }
 
     # Merge the qPCR results with the extra metadata
     metadata_extra <- metadata_extra %>%
@@ -87,11 +104,18 @@ unify_metadata <- function(projects) {
   }
 
   # Process multiple FCM files
-  FCM_files <- list.files(destination_folder, pattern = "fcm.*\\.csv$", full.names = TRUE)
+  FCM_files <- list.files(destination_folder, pattern = "fcm.*\\.(csv|tsv|txt)$", full.names = TRUE)
 
   if (length(FCM_files) > 0) {
     FCM_combined <- FCM_files %>%
-      lapply(read_delim, col_names = TRUE, show_col_types = FALSE) %>%
+      lapply(function(f) {
+        ext <- tolower(file_ext(f))
+        if (ext == "csv") {
+          read_csv(f, col_names = TRUE, show_col_types = FALSE)
+        } else {
+          read_delim(f, delim = "\t", col_names = TRUE, show_col_types = FALSE)
+        }
+      }) %>%
       bind_rows() %>%
       group_by(SampleID) %>%
       summarise(cells_per_ml = mean(cells_per_ml, na.rm = TRUE), .groups = "drop")
@@ -110,21 +134,27 @@ unify_metadata <- function(projects) {
     log_message(warning_message, log_file)
   } else {
     # Write the updated metadata_extra back to a file
-    write_delim(metadata_extra, file = paste0(destination_folder, "/metadata_extra_updated.tsv"), delim = "\t", col_names = TRUE)
+    # write_delim(metadata_extra, file = paste0(destination_folder, "/metadata_extra_updated.tsv"), delim = "\t", col_names = TRUE)
     message <- paste("Message: Metadata updated with available qPCR and/or FCM data for project:", project_name)
     log_message(message, log_file)
   }
 
   # Process main metadata files
-  metadata_files <- list.files(destination_folder, pattern = "metadata\\.tsv$", full.names = TRUE)
+  metadata_files <- list.files(destination_folder, pattern = "metadata\\.(tsv|txt|csv)$", full.names = TRUE)
 
   # Combine metadata files
   if (length(metadata_files) > 0) {
     metadata <- metadata_files %>%
-      lapply(read_delim, col_names = TRUE, show_col_types = FALSE) %>%
+      lapply(function(f) {
+        ext <- tolower(file_ext(f))
+        if (ext == "csv") {
+          read_csv(f, col_names = TRUE, show_col_types = FALSE)
+        } else {
+          read_delim(f, delim = "\t", col_names = TRUE, show_col_types = FALSE)
+        }}) %>%
       bind_rows()
   } else {
-    error_message <- paste("Error: metadata.tsv file does not exist.")
+    error_message <- paste("Error: metadata file (.tsv/.txt/.csv) does not exist in", destination_folder)
     log_message(error_message, log_file)
     stop(error_message)
   }
@@ -187,7 +217,7 @@ unify_metadata <- function(projects) {
   }
 
   # Write the formatted metadata to a file
-  write.table(combined_metadata, file = paste0(destination_folder, project_name, "_metadata_formatted.tsv"), sep = "\t", row.names = FALSE, quote = FALSE)
+  write.table(combined_metadata, file = paste0(destination_folder, project_name, "_final_metadata.tsv"), sep = "\t", row.names = FALSE, quote = FALSE)
 
   return(combined_metadata)
 
