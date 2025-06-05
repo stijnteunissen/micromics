@@ -76,10 +76,10 @@ rarefaction_curve <- function(physeq = resolved_tree_physeq, color = NULL, base_
   figure_folder = paste0(project_folder, "/figures")
   if (!dir.exists(figure_folder)) {dir.create(figure_folder, recursive = TRUE)}
 
-  figure_path <- file.path(figure_folder, glue::glue("{project_name}_rarefaction_curve.pdf"))
-  pdf(file = figure_path, useDingbats = FALSE, width = 7, height = 5)
+  # figure_path <- file.path(figure_folder, glue::glue("{project_name}_rarefaction_curve.pdf"))
+  # pdf(file = figure_path, useDingbats = FALSE, width = 7, height = 5)
   amp_rarecurve(physeq, color = color, legend.position = "bottomright", xlim = c(0, max(sample_sums(physeq))))
-  dev.off()
+  # dev.off()
   return(rarefaction_plot)
 
   log_message("Created successfully rarefaction curve.", log_file)
