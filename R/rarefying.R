@@ -67,24 +67,41 @@ rarefying = function(physeq = physeq,
   output_asv_rds_files = paste0(output_folder_rds_files, "ASV/")
   if(!dir.exists(output_asv_rds_files)){dir.create(output_asv_rds_files)}
 
-  avgrarefy = function(x, sample, iterations = iteration, seed = 711) {
+  avgrarefy <- function(x, rarefy_to, iterations = iteration, seed = 711) {
     set.seed(seed)
-    ncores = parallel::detectCores()
-    nworkers = max(1, ncores - 2) # subtract 2, but never below 1
-    cl = parallel::makeCluster(nworkers)
-    clusterEvalQ(cl, {
-      install.packages("vegan", repos="https://cloud.r-project.org", quiet = TRUE)
-      library(vegan)}) # load vegan on all worker nodes
 
-    tablist = parLapply(cl, seq_len(iterations), function(i) {
-      rarefied_sample = suppressWarnings(rrarefy(x, sample = sample))
-      return(rarefied_sample)
+    # Ensure 'vegan' is installed on the master node; install if missing
+    if (!requireNamespace("vegan", quietly = TRUE)) {
+      install.packages("vegan", repos = "https://cloud.r-project.org")
+    }
+
+    # Determine number of workers
+    ncores <- parallel::detectCores()
+    nworkers <- max(1, ncores - 2)
+    cl <- parallel::makeCluster(nworkers)
+
+    # On each worker: load 'vegan' (assumes now installed on master,
+    # so it should be available on worker as well)
+    clusterEvalQ(cl, {
+      if (!requireNamespace("vegan", quietly = TRUE)) {
+        install.packages("vegan", repos = "https://cloud.r-project.org", quiet = TRUE)
+      }
+      library(vegan)
     })
+
+    # Export data and target depth to workers
+    clusterExport(cl, varlist = c("x", "rarefy_to"), envir = environment())
+
+    # Perform parallel rarefactions
+    tablist <- parLapply(cl, seq_len(iterations), function(i) {
+      suppressWarnings(rrarefy(x, sample = rarefy_to))
+    })
+
     stopCluster(cl)
 
-    afunc = array(unlist(tablist), c(dim(tablist[[1]]), iterations))
-    output = apply(afunc, 1:2, mean)
-
+    # Average the results
+    afunc  <- array(unlist(tablist), c(dim(tablist[[1]]), iterations))
+    output <- apply(afunc, 1:2, mean)
     return(round(output, 0))
   }
 
@@ -133,16 +150,12 @@ rarefying = function(physeq = physeq,
                              dimnames = list(rownames(psdata_phyloseq), colnames(psdata_phyloseq)))
 
     for (i in seq_len(ncol(psdata_phyloseq))) {
-      sample_name = colnames(psdata_phyloseq)[i]
-      sample_counts = psdata_phyloseq[, sample_name, drop = FALSE]
+      sample_name <- colnames(psdata_phyloseq)[i]
+      sample_counts <- psdata_phyloseq[, sample_name, drop = FALSE]
 
       if (!is.na(rarefy_to[i]) && rarefy_to[i] > 0) {
-        rarefied_sample = avgrarefy(x = sample_counts, sample = rarefy_to[i], iterations = iteration, seed = 711)
-
-        # Store rarefied counts in the corresponding column
+        rarefied_sample <- avgrarefy(x = sample_counts, rarefy_to = rarefy_to[i], iterations = iteration, seed = 711)
         rarefied_matrix[, sample_name] <- as.numeric(rarefied_sample)
-      } else {
-        warning(paste("Skipping sample", sample_name, "due to invalid rarefy_to value"))
       }
     }
 
@@ -204,16 +217,12 @@ rarefying = function(physeq = physeq,
                              dimnames = list(rownames(psdata_phyloseq), colnames(psdata_phyloseq)))
 
     for (i in seq_len(ncol(psdata_phyloseq))) {
-      sample_name = colnames(psdata_phyloseq)[i]
-      sample_counts = psdata_phyloseq[, sample_name, drop = FALSE]
+      sample_name <- colnames(psdata_phyloseq)[i]
+      sample_counts <- psdata_phyloseq[, sample_name, drop = FALSE]
 
       if (!is.na(rarefy_to[i]) && rarefy_to[i] > 0) {
-        rarefied_sample = avgrarefy(x = sample_counts, sample = rarefy_to[i], iterations = iteration, seed = 711)
-
-        # Store rarefied counts in the corresponding column
+        rarefied_sample <- avgrarefy(x = sample_counts, rarefy_to = rarefy_to[i], iterations = iteration, seed = 711)
         rarefied_matrix[, sample_name] <- as.numeric(rarefied_sample)
-      } else {
-        warning(paste("Skipping sample", sample_name, "due to invalid rarefy_to value"))
       }
     }
 
