@@ -59,7 +59,7 @@ by DNA and RNA types.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">alpha_diversity</span><span class="op">(</span></span>
 <span>  physeq <span class="op">=</span> <span class="va">physeq</span>,</span>
 <span>  norm_method <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  taxrank <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phylum"</span>, <span class="st">"Class"</span>, <span class="st">"Order"</span>, <span class="st">"Family"</span>, <span class="st">"Tax_label"</span><span class="op">)</span>,</span>
+<span>  taxrank <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phylum"</span>, <span class="st">"Class"</span>, <span class="st">"Order"</span>, <span class="st">"Family"</span>, <span class="st">"Genus"</span><span class="op">)</span>,</span>
 <span>  date_factor <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -83,7 +83,7 @@ by DNA and RNA types.</p>
 <dd><p>A character vector specifying the taxonomic levels for which
 alpha diversity is to be calculated. If the first element is (taxrank = <code>asv</code>),
 ASV-level data is processed. Otherwise, the function
-processes data for each taxonomic level provided default is taxrank = c('Phylum', 'Class', 'Order', 'Family', 'Tax_label').</p></dd>
+processes data for each taxonomic level provided default is taxrank = c('Phylum', 'Class', 'Order', 'Family', 'Genus').</p></dd>
 
 
 <dt id="arg-date-factor">date_factor<a class="anchor" aria-label="anchor" href="#arg-date-factor"></a></dt>

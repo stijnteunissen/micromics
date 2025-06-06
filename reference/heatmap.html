@@ -57,7 +57,8 @@ as a PDF.</p>
 <span>  physeq <span class="op">=</span> <span class="va">rarefied_genus_psmelt</span>,</span>
 <span>  ntaxa <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  norm_method <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  taxrank <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phylum"</span>, <span class="st">"Class"</span>, <span class="st">"Order"</span>, <span class="st">"Family"</span>, <span class="st">"Tax_label"</span><span class="op">)</span></span>
+<span>  taxrank <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phylum"</span>, <span class="st">"Class"</span>, <span class="st">"Order"</span>, <span class="st">"Family"</span>, <span class="st">"Genus"</span><span class="op">)</span>,</span>
+<span>  date_factor <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -78,7 +79,7 @@ as a PDF.</p>
 
 
 <dt id="arg-taxrank">taxrank<a class="anchor" aria-label="anchor" href="#arg-taxrank"></a></dt>
-<dd><p>A character string indicating the taxonomic rank to use for grouping taxa. The default is <code>"Tax_label"</code>.</p></dd>
+<dd><p>A character string indicating the taxonomic rank to use for grouping taxa. The default is <code>"Genus"</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -107,7 +108,7 @@ as a PDF.</p>
 <span class="r-in"><span>    physeq <span class="op">=</span> <span class="va">rarefied_genus_psmelt</span>,</span></span>
 <span class="r-in"><span>    ntaxa <span class="op">=</span> <span class="fl">20</span>,</span></span>
 <span class="r-in"><span>    norm_method <span class="op">=</span> <span class="st">"fcm"</span>,</span></span>
-<span class="r-in"><span>    taxrank <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phylum"</span>, <span class="st">"Class"</span>, <span class="st">"Order"</span>, <span class="st">"Family"</span>, <span class="st">"Tax_label"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    taxrank <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phylum"</span>, <span class="st">"Class"</span>, <span class="st">"Order"</span>, <span class="st">"Family"</span>, <span class="st">"Genus"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
