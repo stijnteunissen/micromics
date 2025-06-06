@@ -80,7 +80,6 @@ unify_metadata <- function(projects) {
           read_delim(f, delim = "\t", col_names = TRUE, show_col_types = FALSE)
         }}) %>%
       bind_rows()
-  }
 
     # Check if the column 'sq_calc_mean' exists in the qPCR data
     if ("sq_calc_mean" %in% colnames(qPCR_data)) {
@@ -100,6 +99,9 @@ unify_metadata <- function(projects) {
       left_join(qPCR_combined, by = "SampleID")
 
     data_available <- TRUE
+  } else {
+    log_message(paste("No qPCR data file found for project:", project_name), log_file)
+  }
 
   # Process multiple FCM files
   FCM_files <- list.files(destination_folder, pattern = "fcm.*\\.(csv|tsv|txt)$", full.names = TRUE)
