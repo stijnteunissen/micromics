@@ -6,7 +6,7 @@
 \usage{
 beta_diversity(
   physeq = physeq,
-  taxrank = c("Phylum", "Class", "Order", "Family", "Tax_label"),
+  taxrank = c("Phylum", "Class", "Order", "Family", "Genus"),
   norm_method = NULL,
   ordination_method = "PCoA",
   color_factor = NULL,
@@ -19,7 +19,7 @@ beta_diversity(
 \arguments{
 \item{physeq}{A phyloseq object containing microbial community data.}
 
-\item{taxrank}{A character vector specifying the taxonomic levels to process. If the first element (case-insensitive) is \code{"asv"}, ASV-level beta diversity is computed; otherwise, beta diversity is computed for each taxonomic level provided (default: \code{c("Phylum", "Class", "Order", "Family", "Tax_label")}).}
+\item{taxrank}{A character vector specifying the taxonomic levels to process. If the first element (case-insensitive) is \code{"asv"}, ASV-level beta diversity is computed; otherwise, beta diversity is computed for each taxonomic level provided (default: \code{c("Phylum", "Class", "Order", "Family", "Genus")}).}
 
 \item{norm_method}{A character string indicating the normalization method to be used for generating absolute abundance data. Options include:
 \itemize{

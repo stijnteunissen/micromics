@@ -8,7 +8,8 @@ heatmap(
   physeq = rarefied_genus_psmelt,
   ntaxa = NULL,
   norm_method = NULL,
-  taxrank = c("Phylum", "Class", "Order", "Family", "Tax_label")
+  taxrank = c("Phylum", "Class", "Order", "Family", "Genus"),
+  date_factor = NULL
 )
 }
 \arguments{
@@ -18,7 +19,7 @@ heatmap(
 
 \item{norm_method}{A character string specifying the normalization method. If \code{NULL}, the function uses the provided \code{physeq} directly. If set to \code{"fcm"} or \code{"qpcr"}, the function extracts the corresponding \code{psmelt_copy_number_corrected_} data based on the taxonomic rank.}
 
-\item{taxrank}{A character string indicating the taxonomic rank to use for grouping taxa. The default is \code{"Tax_label"}.}
+\item{taxrank}{A character string indicating the taxonomic rank to use for grouping taxa. The default is \code{"Genus"}.}
 }
 \value{
 A \code{ggplot} object representing the heatmap of relative abundance.
@@ -53,7 +54,7 @@ The function performs the following steps:
     physeq = rarefied_genus_psmelt,
     ntaxa = 20,
     norm_method = "fcm",
-    taxrank = c("Phylum", "Class", "Order", "Family", "Tax_label")
+    taxrank = c("Phylum", "Class", "Order", "Family", "Genus")
   )
 }
 

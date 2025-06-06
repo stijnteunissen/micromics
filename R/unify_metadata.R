@@ -93,15 +93,13 @@ unify_metadata <- function(projects) {
       qPCR_combined <- qPCR_data %>%
         group_by(SampleID) %>%
         summarise(sq_mean = mean(SQ, na.rm = TRUE), .groups = "drop")
+    }
 
     # Merge the qPCR results with the extra metadata
     metadata_extra <- metadata_extra %>%
       left_join(qPCR_combined, by = "SampleID")
 
     data_available <- TRUE
-  } else {
-    log_message(paste("No qPCR data file found for project:", project_name), log_file)
-  }
 
   # Process multiple FCM files
   FCM_files <- list.files(destination_folder, pattern = "fcm.*\\.(csv|tsv|txt)$", full.names = TRUE)

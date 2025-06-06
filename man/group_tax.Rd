@@ -7,7 +7,8 @@
 group_tax(
   physeq = rarefied_asv_physeq,
   norm_method = NULL,
-  taxrank = c("Phylum", "Class", "Order", "Family", "Tax_label")
+  taxrank = c("Phylum", "Class", "Order", "Family", "Genus"),
+  copy_correction = TRUE
 )
 }
 \arguments{
@@ -28,7 +29,7 @@ The function saves multiple \code{phyloseq} objects as RDS files.
 The aggregated objects are saved in the output directory \verb{output_data/rds_files/After_cleaning_rds_files/}.
 }
 \description{
-This function aggregates ASV data at specified taxonomic levels (e.g., Phylum, Class, Order, Family, or Tax_label)
+This function aggregates ASV data at specified taxonomic levels (e.g., Phylum, Class, Order, Family, or Genus)
 using the \code{tax_glom} function from the \pkg{phyloseq} package.
 }
 \details{

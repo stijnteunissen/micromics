@@ -7,7 +7,7 @@
 psdata_to_tibble(
   physeq = rarefied_genus_physeq,
   norm_method = NULL,
-  taxrank = c("Phylum", "Class", "Order", "Family", "Tax_label")
+  taxrank = c("Phylum", "Class", "Order", "Family", "Genus")
 )
 }
 \arguments{
