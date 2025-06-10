@@ -60,7 +60,7 @@ unify_metadata <- function(projects) {
   metadata_extra <- if (ext == "csv") {
     read_csv(metadata_extra_file, col_names = TRUE, show_col_types = FALSE)
   } else {
-    read_delim(metadata_extra_file, delim = "\t", col_names = TRUE, show_col_types = FALSE)
+    read_delim(metadata_extra_file, col_names = TRUE, show_col_types = FALSE)
   }
 
   # Initialize flags and data holders
@@ -77,7 +77,7 @@ unify_metadata <- function(projects) {
         if (ext == "csv") {
           read_csv(f, col_names = TRUE, show_col_types = FALSE)
         } else {
-          read_delim(f, delim = "\t", col_names = TRUE, show_col_types = FALSE)
+          read_delim(f, col_names = TRUE, show_col_types = FALSE)
         }}) %>%
       bind_rows()
 
@@ -113,7 +113,7 @@ unify_metadata <- function(projects) {
         if (ext == "csv") {
           read_csv(f, col_names = TRUE, show_col_types = FALSE)
         } else {
-          read_delim(f, delim = "\t", col_names = TRUE, show_col_types = FALSE)
+          read_delim(f, col_names = TRUE, show_col_types = FALSE)
         }
       }) %>%
       bind_rows() %>%
@@ -150,7 +150,7 @@ unify_metadata <- function(projects) {
         if (ext == "csv") {
           read_csv(f, col_names = TRUE, show_col_types = FALSE)
         } else {
-          read_delim(f, delim = "\t", col_names = TRUE, show_col_types = FALSE)
+          read_delim(f, col_names = TRUE, show_col_types = FALSE)
         }}) %>%
       bind_rows()
   } else {
