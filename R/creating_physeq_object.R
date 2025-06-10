@@ -50,7 +50,7 @@ creating_physeq_object = function(projects) {
   table_file <- list.files(destination_folder, pattern = "table.*\\.qza$", full.names = TRUE, recursive = TRUE)
   rooted_tree_file <- list.files(destination_folder, pattern = "rooted-tree.*\\.qza$", full.names = TRUE, recursive = TRUE)
   taxonomy_file <- list.files(destination_folder, pattern = "classifier.*\\.qza", full.names = TRUE, recursive = TRUE)
-  metadata_file <- list.files(destination_folder, pattern = "final_metadata\\.tsv", full.names = TRUE)
+  metadata_file <- list.files(destination_folder, pattern = "metadata_final\\.tsv", full.names = TRUE)
 
   # Create the phyloseq object
   physeq <- qza_to_phyloseq(

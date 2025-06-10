@@ -142,21 +142,39 @@ unify_metadata <- function(projects) {
   # Process main metadata files
   metadata_files <- list.files(destination_folder, pattern = "metadata\\.(tsv|txt|csv)$", full.names = TRUE)
 
-  # Combine metadata files
-  if (length(metadata_files) > 0) {
-    metadata <- metadata_files %>%
-      lapply(function(f) {
-        ext <- tolower(file_ext(f))
-        if (ext == "csv") {
-          read_csv(f, col_names = TRUE, show_col_types = FALSE)
-        } else {
-          read_delim(f, col_names = TRUE, show_col_types = FALSE)
-        }})
-  } else {
+  if (length(metadata_files) == 0) {
     error_message <- paste("Error: metadata file (.tsv/.txt/.csv) does not exist in", destination_folder)
     log_message(error_message, log_file)
     stop(error_message)
   }
+
+  # Combine metadata files
+  metadata_list <- lapply(metadata_files, function(f) {
+    ext <- tolower(tools::file_ext(f))
+    if (ext == "csv") {
+      read_csv(f, col_names = TRUE, show_col_types = FALSE)
+    } else {
+      read_delim(f, col_names = TRUE, show_col_types = FALSE)
+    }
+  })
+
+  metadata = bind_rows(metadata_list)
+
+
+  # if (length(metadata_files) > 0) {
+  #   metadata <- metadata_files %>%
+  #     lapply(function(f) {
+  #       ext <- tolower(file_ext(f))
+  #       if (ext == "csv") {
+  #         read_csv(f, col_names = TRUE, show_col_types = FALSE)
+  #       } else {
+  #         read_delim(f, col_names = TRUE, show_col_types = FALSE)
+  #       }})
+  # } else {
+  #   error_message <- paste("Error: metadata file (.tsv/.txt/.csv) does not exist in", destination_folder)
+  #   log_message(error_message, log_file)
+  #   stop(error_message)
+  # }
 
   # Rename '#SampleID' to 'SampleID' in metadata if it exists
   if ("#SampleID" %in% colnames(metadata)) {
@@ -216,7 +234,7 @@ unify_metadata <- function(projects) {
   }
 
   # Write the formatted metadata to a file
-  write.table(combined_metadata, file = paste0(destination_folder, project_name, "_final_metadata.tsv"), sep = "\t", row.names = FALSE, quote = FALSE)
+  write.table(combined_metadata, file = paste0(destination_folder, project_name, "_metadata_final.tsv"), sep = "\t", row.names = FALSE, quote = FALSE)
 
   return(combined_metadata)
 
