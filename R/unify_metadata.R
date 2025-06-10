@@ -48,7 +48,6 @@ unify_metadata <- function(projects) {
   project_folder <- paste0(base_path, project_name)
   destination_folder <- paste0(project_folder, "/input_data/")
 
-  destination_folder = ("~/Desktop/qiime2_output/")
   # Read additional metadata
   metadata_extra_file <- list.files(destination_folder, pattern = "metadata_extra\\.(tsv|txt|csv)$", full.names = TRUE)[1]
   if (is.na(metadata_extra_file)) {
