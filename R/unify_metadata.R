@@ -48,6 +48,7 @@ unify_metadata <- function(projects) {
   project_folder <- paste0(base_path, project_name)
   destination_folder <- paste0(project_folder, "/input_data/")
 
+  destination_folder = ("~/Desktop/qiime2_output/")
   # Read additional metadata
   metadata_extra_file <- list.files(destination_folder, pattern = "metadata_extra\\.(tsv|txt|csv)$", full.names = TRUE)[1]
   if (is.na(metadata_extra_file)) {
@@ -84,9 +85,7 @@ unify_metadata <- function(projects) {
     # Check if the column 'sq_calc_mean' exists in the qPCR data
     if ("sq_calc_mean" %in% colnames(qPCR_data)) {
       # If it exists, use the existing sq_calc_mean values (taking the first occurrence per SampleID)
-      qPCR_combined <- qPCR_data %>%
-        group_by(SampleID) %>%
-        summarise(sq_calc_mean = sq_calc_mean, .groups = "drop")
+      qPCR_combined <- qPCR_data
     } else {
       # Otherwise, calculate the mean of SQ values and name the result 'sq_mean'
       qPCR_combined <- qPCR_data %>%
