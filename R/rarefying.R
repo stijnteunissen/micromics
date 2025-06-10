@@ -160,7 +160,7 @@ rarefying = function(physeq = physeq,
     }
 
     # rescale the rarefied matrix back to the original scale
-    rarefied_matrix = rarefied_matrix * scaling_factor
+    rarefied_matrix = ceiling(rarefied_matrix * scaling_factor)
 
     rarefied_matrix_t = t(rarefied_matrix)
     colnames(rarefied_matrix_t) = taxa_names(psdata_fcm)
@@ -227,7 +227,7 @@ rarefying = function(physeq = physeq,
     }
 
     # rescale the rarefied matrix back to the original scale
-    rarefied_matrix = rarefied_matrix * scaling_factor
+    rarefied_matrix = ceiling(rarefied_matrix * scaling_factor)
 
     rarefied_matrix_t = t(rarefied_matrix)
     colnames(rarefied_matrix_t) = taxa_names(psdata_qpcr)
