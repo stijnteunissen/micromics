@@ -151,8 +151,7 @@ unify_metadata <- function(projects) {
           read_csv(f, col_names = TRUE, show_col_types = FALSE)
         } else {
           read_delim(f, col_names = TRUE, show_col_types = FALSE)
-        }}) %>%
-      bind_rows()
+        }})
   } else {
     error_message <- paste("Error: metadata file (.tsv/.txt/.csv) does not exist in", destination_folder)
     log_message(error_message, log_file)
