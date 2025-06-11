@@ -439,7 +439,7 @@ normalise_data = function(physeq = without_mock_physeq,
           legend.position = c(0.05, 0.95),
           legend.justification = c(0, 1),
           legend.background = element_rect(fill = "white",  colour = "grey80")) +
-    annotate("text", x = 0.5, y = 11, label = label_text,
+    annotate("text", x = 2, y = 11, label = label_text,
              hjust = 1, vjust = 1, size = 4)
 
   figure_file_path = paste0(figure_folder, project_name, "_copy_number_comparison.pdf")
