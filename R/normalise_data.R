@@ -412,6 +412,11 @@ normalise_data = function(physeq = without_mock_physeq,
       probability >= 0.5 & probability <= 0.9 ~ "Medium (>= 0.5 & <= 0.9)",
       probability < 0.5 ~ "Low (< 0.5)"))
 
+  cor_test = cor.test(plot_data$mean, plot_data$copy_number, method = "pearson")
+  r_val = cor_test$estimate
+  p_val = cor_test$p.value
+  label_text = sprintf("R = %.2f", r_val)
+
   copy_number_comparison =
     ggplot(plot_data, aes(x = mean, y = copy_number, color = probability_rate)) +
     geom_point(aes(color = probability_rate), size = 1) +
@@ -423,14 +428,19 @@ normalise_data = function(physeq = without_mock_physeq,
     ylim(0, 15) +
     theme_bw() +
     labs(
-      title = "OTU copy number comparison",
+      title = "ASV copy number comparison",
       x = "mean reference rrnDB",
       y = "Predicted copy number",
       color = "Probability rate") +
     theme(axis.title = element_text(size = 14),
           axis.text = element_text(size = 12),
           legend.title = element_text(size = 13),
-          legend.text = element_text(size = 12))
+          legend.text = element_text(size = 12),
+          legend.position = c(0.05, 0.95),
+          legend.justification = c(0, 1),
+          legend.background = element_rect(fill = "white",  colour = "grey80")) +
+    annotate("text", x = Inf, y = Inf, label = label_text,
+             hjust = 1, vjust = 1, size = 4)
 
   figure_file_path = paste0(figure_folder, project_name, "_copy_number_comparison.pdf")
   ggsave(filename = figure_file_path, plot = copy_number_comparison, width = 8, height = 6)
