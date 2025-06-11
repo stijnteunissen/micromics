@@ -429,8 +429,8 @@ normalise_data = function(physeq = without_mock_physeq,
     theme_bw() +
     labs(
       title = "ASV copy number comparison",
-      x = "mean reference rrnDB",
-      y = "Predicted copy number",
+      x = "mean copy number reference rrnDB",
+      y = "Predicted copy number per genus",
       color = "Probability rate") +
     theme(axis.title = element_text(size = 14),
           axis.text = element_text(size = 12),
