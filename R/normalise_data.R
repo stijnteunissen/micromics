@@ -450,7 +450,6 @@ normalise_data = function(physeq = without_mock_physeq,
   figure_file_path_png <- file.path(figure_folder, paste0(project_name, "_copy_number_comparison.png"))
   ggsave(filename = figure_file_path_png, plot = copy_number_comparison, width = 6, height = 6, dpi = 300)
 
-
   log_message(paste("Copy number comparison saved as .pdf and .png object in", figure_file_path), log_file)
   }
 
