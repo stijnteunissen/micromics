@@ -442,10 +442,14 @@ normalise_data = function(physeq = without_mock_physeq,
     annotate("text", x = 2.25, y = 11, label = label_text,
              hjust = 1, vjust = 1, size = 5)
 
-  for (ext in c("pdf", "png")) {
-    file_path <- file.path(figure_folder, paste0(project_name, "_copy_number_comparison.", ext))
-    ggsave(filename = file_path, plot = copy_number_comparison, width = 6, height = 6, dpi = ifelse(ext == "png", 300, NA))
-  }
+  # Save as PDF
+  figure_file_path_pdf <- file.path(figure_folder, paste0(project_name, "_copy_number_comparison.pdf"))
+  ggsave(filename = figure_file_path_pdf, plot = copy_number_comparison, width = 6, height = 6)
+
+  # Save as PNG
+  figure_file_path_png <- file.path(figure_folder, paste0(project_name, "_copy_number_comparison.png"))
+  ggsave(filename = figure_file_path_png, plot = copy_number_comparison, width = 6, height = 6, dpi = 300)
+
 
   log_message(paste("Copy number comparison saved as .pdf and .png object in", figure_file_path), log_file)
   }
