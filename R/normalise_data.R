@@ -415,7 +415,7 @@ normalise_data = function(physeq = without_mock_physeq,
   cor_test = cor.test(plot_data$mean, plot_data$copy_number, method = "pearson")
   r_val = cor_test$estimate
   p_val = cor_test$p.value
-  label_text = sprintf("R = %.2f", r_val)
+  label_text = sprintf("r = %.2f", r_val)
 
   copy_number_comparison =
     ggplot(plot_data, aes(x = mean, y = copy_number, color = probability_rate)) +
