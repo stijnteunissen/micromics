@@ -443,7 +443,7 @@ normalise_data = function(physeq = without_mock_physeq,
              hjust = 1, vjust = 1, size = 5)
 
   figure_file_path = paste0(figure_folder, project_name, "_copy_number_comparison.pdf")
-  ggsave(filename = figure_file_path, plot = copy_number_comparison, width = 8, height = 6)
+  ggsave(filename = figure_file_path, plot = copy_number_comparison, width = 6, height = 6)
   log_message(paste("Copy number comparison saved as .pdf object in", figure_file_path), log_file)
   }
 
