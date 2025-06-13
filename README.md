@@ -50,3 +50,7 @@ You can also embed plots, for example:
 
 In that case, don’t forget to commit and push the resulting figure
 files, so they display on GitHub and CRAN.
+
+## License
+
+This package is licensed under the MIT License with additional terms restricting its use to non-commercial research only. See the [LICENSE](LICENSE.md) file for details.
