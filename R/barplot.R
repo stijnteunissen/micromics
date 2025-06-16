@@ -96,7 +96,10 @@ barplot = function(physeq = rarefied_genus_psmelt,
   # Global directories and project variables (assumed to be available)
   project_name = projects
   project_folder = paste0(base_path, project_name)
-  figure_folder = paste0(project_folder, "/figures/")
+  figure_folder_pdf = paste0(project_folder, "/figures/PDF_figures")
+  if(!dir.exists(figure_folder_pdf)) { dir.create(figure_folder_pdf) }
+  figure_folder_png = paste0(project_folder, "/figures/PNG_figures")
+  if(!dir.exists(figure_folder_png)) { dir.create(figure_folder_png) }
   destination_folder = paste0(project_folder, "/input_data/")
   output_folder_csv_files = paste0(project_folder, "/output_data/csv_files/")
   output_folder_rds_files = paste0(project_folder, "/output_data/rds_files/After_cleaning_rds_files/")
@@ -136,10 +139,15 @@ barplot = function(physeq = rarefied_genus_psmelt,
     }
 
     # Create output folders (barplot folder and tax folder)
-    barplot_folder = paste0(figure_folder, "Barplot/")
-    if(!dir.exists(barplot_folder)) { dir.create(barplot_folder) }
-    tax_folder = paste0(barplot_folder, tax, "/")
-    if(!dir.exists(tax_folder)) { dir.create(tax_folder) }
+    barplot_folder_png = paste0(figure_folder_png, "Barplot/")
+    if(!dir.exists(barplot_folder_png)) { dir.create(barplot_folder_png) }
+    tax_folder_png = paste0(barplot_folder_png, tax, "/")
+    if(!dir.exists(tax_folder_png)) { dir.create(tax_folder_png) }
+
+    barplot_folder_pdf = paste0(figure_folder_pdf, "Barplot/")
+    if(!dir.exists(barplot_folder_pdf)) { dir.create(barplot_folder_pdf) }
+    tax_folder_pdf = paste0(barplot_folder_pdf, tax, "/")
+    if(!dir.exists(tax_folder_pdf)) { dir.create(tax_folder_pdf) }
 
     variable_columns = intersect(present_variable_factors, colnames(copy_number_corrected_data))
     factor_columns = unique(c(variable_columns))
@@ -257,7 +265,11 @@ barplot = function(physeq = rarefied_genus_psmelt,
         scale_y_continuous(expand = c(0, 0))
 
       print(barplot_relative)
-      figure_file_path = paste0(tax_folder, project_name, "_barplot_relative_", tax, "_level.pdf")
+      figure_file_path = paste0(tax_folder_png, project_name, "_barplot_relative_", tax, "_level.png")
+      ggsave(filename = figure_file_path, plot = barplot_relative, width = 12, height = 8, dpi = 300)
+      log_message(paste("Relative barplot saved as .png object in", figure_file_path), log_file)
+
+      figure_file_path = paste0(tax_folder_pdf, project_name, "_barplot_relative_", tax, "_level.pdf")
       ggsave(filename = figure_file_path, plot = barplot_relative, width = 12, height = 8)
       log_message(paste("Relative barplot saved as .pdf object in", figure_file_path), log_file)
 
@@ -283,12 +295,24 @@ barplot = function(physeq = rarefied_genus_psmelt,
         scale_y_continuous(expand = c(0, 0))
 
       print(barplot_relative_dna)
-      figure_file_path = paste0(tax_folder, project_name, "_barplot_relative_dna_", tax, "_level.pdf")
+
+      # save figure as png
+      figure_file_path = paste0(tax_folder_png, project_name, "_barplot_relative_dna_", tax, "_level.png")
+      ggsave(filename = figure_file_path, plot = barplot_relative_dna, width = 12, height = 8, dpi = 600)
+      log_message(paste("Relative barplot saved as .png object in", figure_file_path), log_file)
+
+      figure_file_path = paste0(tax_folder_png, project_name, "_barplot_relative_rna_", tax, "_level.png")
+      ggsave(filename = figure_file_path, plot = barplot_relative_rna, width = 12, height = 8, dpi = 600)
+      log_message(paste("Relative barplot saved as .png object in", figure_file_path), log_file)
+
+      print(barplot_relative_rna)
+
+      # save figure as pdf
+      figure_file_path = paste0(tax_folder_pdf, project_name, "_barplot_relative_dna_", tax, "_level.pdf")
       ggsave(filename = figure_file_path, plot = barplot_relative_dna, width = 12, height = 8)
       log_message(paste("Relative barplot saved as .pdf object in", figure_file_path), log_file)
 
-      print(barplot_relative_rna)
-      figure_file_path = paste0(tax_folder, project_name, "_barplot_relative_rna_", tax, "_level.pdf")
+      figure_file_path = paste0(tax_folder_pdf, project_name, "_barplot_relative_rna_", tax, "_level.pdf")
       ggsave(filename = figure_file_path, plot = barplot_relative_rna, width = 12, height = 8)
       log_message(paste("Relative barplot saved as .pdf object in", figure_file_path), log_file)
 
@@ -401,10 +425,15 @@ barplot = function(physeq = rarefied_genus_psmelt,
       saveRDS(plot_data_norm, file = output_file_path)
       log_message(paste("Absolute pstibble data saved as .rds object in", output_file_path), log_file)
 
-      barplot_folder = paste0(figure_folder, "Barplot/")
-      if(!dir.exists(barplot_folder)) { dir.create(barplot_folder) }
-      tax_folder = paste0(barplot_folder, tax, "/")
-      if(!dir.exists(tax_folder)) { dir.create(tax_folder) }
+      barplot_folder_png = paste0(figure_folder_png, "Barplot/")
+      if(!dir.exists(barplot_folder_png)) { dir.create(barplot_folder_png) }
+      tax_folder_png = paste0(barplot_folder_png, tax, "/")
+      if(!dir.exists(tax_folder_png)) { dir.create(tax_folder_png) }
+
+      barplot_folder_pdf = paste0(figure_folder_pdf, "Barplot/")
+      if(!dir.exists(barplot_folder_pdf)) { dir.create(barplot_folder_pdf) }
+      tax_folder_pdf = paste0(barplot_folder_pdf, tax, "/")
+      if(!dir.exists(tax_folder_pdf)) { dir.create(tax_folder_pdf) }
 
       na_types = unique(plot_data_norm$na_type)
 
@@ -455,10 +484,19 @@ barplot = function(physeq = rarefied_genus_psmelt,
               }))
             }, expand = c(0, 0), limits = c(0, NA))
         }
+
         print(barplot_absolute)
-        figure_file_path = paste0(tax_folder, project_name, "_barplot_absolute_", tax, "_level.pdf")
+
+        # figures saved as png
+        figure_file_path = paste0(tax_folder_png, project_name, "_barplot_absolute_", tax, "_level.png")
+        ggsave(filename = figure_file_path, plot = barplot_absolute, width = 12, height = 8, dpi = 600)
+        log_message(paste("Absolute barplot saved as .png object in", figure_file_path), log_file)
+
+        # figure saved as pdf
+        figure_file_path = paste0(tax_folder_pdf, project_name, "_barplot_absolute_", tax, "_level.pdf")
         ggsave(filename = figure_file_path, plot = barplot_absolute, width = 12, height = 8)
         log_message(paste("Absolute barplot saved as .pdf object in", figure_file_path), log_file)
+
       } else if (length(na_types) == 2) {
         if (sample_matrix == "liquid") {
           ylabel = "Cell equivalents (Cells/ml) sample"
@@ -554,12 +592,24 @@ barplot = function(physeq = rarefied_genus_psmelt,
             }, expand = c(0, 0), limits = c(0, NA))
         }
         print(barplot_absolute_dna)
-        figure_file_path = paste0(tax_folder, project_name, "_barplot_absolute_dna_", tax, "_level.pdf")
+
+        # figures saved as png
+        figure_file_path = paste0(tax_folder_png, project_name, "_barplot_absolute_dna_", tax, "_level.png")
+        ggsave(filename = figure_file_path, plot = barplot_absolute_dna, width = 12, height = 8, dpi = 600)
+        log_message(paste("Absolute barplot saved as .png object in", figure_file_path), log_file)
+
+        print(barplot_absolute_rna)
+        figure_file_path = paste0(tax_folder_png, project_name, "_barplot_absolute_rna_", tax, "_level.png")
+        ggsave(filename = figure_file_path, plot = barplot_absolute_rna, width = 12, height = 8, dpi = 600)
+        log_message(paste("Absolute barplot saved as .png object in", figure_file_path), log_file)
+
+        # figures saved as pdf
+        figure_file_path = paste0(tax_folder_pdf, project_name, "_barplot_absolute_dna_", tax, "_level.pdf")
         ggsave(filename = figure_file_path, plot = barplot_absolute_dna, width = 12, height = 8)
         log_message(paste("Absolute barplot saved as .pdf object in", figure_file_path), log_file)
 
         print(barplot_absolute_rna)
-        figure_file_path = paste0(tax_folder, project_name, "_barplot_absolute_rna_", tax, "_level.pdf")
+        figure_file_path = paste0(tax_folder_pdf, project_name, "_barplot_absolute_rna_", tax, "_level.pdf")
         ggsave(filename = figure_file_path, plot = barplot_absolute_rna, width = 12, height = 8)
         log_message(paste("Absolute barplot saved as .pdf object in", figure_file_path), log_file)
       }

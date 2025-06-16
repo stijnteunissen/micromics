@@ -50,7 +50,10 @@ decontam =  function(physeq = resolved_tree_physeq,
   project_name = projects
 
   project_folder = paste0(base_path, project_name)
-  figure_folder = paste0(project_folder, "/figures/")
+  figure_folder_pdf = paste0(project_folder, "/figures/PDF_figures")
+  if(!dir.exists(figure_folder_pdf)) { dir.create(figure_folder_pdf) }
+  figure_folder_png = paste0(project_folder, "/figures/PNG_figures")
+  if(!dir.exists(figure_folder_png)) { dir.create(figure_folder_png) }
   output_folder_csv_files = paste0(project_folder, "/output_data/csv_files/")
   output_folder_rds_files = paste0(project_folder, "/output_data/rds_files/Before_cleaning_rds_files/")
 
@@ -147,7 +150,11 @@ decontam =  function(physeq = resolved_tree_physeq,
     ylab("Read Count") +
     ggtitle(paste("Read Count Plot for", project_name))
 
-  figure_file_path = paste0(figure_folder, project_name, "_decontam_library_size.pdf")
+  figure_file_path = paste0(figure_folder_png, project_name, "_decontam_library_size.png")
+  ggsave(filename = figure_file_path, plot = p1)
+  log_message(paste("Read Count plot saved as .png object in", figure_file_path), log_file)
+
+  figure_file_path = paste0(figure_folder_pdf, project_name, "_decontam_library_size.pdf")
   ggsave(filename = figure_file_path, plot = p1)
   log_message(paste("Read Count plot saved as .pdf object in", figure_file_path), log_file)
 
@@ -185,10 +192,14 @@ decontam =  function(physeq = resolved_tree_physeq,
       ylab("Prevalence (True Samples)") +
       ggtitle(paste(decon_method, "Plot for", project_name))
 
-    figure_file_path = paste0(figure_folder, project_name, "_decontam_method_", decon_method, ".pdf")
+    figure_file_path = paste0(figure_folder_png, project_name, "_decontam_method_", decon_method, ".png")
+    ggsave(filename = figure_file_path, plot = p2)
+    log_message(paste("Plot saved as .png object in", figure_file_path), log_file)
 
+    figure_file_path = paste0(figure_folder_pdf, project_name, "_decontam_method_", decon_method, ".pdf")
     ggsave(filename = figure_file_path, plot = p2)
     log_message(paste("Plot saved as .pdf object in", figure_file_path), log_file)
+
     print(p2)
   }
 

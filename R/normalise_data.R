@@ -97,7 +97,10 @@ normalise_data = function(physeq = without_mock_physeq,
 
   project_folder = paste0(base_path, project_name)
   destination_folder = paste0(project_folder, "/input_data/")
-  figure_folder = paste0(project_folder, "/figures/")
+  figure_folder_pdf = paste0(project_folder, "/figures/PDF_figures")
+  if(!dir.exists(figure_folder_pdf)) { dir.create(figure_folder_pdf) }
+  figure_folder_png = paste0(project_folder, "/figures/PNG_figures")
+  if(!dir.exists(figure_folder_png)) { dir.create(figure_folder_png) }
   output_folder_rds_files_before = paste0(project_folder, "/output_data/rds_files/Before_cleaning_rds_files/")
   output_folder_rds_files_after = paste0(project_folder, "/output_data/rds_files/After_cleaning_rds_files/")
   output_asv_rds_files = paste0(output_folder_rds_files_after, "ASV/")
@@ -443,16 +446,16 @@ normalise_data = function(physeq = without_mock_physeq,
              hjust = 1, vjust = 1, size = 5)
 
   # Save as PDF
-  figure_file_path_pdf <- file.path(figure_folder, paste0(project_name, "_copy_number_comparison.pdf"))
+  figure_file_path_pdf <- file.path(figure_folder_png, paste0(project_name, "_copy_number_comparison.pdf"))
   ggsave(filename = figure_file_path_pdf, plot = copy_number_comparison, width = 6, height = 6)
 
   log_message(paste("Copy number comparison saved as .pdf object in", figure_file_path_pdf), log_file)
 
   # Save as PNG
-  figure_file_path_png <- file.path(figure_folder, paste0(project_name, "_copy_number_comparison.png"))
-  ggsave(filename = figure_file_path_png, plot = copy_number_comparison, width = 6, height = 6, dpi = 300)
+  figure_file_path_png <- file.path(figure_folder_pdf, paste0(project_name, "_copy_number_comparison.png"))
+  ggsave(filename = figure_file_path_png, plot = copy_number_comparison, width = 6, height = 6, dpi = 600)
 
-  log_message(paste("Copy number comparison saved as .png object in", figure_file_path_png), log_file)
+  log_message(paste("Copy number comparison saved as .png object in", figure_folder_pdf), log_file)
   }
 
   if (copy_correction == FALSE) {
