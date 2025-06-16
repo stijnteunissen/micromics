@@ -96,9 +96,9 @@ barplot = function(physeq = rarefied_genus_psmelt,
   # Global directories and project variables (assumed to be available)
   project_name = projects
   project_folder = paste0(base_path, project_name)
-  figure_folder_pdf = paste0(project_folder, "/figures/PDF_figures")
+  figure_folder_pdf = paste0(project_folder, "/figures/PDF_figures/")
   if(!dir.exists(figure_folder_pdf)) { dir.create(figure_folder_pdf) }
-  figure_folder_png = paste0(project_folder, "/figures/PNG_figures")
+  figure_folder_png = paste0(project_folder, "/figures/PNG_figures/")
   if(!dir.exists(figure_folder_png)) { dir.create(figure_folder_png) }
   destination_folder = paste0(project_folder, "/input_data/")
   output_folder_csv_files = paste0(project_folder, "/output_data/csv_files/")

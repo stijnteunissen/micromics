@@ -97,9 +97,9 @@ normalise_data = function(physeq = without_mock_physeq,
 
   project_folder = paste0(base_path, project_name)
   destination_folder = paste0(project_folder, "/input_data/")
-  figure_folder_pdf = paste0(project_folder, "/figures/PDF_figures")
+  figure_folder_pdf = paste0(project_folder, "/figures/PDF_figures/")
   if(!dir.exists(figure_folder_pdf)) { dir.create(figure_folder_pdf) }
-  figure_folder_png = paste0(project_folder, "/figures/PNG_figures")
+  figure_folder_png = paste0(project_folder, "/figures/PNG_figures/")
   if(!dir.exists(figure_folder_png)) { dir.create(figure_folder_png) }
   output_folder_rds_files_before = paste0(project_folder, "/output_data/rds_files/Before_cleaning_rds_files/")
   output_folder_rds_files_after = paste0(project_folder, "/output_data/rds_files/After_cleaning_rds_files/")

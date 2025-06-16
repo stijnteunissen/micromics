@@ -82,9 +82,9 @@ beta_diversity <- function(physeq = physeq,
   # Set up project and folder paths
   project_name <- projects
   project_folder <- paste0(base_path, project_name)
-  figure_folder_pdf = paste0(project_folder, "/figures/PDF_figures")
+  figure_folder_pdf = paste0(project_folder, "/figures/PDF_figures/")
   if(!dir.exists(figure_folder_pdf)) { dir.create(figure_folder_pdf) }
-  figure_folder_png = paste0(project_folder, "/figures/PNG_figures")
+  figure_folder_png = paste0(project_folder, "/figures/PNG_figures/")
   if(!dir.exists(figure_folder_png)) { dir.create(figure_folder_png) }
   destination_folder <- paste0(project_folder, "/input_data/")
   output_folder_csv_files <- paste0(project_folder, "/output_data/csv_files/")
@@ -372,7 +372,7 @@ beta_diversity <- function(physeq = physeq,
       tax_folder_png <- paste0(beta_div_folder_png, tax, "/")
       if (!dir.exists(tax_folder_png)) {dir.create(tax_folder_png, recursive = TRUE)}
 
-      tax_folder_pdf <- paste0(beta_div_folder, tax, "/")
+      tax_folder_pdf <- paste0(beta_div_folder_pdf, tax, "/")
       if (!dir.exists(tax_folder_pdf)) {dir.create(tax_folder_pdf, recursive = TRUE)}
 
       psdata_relative <- transform_sample_counts(psdata_relative, function(x) x / sum(x) * 100)
