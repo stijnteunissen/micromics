@@ -131,7 +131,10 @@ alpha_diversity = function(physeq = physeq,
 
   project_name = projects
   project_folder = paste0(base_path, project_name)
-  figure_folder = paste0(project_folder, "/figures/")
+  figure_folder_pdf = paste0(project_folder, "/figures/PDF_figures")
+  if(!dir.exists(figure_folder_pdf)) { dir.create(figure_folder_pdf) }
+  figure_folder_png = paste0(project_folder, "/figures/PNG_figures")
+  if(!dir.exists(figure_folder_png)) { dir.create(figure_folder_png) }
   output_folder_csv_files = paste0(project_folder, "/output_data/csv_files/")
 
   if (tolower(taxrank[1]) == "asv") {
@@ -145,11 +148,15 @@ alpha_diversity = function(physeq = physeq,
       psdata = physeq[["psdata_asv_qpcr_norm_rarefied"]]
     }
 
-    alpha_div_folder = paste0(figure_folder, "Alpha_diversity/")
-    if(!dir.exists(alpha_div_folder)){dir.create(alpha_div_folder)}
+    alpha_div_folder_png = paste0(figure_folder_png, "Alpha_diversity/")
+    if(!dir.exists(alpha_div_folder_png)){dir.create(alpha_div_folder_png)}
+    asv_folder_png = paste0(alpha_div_folder_png, "ASV/")
+    if(!dir.exists(asv_folder_png)){dir.create(asv_folder_png)}
 
-    asv_folder = paste0(alpha_div_folder, "ASV/")
-    if(!dir.exists(asv_folder)){dir.create(asv_folder)}
+    alpha_div_folder_pdf = paste0(figure_folder_pdf, "Alpha_diversity/")
+    if(!dir.exists(alpha_div_folder_pdf)){dir.create(alpha_div_folder_pdf)}
+    asv_folder_pdf = paste0(alpha_div_folder_pdf, "ASV/")
+    if(!dir.exists(asv_folder_pdf)){dir.create(asv_folder_pdf)}
 
     variable_columns = intersect(present_variable_factors, colnames(sample_data(psdata)))
     factor_columns = unique(c(variable_columns))
@@ -184,7 +191,6 @@ alpha_diversity = function(physeq = physeq,
 
     alpha_div_csv_folder = paste0(output_folder_csv_files, "Alpha_diversity/")
     if(!dir.exists(alpha_div_csv_folder)){dir.create(alpha_div_csv_folder)}
-
     asv_csv_folder = paste0(alpha_div_csv_folder, "ASV/")
     if(!dir.exists(asv_csv_folder)){dir.create(asv_csv_folder)}
 
@@ -251,7 +257,11 @@ alpha_diversity = function(physeq = physeq,
 
     print(combined_plot)
 
-    figure_file_path = paste0(asv_folder, project_name, "_alpha_diversity_asv_level.pdf")
+    figure_file_path = paste0(asv_folder_png, project_name, "_alpha_diversity_asv_level.png")
+    ggsave(filename = figure_file_path, plot = combined_plot, width = 12, height = 5, dpi = 600)
+    log_message(paste("alpha diversity asv level saved as .png object in", figure_file_path), log_file)
+
+    figure_file_path = paste0(asv_folder_pdf, project_name, "_alpha_diversity_asv_level.pdf")
     ggsave(filename = figure_file_path, plot = combined_plot, width = 12, height = 5)
     log_message(paste("alpha diversity asv level saved as .pdf object in", figure_file_path), log_file)
 
@@ -268,11 +278,15 @@ alpha_diversity = function(physeq = physeq,
         psdata = physeq[[paste0("psdata_qpcr_norm_rarefied_", tax)]]
       }
 
-      alpha_div_folder = paste0(figure_folder, "Alpha_diversity/")
-      if(!dir.exists(alpha_div_folder)){dir.create(alpha_div_folder)}
+      alpha_div_folder_png = paste0(figure_folder_png, "Alpha_diversity/")
+      if(!dir.exists(alpha_div_folder_png)){dir.create(alpha_div_folder_png)}
+      tax_folder_png = paste0(alpha_div_folder_png, tax, "/")
+      if(!dir.exists(tax_folder_png)){dir.create(tax_folder_png)}
 
-      tax_folder = paste0(alpha_div_folder, tax, "/")
-      if(!dir.exists(tax_folder)){dir.create(tax_folder)}
+      alpha_div_folder_pdf = paste0(figure_folder_pdf, "Alpha_diversity/")
+      if(!dir.exists(alpha_div_folder_pdf)){dir.create(alpha_div_folder_pdf)}
+      tax_folder_pdf = paste0(alpha_div_folder_pdf, tax, "/")
+      if(!dir.exists(tax_folder_pdf)){dir.create(tax_folder_pdf)}
 
       variable_columns = intersect(present_variable_factors, colnames(sample_data(psdata)))
       factor_columns = unique(c(variable_columns))
@@ -307,7 +321,6 @@ alpha_diversity = function(physeq = physeq,
 
       alpha_div_csv_folder = paste0(output_folder_csv_files, "Alpha_diversity/")
       if(!dir.exists(alpha_div_csv_folder)){dir.create(alpha_div_csv_folder)}
-
       tax_csv_folder = paste0(alpha_div_csv_folder, tax, "/")
       if(!dir.exists(tax_csv_folder)){dir.create(tax_csv_folder)}
 
@@ -374,7 +387,11 @@ alpha_diversity = function(physeq = physeq,
 
       print(combined_plot)
 
-      figure_file_path = paste0(tax_folder, project_name, "_alpha_diversity_", tax, "_level.pdf")
+      figure_file_path = paste0(tax_folder_png, project_name, "_alpha_diversity_", tax, "_level.png")
+      ggsave(filename = figure_file_path, plot = combined_plot, width = 12, height = 5, dpi = 600)
+      log_message(paste("alpha diversity", tax, "level saved as .png object in", figure_file_path), log_file)
+
+      figure_file_path = paste0(tax_folder_pdf, project_name, "_alpha_diversity_", tax, "_level.pdf")
       ggsave(filename = figure_file_path, plot = combined_plot, width = 12, height = 5)
       log_message(paste("alpha diversity", tax, "level saved as .pdf object in", figure_file_path), log_file)
     }

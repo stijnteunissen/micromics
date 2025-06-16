@@ -88,7 +88,10 @@ heatmap = function(physeq = rarefied_genus_psmelt,
   project_name = projects
 
   project_folder = paste0(base_path, project_name)
-  figure_folder = paste0(project_folder, "/figures/")
+  figure_folder_pdf = paste0(project_folder, "/figures/PDF_figures")
+  if(!dir.exists(figure_folder_pdf)) { dir.create(figure_folder_pdf) }
+  figure_folder_png = paste0(project_folder, "/figures/PNG_figures")
+  if(!dir.exists(figure_folder_png)) { dir.create(figure_folder_png) }
   destination_folder = paste0(project_folder, "/input_data/")
   output_folder = paste0(project_folder, "/output_data/")
 
@@ -107,10 +110,15 @@ heatmap = function(physeq = rarefied_genus_psmelt,
     }
 
     # Create output folders (barplot folder and tax folder)
-    heatmap_folder = paste0(figure_folder, "Heatmap/")
-    if(!dir.exists(heatmap_folder)) { dir.create(heatmap_folder) }
-    tax_folder = paste0(heatmap_folder, tax, "/")
-    if(!dir.exists(tax_folder)) { dir.create(tax_folder) }
+    heatmap_folder_png = paste0(figure_folder_png, "Heatmap/")
+    if(!dir.exists(heatmap_folder_png)) { dir.create(heatmap_folder_png) }
+    tax_folder_png = paste0(heatmap_folder_png, tax, "/")
+    if(!dir.exists(tax_folder_png)) { dir.create(tax_folder_png) }
+
+    heatmap_folder_pdf = paste0(figure_folder_pdf, "Heatmap/")
+    if(!dir.exists(heatmap_folder_pdf)) { dir.create(heatmap_folder_pdf) }
+    tax_folder_pdf = paste0(heatmap_folder_pdf, tax, "/")
+    if(!dir.exists(tax_folder_pdf)) { dir.create(tax_folder_pdf) }
 
   variable_columns = intersect(present_variable_factors, colnames(copy_number_corrected_data))
   factor_columns = unique(c(variable_columns))
@@ -223,7 +231,11 @@ heatmap = function(physeq = rarefied_genus_psmelt,
 
   print(heatmap_relative)
 
-  figure_file_path = paste0(tax_folder, project_name, "_heatmap_relative_", tax, "_level.pdf")
+  figure_file_path = paste0(tax_folder_png, project_name, "_heatmap_relative_", tax, "_level.png")
+  ggsave(filename = figure_file_path, plot = heatmap_relative, width = plot_width, height = 8, limitsize = FALSE, dpi = 600)
+  log_message(paste("Relative heatmap saved as .png object in", figure_file_path), log_file)
+
+  figure_file_path = paste0(tax_folder_pdf, project_name, "_heatmap_relative_", tax, "_level.pdf")
   ggsave(filename = figure_file_path, plot = heatmap_relative, width = plot_width, height = 8, limitsize = FALSE)
   log_message(paste("Relative heatmap saved as .pdf object in", figure_file_path), log_file)
   }

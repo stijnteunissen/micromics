@@ -82,7 +82,10 @@ beta_diversity <- function(physeq = physeq,
   # Set up project and folder paths
   project_name <- projects
   project_folder <- paste0(base_path, project_name)
-  figure_folder <- paste0(project_folder, "/figures/")
+  figure_folder_pdf = paste0(project_folder, "/figures/PDF_figures")
+  if(!dir.exists(figure_folder_pdf)) { dir.create(figure_folder_pdf) }
+  figure_folder_png = paste0(project_folder, "/figures/PNG_figures")
+  if(!dir.exists(figure_folder_png)) { dir.create(figure_folder_png) }
   destination_folder <- paste0(project_folder, "/input_data/")
   output_folder_csv_files <- paste0(project_folder, "/output_data/csv_files/")
 
@@ -142,8 +145,11 @@ beta_diversity <- function(physeq = physeq,
   }
 
   # Create the main beta-diversity folder
-  beta_div_folder <- paste0(figure_folder, "Beta_diversity/")
-  if (!dir.exists(beta_div_folder)){dir.create(beta_div_folder)}
+  beta_div_folder_png <- paste0(figure_folder_png, "Beta_diversity/")
+  if (!dir.exists(beta_div_folder_png)){dir.create(beta_div_folder_png)}
+
+  beta_div_folder_pdf <- paste0(figure_folder_pdf, "Beta_diversity/")
+  if (!dir.exists(beta_div_folder_pdf)){dir.create(beta_div_folder_pdf)}
 
   if (tolower(taxrank[1]) == "asv") {
     log_message("Processing ASV-level beta diversity", log_file)
@@ -159,8 +165,11 @@ beta_diversity <- function(physeq = physeq,
     }
 
     # Create the ASV folder under beta-diversity
-    asv_folder <- paste0(beta_div_folder, "ASV/")
-    if (!dir.exists(asv_folder)){dir.create(asv_folder)}
+    asv_folder_png <- paste0(beta_div_folder_png, "ASV/")
+    if (!dir.exists(asv_folder_png)){dir.create(asv_folder_png)}
+
+    asv_folder_pdf <- paste0(beta_div_folder_pdf, "ASV/")
+    if (!dir.exists(asv_folder_pdf)){dir.create(asv_folder_pdf)}
 
     # Transform counts to relative abundance (percentage)
     psdata_relative <- transform_sample_counts(psdata_relative, function(x) x / sum(x) * 100)
@@ -227,7 +236,11 @@ beta_diversity <- function(physeq = physeq,
       print(combined_plot_relative)
 
       # Save the relative beta diversity plot (using the provided 'level' in the filename)
-      figure_file_path <- paste0(asv_folder, project_name, "_beta_diversity_relative_", ordination_method, "_asv_level.pdf")
+      figure_file_path <- paste0(asv_folder_png, project_name, "_beta_diversity_relative_", ordination_method, "_asv_level.png")
+      ggsave(filename = figure_file_path, plot = combined_plot_relative, width = 10, height = 5, dpi = 600)
+      log_message(paste("Relative beta diversity plot saved:", figure_file_path), log_file)
+
+      figure_file_path <- paste0(asv_folder_pdf, project_name, "_beta_diversity_relative_", ordination_method, "_asv_level.pdf")
       ggsave(filename = figure_file_path, plot = combined_plot_relative, width = 10, height = 5)
       log_message(paste("Relative beta diversity plot saved:", figure_file_path), log_file)
 
@@ -237,7 +250,12 @@ beta_diversity <- function(physeq = physeq,
                                    color_factor, shape_factor, size_factor, alpha_factor) +
           theme(legend.position = "right")
         print(plot_man)
-        figure_file_path <- paste0(asv_folder, project_name, "_beta_diversity_absolute_", ordination_method, "_asv_level.pdf")
+
+        figure_file_path <- paste0(asv_folder_png, project_name, "_beta_diversity_absolute_", ordination_method, "_asv_level.png")
+        ggsave(filename = figure_file_path, plot = plot_man, width = 10, height = 5, dpi = 600)
+        log_message(paste("Absolute beta diversity plot saved:", figure_file_path), log_file)
+
+        figure_file_path <- paste0(asv_folder_pdf, project_name, "_beta_diversity_absolute_", ordination_method, "_asv_level.pdf")
         ggsave(filename = figure_file_path, plot = plot_man, width = 10, height = 5)
         log_message(paste("Absolute beta diversity plot saved:", figure_file_path), log_file)
       }
@@ -266,7 +284,11 @@ beta_diversity <- function(physeq = physeq,
 
       print(combined_plot_relative_dna)
 
-      figure_file_path <- paste0(asv_folder, project_name, "_beta_diversity_relative_", ordination_method, "_asv_level_dna.pdf")
+      figure_file_path <- paste0(asv_folder_png, project_name, "_beta_diversity_relative_", ordination_method, "_asv_level_dna.png")
+      ggsave(filename = figure_file_path, plot = combined_plot_relative_dna, width = 10, height = 5, dpi = 600)
+      log_message(paste("Relative beta diversity DNA plot saved:", figure_file_path), log_file)
+
+      figure_file_path <- paste0(asv_folder_pdf, project_name, "_beta_diversity_relative_", ordination_method, "_asv_level_dna.pdf")
       ggsave(filename = figure_file_path, plot = combined_plot_relative_dna, width = 10, height = 5)
       log_message(paste("Relative beta diversity DNA plot saved:", figure_file_path), log_file)
 
@@ -277,7 +299,11 @@ beta_diversity <- function(physeq = physeq,
           theme(legend.position = "right")
         print(plot_man_dna)
 
-        figure_file_path <- paste0(asv_folder, project_name, "_beta_diversity_absolute_", ordination_method, "_asv_level_dna.pdf")
+        figure_file_path <- paste0(asv_folder_png, project_name, "_beta_diversity_absolute_", ordination_method, "_asv_level_dna.png")
+        ggsave(filename = figure_file_path, plot = plot_man_dna, width = 10, height = 5, dpi = 600)
+        log_message(paste("Absolute beta diversity DNA plot saved:", figure_file_path), log_file)
+
+        figure_file_path <- paste0(asv_folder_pdf, project_name, "_beta_diversity_absolute_", ordination_method, "_asv_level_dna.pdf")
         ggsave(filename = figure_file_path, plot = plot_man_dna, width = 10, height = 5)
         log_message(paste("Absolute beta diversity DNA plot saved:", figure_file_path), log_file)
       }
@@ -304,7 +330,11 @@ beta_diversity <- function(physeq = physeq,
 
       print(combined_plot_relative_rna)
 
-      figure_file_path <- paste0(asv_folder, project_name, "_beta_diversity_relative_", ordination_method, "_asv_level_rna.pdf")
+      figure_file_path <- paste0(asv_folder_png, project_name, "_beta_diversity_relative_", ordination_method, "_asv_level_rna.png")
+      ggsave(filename = figure_file_path, plot = combined_plot_relative_rna, width = 10, height = 5, dpi = 600)
+      log_message(paste("Relative beta diversity RNA plot saved:", figure_file_path), log_file)
+
+      figure_file_path <- paste0(asv_folder_pdf, project_name, "_beta_diversity_relative_", ordination_method, "_asv_level_rna.pdf")
       ggsave(filename = figure_file_path, plot = combined_plot_relative_rna, width = 10, height = 5)
       log_message(paste("Relative beta diversity RNA plot saved:", figure_file_path), log_file)
 
@@ -315,7 +345,11 @@ beta_diversity <- function(physeq = physeq,
           theme(legend.position = "right")
         print(plot_man_rna)
 
-        figure_file_path <- paste0(asv_folder, project_name, "_beta_diversity_absolute_", ordination_method, "_asv_level_rna.pdf")
+        figure_file_path <- paste0(asv_folder_png, project_name, "_beta_diversity_absolute_", ordination_method, "_asv_level_rna.png")
+        ggsave(filename = figure_file_path, plot = plot_man_rna, width = 10, height = 5, dpi = 600)
+        log_message(paste("Absolute beta diversity RNA plot saved:", figure_file_path), log_file)
+
+        figure_file_path <- paste0(asv_folder_pdf, project_name, "_beta_diversity_absolute_", ordination_method, "_asv_level_rna.pdf")
         ggsave(filename = figure_file_path, plot = plot_man_rna, width = 10, height = 5)
         log_message(paste("Absolute beta diversity RNA plot saved:", figure_file_path), log_file)
       }
@@ -335,10 +369,11 @@ beta_diversity <- function(physeq = physeq,
         psdata_absolute <- physeq[[paste0("psdata_qpcr_norm_rarefied_", tax)]]
       }
 
-      tax_folder <- paste0(beta_div_folder, tax, "/")
-      if (!dir.exists(tax_folder)) {
-        dir.create(tax_folder, recursive = TRUE)
-      }
+      tax_folder_png <- paste0(beta_div_folder_png, tax, "/")
+      if (!dir.exists(tax_folder_png)) {dir.create(tax_folder_png, recursive = TRUE)}
+
+      tax_folder_pdf <- paste0(beta_div_folder, tax, "/")
+      if (!dir.exists(tax_folder_pdf)) {dir.create(tax_folder_pdf, recursive = TRUE)}
 
       psdata_relative <- transform_sample_counts(psdata_relative, function(x) x / sum(x) * 100)
 
@@ -400,7 +435,11 @@ beta_diversity <- function(physeq = physeq,
 
         print(combined_plot_relative)
 
-        figure_file_path <- paste0(tax_folder, project_name, "_beta_diversity_relative_", ordination_method, "_", tax, "_level.pdf")
+        figure_file_path <- paste0(tax_folder_png, project_name, "_beta_diversity_relative_", ordination_method, "_", tax, "_level.png")
+        ggsave(filename = figure_file_path, plot = combined_plot_relative, width = 10, height = 5, dpi = 600)
+        log_message(paste("Relative beta diversity plot saved:", figure_file_path), log_file)
+
+        figure_file_path <- paste0(tax_folder_pdf, project_name, "_beta_diversity_relative_", ordination_method, "_", tax, "_level.pdf")
         ggsave(filename = figure_file_path, plot = combined_plot_relative, width = 10, height = 5)
         log_message(paste("Relative beta diversity plot saved:", figure_file_path), log_file)
 
@@ -409,7 +448,12 @@ beta_diversity <- function(physeq = physeq,
                                      color_factor, shape_factor, size_factor, alpha_factor) +
             theme(legend.position = "right")
           print(plot_man)
-          figure_file_path <- paste0(tax_folder, project_name, "_beta_diversity_absolute_", ordination_method, "_", tax, "_level.pdf")
+
+          figure_file_path <- paste0(tax_folder_png, project_name, "_beta_diversity_absolute_", ordination_method, "_", tax, "_level.png")
+          ggsave(filename = figure_file_path, plot = plot_man, width = 10, height = 5, dpi = 600)
+          log_message(paste("Absolute beta diversity plot saved:", figure_file_path), log_file)
+
+          figure_file_path <- paste0(tax_folder_pdf, project_name, "_beta_diversity_absolute_", ordination_method, "_", tax, "_level.pdf")
           ggsave(filename = figure_file_path, plot = plot_man, width = 10, height = 5)
           log_message(paste("Absolute beta diversity plot saved:", figure_file_path), log_file)
         }
@@ -436,7 +480,11 @@ beta_diversity <- function(physeq = physeq,
 
         print(combined_plot_relative_dna)
 
-        figure_file_path <- paste0(tax_folder, project_name, "_beta_diversity_relative_", ordination_method, "_", tax, "_level_dna.pdf")
+        figure_file_path <- paste0(tax_folder_png, project_name, "_beta_diversity_relative_", ordination_method, "_", tax, "_level_dna.png")
+        ggsave(filename = figure_file_path, plot = combined_plot_relative_dna, width = 10, height = 5, dpi = 600)
+        log_message(paste("Relative beta diversity DNA plot saved:", figure_file_path), log_file)
+
+        figure_file_path <- paste0(tax_folder_pdf, project_name, "_beta_diversity_relative_", ordination_method, "_", tax, "_level_dna.pdf")
         ggsave(filename = figure_file_path, plot = combined_plot_relative_dna, width = 10, height = 5)
         log_message(paste("Relative beta diversity DNA plot saved:", figure_file_path), log_file)
 
@@ -446,7 +494,12 @@ beta_diversity <- function(physeq = physeq,
                                          color_factor, shape_factor, size_factor, alpha_factor) +
             theme(legend.position = "right")
           print(plot_man_dna)
-          figure_file_path <- paste0(tax_folder, project_name, "_beta_diversity_absolute_", ordination_method, "_", tax, "_level_dna.pdf")
+
+          figure_file_path <- paste0(tax_folder_png, project_name, "_beta_diversity_absolute_", ordination_method, "_", tax, "_level_dna.png")
+          ggsave(filename = figure_file_path, plot = plot_man_dna, width = 10, height = 5, dpi = 600)
+          log_message(paste("Absolute beta diversity DNA plot saved:", figure_file_path), log_file)
+
+          figure_file_path <- paste0(tax_folder_pdf, project_name, "_beta_diversity_absolute_", ordination_method, "_", tax, "_level_dna.pdf")
           ggsave(filename = figure_file_path, plot = plot_man_dna, width = 10, height = 5)
           log_message(paste("Absolute beta diversity DNA plot saved:", figure_file_path), log_file)
         }
@@ -473,7 +526,11 @@ beta_diversity <- function(physeq = physeq,
 
         print(combined_plot_relative_rna)
 
-        figure_file_path <- paste0(tax_folder, project_name, "_beta_diversity_relative_", ordination_method, "_", tax, "_level_rna.pdf")
+        figure_file_path <- paste0(tax_folder_png, project_name, "_beta_diversity_relative_", ordination_method, "_", tax, "_level_rna.png")
+        ggsave(filename = figure_file_path, plot = combined_plot_relative_rna, width = 10, height = 5, dpi = 600)
+        log_message(paste("Relative beta diversity RNA plot saved:", figure_file_path), log_file)
+
+        figure_file_path <- paste0(tax_folder_pdf, project_name, "_beta_diversity_relative_", ordination_method, "_", tax, "_level_rna.pdf")
         ggsave(filename = figure_file_path, plot = combined_plot_relative_rna, width = 10, height = 5)
         log_message(paste("Relative beta diversity RNA plot saved:", figure_file_path), log_file)
 
@@ -485,7 +542,11 @@ beta_diversity <- function(physeq = physeq,
 
           print(plot_man_rna)
 
-          figure_file_path <- paste0(tax_folder, project_name, "_beta_diversity_absolute_", ordination_method, "_", tax, "_level_rna.pdf")
+          figure_file_path <- paste0(tax_folder_png, project_name, "_beta_diversity_absolute_", ordination_method, "_", tax, "_level_rna.png")
+          ggsave(filename = figure_file_path, plot = plot_man_rna, width = 10, height = 5, dpi = 600)
+          log_message(paste("Absolute beta diversity RNA plot saved:", figure_file_path), log_file)
+
+          figure_file_path <- paste0(tax_folder_pdf, project_name, "_beta_diversity_absolute_", ordination_method, "_", tax, "_level_rna.pdf")
           ggsave(filename = figure_file_path, plot = plot_man_rna, width = 10, height = 5)
           log_message(paste("Absolute beta diversity RNA plot saved:", figure_file_path), log_file)
         }
