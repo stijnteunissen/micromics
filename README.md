@@ -23,7 +23,5 @@ devootls::install_github("stijnteunissen/micromics")
 
 This package is licensed under the MIT License with additional terms restricting its use to non-commercial research only. See the [LICENSE](LICENSE.md) file for details.
 
-## Citation
-If you use this package, please cite it as:
-
+## Citing micromics
 Teunissen, S., van Veelen, H. P. J., Silvius, J. (2025). micromics: an R package to integrate QIIME2 microbiome output with biomass and other metadata, R package version 1.0.0, GitHub. https://github.com/stijnteunissen/micromics.
