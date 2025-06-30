@@ -1,0 +1,14 @@
+citHeader("To cite the micromics package, please use:")
+
+citEntry(
+  entry    = "Article",
+  title    = "{micromics}: An R Package to Integrate QIIME2 Microbiome Output with Biomass and Other Metadata",
+  author   = c(
+    person("Stijn", "Teunissen", role = c("aut", "cre")),
+    person("Jippe", "Silvius", role = "aut"),
+    person("H. Pieter J.", "van Veelen", role = "aut")
+    ),
+  year     = "2025",
+  volume   = "1.0.0",
+  url      = "https://github.com/stijnteunissen/micromics"
+)
