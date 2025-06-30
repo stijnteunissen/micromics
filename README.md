@@ -1,11 +1,4 @@
-
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
 # micromics
-
-<!-- badges: start -->
-
-<!-- badges: end -->
 
 *micromics*is an R package designed to analyse and visualise microbiome data derived from *QIIME2* output files in a streamlined and reproducible manner. It simplifies the import and processing of *QIIME2* artefacts and includes a normalisation step using biomass data to convert read counts into biological estimates, such as cell equivalents per millilitre of sample. This conversion allows for more accurate interpretation and comparison of microbial abundance across different samples. 
 
