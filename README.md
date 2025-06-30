@@ -11,8 +11,7 @@
 
 ## Installation
 
-You can install the development version of *micromics* from
-[GitHub](https://github.com/) with:
+*micromics* is implemented in R (3.5.0). You can install *micromics* using *devtools*:
 
 ``` r
 # install.packages
