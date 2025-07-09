@@ -362,11 +362,11 @@ normalise_data = function(physeq = without_mock_physeq,
       mutate(Genus = case_when(
         grepl("\\d", Genus) ~ {
           first_non_numeric <- case_when(
-            !grepl("\\d", Family) ~ paste(Family, Genus, sep = " "),
-            !grepl("\\d", Order) ~ paste(Order, Genus, sep = " "),
-            !grepl("\\d", Class) ~ paste(Class, Genus, sep = " "),
-            !grepl("\\d", Phylum) ~ paste(Phylum, Genus, sep = " "),
-            !grepl("\\d", Kingdom) ~ paste(Kingdom, Genus, sep = " "),
+            !grepl("\\d", Family) ~ paste0("Genus of ", Family, Genus, sep = " "),
+            !grepl("\\d", Order) ~ paste0("Genus of ", Order, Genus, sep = " "),
+            !grepl("\\d", Class) ~ paste0("Genus of ", Class, Genus, sep = " "),
+            !grepl("\\d", Phylum) ~ paste0("Genus of ", Phylum, Genus, sep = " "),
+            !grepl("\\d", Kingdom) ~ paste0("Genus of ", Kingdom, Genus, sep = " "),
             TRUE ~ NA_character_
           )
           first_non_numeric
