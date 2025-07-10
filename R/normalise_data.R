@@ -351,39 +351,39 @@ normalise_data = function(physeq = without_mock_physeq,
     otu_table(psdata_qpcr_norm) = otu_qpcr_norm
   }
 
-  # modify tax table
-  modify_tax_table = function(psdata) {
-    tax_table_df = as.data.frame(tax_table(psdata))
-    otu_names = taxa_names(psdata)
-
-    tax_table_df =
-      tax_table_df %>%
-      rowwise() %>%
-      mutate(Genus = case_when(
-        grepl("\\d", Genus) ~ {
-          first_non_numeric <- case_when(
-            !grepl("\\d", Family) ~ paste0("Genus of ", Family, Genus, sep = " "),
-            !grepl("\\d", Order) ~ paste0("Genus of ", Order, Genus, sep = " "),
-            !grepl("\\d", Class) ~ paste0("Genus of ", Class, Genus, sep = " "),
-            !grepl("\\d", Phylum) ~ paste0("Genus of ", Phylum, Genus, sep = " "),
-            !grepl("\\d", Kingdom) ~ paste0("Genus of ", Kingdom, Genus, sep = " "),
-            TRUE ~ NA_character_
-          )
-          first_non_numeric
-        },
-        TRUE ~ Genus)) %>%
-      ungroup()
-
-    # tax_table_df =
-    #   tax_table_df %>%
-    #   dplyr::rename(Tax_label = Species)
-
-    tax_table_matrix = as.matrix(tax_table_df)
-    rownames(tax_table_matrix) = otu_names
-    tax_table(psdata) = tax_table_matrix
-
-    return(psdata)
-  }
+  # # modify tax table
+  # modify_tax_table = function(psdata) {
+  #   tax_table_df = as.data.frame(tax_table(psdata))
+  #   otu_names = taxa_names(psdata)
+  #
+  #   tax_table_df =
+  #     tax_table_df %>%
+  #     rowwise() %>%
+  #     mutate(Genus = case_when(
+  #       grepl("\\d", Genus) ~ {
+  #         first_non_numeric <- case_when(
+  #           !grepl("\\d", Family) ~ paste0("Genus of ", Family, Genus, sep = " "),
+  #           !grepl("\\d", Order) ~ paste0("Genus of ", Order, Genus, sep = " "),
+  #           !grepl("\\d", Class) ~ paste0("Genus of ", Class, Genus, sep = " "),
+  #           !grepl("\\d", Phylum) ~ paste0("Genus of ", Phylum, Genus, sep = " "),
+  #           !grepl("\\d", Kingdom) ~ paste0("Genus of ", Kingdom, Genus, sep = " "),
+  #           TRUE ~ NA_character_
+  #         )
+  #         first_non_numeric
+  #       },
+  #       TRUE ~ Genus)) %>%
+  #     ungroup()
+  #
+  #   # tax_table_df =
+  #   #   tax_table_df %>%
+  #   #   dplyr::rename(Tax_label = Species)
+  #
+  #   tax_table_matrix = as.matrix(tax_table_df)
+  #   rownames(tax_table_matrix) = otu_names
+  #   tax_table(psdata) = tax_table_matrix
+  #
+  #   return(psdata)
+  # }
 
   if (copy_correction == TRUE) {
   # database folder
@@ -459,14 +459,15 @@ normalise_data = function(physeq = without_mock_physeq,
   }
 
   if (copy_correction == FALSE) {
-  psdata_copy_number_corrected = modify_tax_table(psdata)
+  #psdata_copy_number_corrected = modify_tax_table(psdata)
+  psdata_copy_number_corrected = psdata
 
   output_file_path = paste0(output_asv_rds_files, project_name, "_phyloseq_asv_level_without_copy_number_corrected_counts.rds")
   saveRDS(psdata_copy_number_corrected, file = output_file_path)
   log_message(paste("phyloseq data without copy number corrected counts asv level saved as .rds object in", output_file_path), log_file)
 
   } else if (copy_correction == TRUE) {
-  psdata_copy_number_corrected = modify_tax_table(psdata_copy_number_corrected)
+  #psdata_copy_number_corrected = modify_tax_table(psdata_copy_number_corrected)
 
   output_file_path = paste0(output_asv_rds_files, project_name, "_phyloseq_asv_level_copy_number_corrected_counts.rds")
   saveRDS(psdata_copy_number_corrected, file = output_file_path)
@@ -480,15 +481,14 @@ normalise_data = function(physeq = without_mock_physeq,
 
   if (norm_method == "fcm") {
     if (copy_correction == TRUE) {
-    psdata_fcm_norm = modify_tax_table(psdata_fcm_norm)
+    #psdata_fcm_norm = modify_tax_table(psdata_fcm_norm)
 
     output_file_path = paste0(output_folder_rds_files_before, project_name, "_phyloseq_asv_level_fcm_normalised_cell_concentration.rds")
     saveRDS(psdata_fcm_norm, file = output_file_path)
     log_message(paste("Phyloseq data fcm normalised cell concentration (cells per ml/gram sample) asv level saved as .rds object in", output_file_path), log_file)
 
     } else if (copy_correction == FALSE) {
-
-    psdata_fcm_norm = modify_tax_table(psdata_fcm_norm)
+    #psdata_fcm_norm = modify_tax_table(psdata_fcm_norm)
 
     output_file_path = paste0(output_folder_rds_files_before, project_name, "_phyloseq_asv_level_fcm_normalised_cell_concentration_withou_copy_number_corrected_count.rds")
     saveRDS(psdata_fcm_norm, file = output_file_path)
@@ -498,7 +498,7 @@ normalise_data = function(physeq = without_mock_physeq,
     return(list(psdata_asv_copy_number_corrected = psdata_copy_number_corrected, psdata_asv_fcm_norm = psdata_fcm_norm))
 
   } else if (norm_method == "qpcr") {
-    psdata_qpcr_norm = modify_tax_table(psdata_qpcr_norm)
+    #psdata_qpcr_norm = modify_tax_table(psdata_qpcr_norm)
 
     output_file_path = paste0(output_folder_rds_files_before, project_name, "_phyloseq_asv_level_qpcr_normalised_celL_concentration.rds")
     saveRDS(psdata_qpcr_norm, file = output_file_path)
