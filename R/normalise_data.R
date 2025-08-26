@@ -180,6 +180,8 @@ normalise_data = function(physeq = without_mock_physeq,
     # qpcr normalisatie
   } else if (!is.null(norm_method) && norm_method == "qpcr" && copy_correction == TRUE) {
 
+    psdata = readRDS("Wetsus/micromics - Documents/General/micromics/microbiome_analysis/projects/MGAD_proj1_Q18279_phyloseq_asv_level_without_mock.rds")
+
     df_psdata_qpcr = data.frame(otu_table(psdata))
     df_psdata_qpcr$OTU = rownames(df_psdata_qpcr)
 
@@ -225,17 +227,6 @@ normalise_data = function(physeq = without_mock_physeq,
         results_list$dna = joined_pstibble_qpcr_norm_dna %>% ungroup()
         log_message(paste("sq_calc_mean already exists, skipping its calculation for dna samples."), log_file)
       }
-
-      # # Add sq_calc_mean to sample_data
-      # df = data.frame(sample_data(psdata))
-      # if (!("sq_calc_mean" %in% colnames(df))) {
-      # df = df %>% mutate(SampleID = rownames(df))
-      # df_2 = df %>% left_join(joined_pstibble_qpcr_norm_dna %>% select(SampleID, sq_calc_mean) %>% distinct(), by = "SampleID")
-      #
-      # original_sample_names <- sample_names(psdata)
-      # rownames(df_2) <- original_sample_names
-      # sample_data(psdata) = sample_data(df_2)
-      # }
     }
 
     if ("rna" %in% joined_pstibble_qpcr_copy_number$na_type) {
@@ -258,26 +249,7 @@ normalise_data = function(physeq = without_mock_physeq,
         results_list$rna = joined_pstibble_qpcr_norm_rna %>% ungroup()
         log_message("sq_calc_mean already exists, skipping its calculation for RNA samples.", log_file)
       }
-
-      # # Add sq_calc_mean to sample_data
-      # df = data.frame(sample_data(psdata))
-      # if (!("sq_calc_mean" %in% colnames(df))) {
-      # df = df %>% mutate(SampleID = rownames(df))
-      # df_2 = df %>% left_join(joined_pstibble_qpcr_norm_rna %>% select(SampleID, sq_calc_mean) %>% distinct(), by = "SampleID")
-      #
-      # original_sample_names <- sample_names(psdata)
-      # rownames(df_2) <- original_sample_names
-      # sample_data(psdata) = sample_data(df_2)
-      # }
     }
-
-    # if ("dna" %in% joined_pstibble_qpcr_copy_number$na_type & "rna" %in% joined_pstibble_qpcr_copy_number$na_type & all(c("sq_calc_mean.x", "sq_calc_mean.y") %in% colnames(df))) {
-    #   df = data.frame(sample_data(psdata))
-    #   df_2 = df %>%
-    #     mutate(sq_calc_mean = coalesce(sq_calc_mean.x, sq_calc_mean.y)) %>%
-    #     select(-sq_calc_mean.x, -sq_calc_mean.y)
-    #   sample_data(psdata) = sample_data(df_2)
-    # }
 
     if (!is.null(results_list$dna) && !is.null(results_list$rna)) {
       joined_pstibble_combined =
@@ -317,6 +289,24 @@ normalise_data = function(physeq = without_mock_physeq,
     taxa_names(otu_qpcr_norm) = qpcr_norm_wide$OTU
     psdata_qpcr_norm = psdata
     otu_table(psdata_qpcr_norm) = otu_qpcr_norm
+
+    # Add sq_calc_mean to sample_data
+    df_tmp = data.frame(sample_data(psdata_qpcr_norm))
+    df_tmp = df_tmp %>% mutate(SampleID = rownames(df_tmp))
+
+    # Get unique values of SampleID and sq_calc_mean
+    df_sq = joined_pstibble_combined %>%
+      select(SampleID, sq_calc_mean) %>%
+      distinct()
+
+    # Merge with sample_data
+    df_tmp2 = df_tmp %>%
+      left_join(df_sq, by = "SampleID")
+
+    # Rownames restore
+    rownames(df_tmp2) = rownames(sample_data(psdata_qpcr_norm))
+    sample_data(psdata_qpcr_norm) = sample_data(df_tmp2)
+
   } else if (!is.null(norm_method) && norm_method == "qpcr" && copy_correction == FALSE) {
     log_message(paste("Error: norm_method is set to 'qpcr' but copy_correction is FALSE. The qPCR normalization method requires copy number correction to be enabled."), log_file)
     stop("Error: norm_method is set to 'qpcr' but copy_correction is FALSE. The qPCR normalization method requires copy number correction to be enabled.")
