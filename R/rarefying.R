@@ -192,11 +192,11 @@ rarefying = function(physeq = physeq,
     ps_matrix = as(t(otu_table(psdata_qpcr)), "matrix")
 
     # Determine the scaling factor based on the maxium value in the otu matrix
-    #max_sample_sum = max(sample_sums(psdata_qpcr))
+    max_sample_sum = max(sample_sums(psdata_qpcr))
     limit = 1e7
-    #scaling_factor = 10 ^ ceiling(log10(max_sample_sum / limit))
-    max_sample_sum = max(sample_data$sq_calc_mean)
     scaling_factor = 10 ^ ceiling(log10(max_sample_sum / limit))
+    #max_sample_sum = max(sample_data$sq_calc_mean)
+    #scaling_factor = 10 ^ ceiling(log10(max_sample_sum / limit))
 
     # scale down to OTU matrix and cells per ml
     scaled_ps_matrix = ceiling(ps_matrix / scaling_factor)
