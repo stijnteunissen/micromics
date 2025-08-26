@@ -182,8 +182,10 @@ rarefying = function(physeq = physeq,
     psdata_ccn = physeq[["psdata_asv_copy_number_corrected"]]
     psdata_qpcr = physeq[["psdata_asv_qpcr_norm"]]
 
-    psdata_qpcr <- prune_samples(sample_sums(psdata_qpcr) > 0, psdata_qpcr)        # Remove samples with zero counts
-    psdata_qpcr <- prune_taxa(rowSums(otu_table(psdata_qpcr)) > 0, psdata_qpcr)
+    psdata_qpcr = readRDS("Wetsus/micromics - Documents/General/micromics/microbiome_analysis/projects/MGAD_proj1_Q18279_phyloseq_asv_level_qpcr_normalised_cell_concentration.rds")
+
+    psdata_qpcr <- prune_samples(sample_sums(psdata_qpcr) > 0, psdata_qpcr) # Remove samples with zero counts
+    psdata_qpcr <- prune_taxa(rowSums(otu_table(psdata_qpcr)) > 0, psdata_qpcr) # Remove taxa with zero counts across all samples
 
     # convert phyloseq to data frame
     sample_data = data.frame(sample_data(psdata_qpcr))
@@ -195,8 +197,9 @@ rarefying = function(physeq = physeq,
     max_sample_sum = max(sample_sums(psdata_qpcr))
     limit = 1e7
     scaling_factor = 10 ^ ceiling(log10(max_sample_sum / limit))
-    #max_sample_sum = max(sample_data$sq_calc_mean)
-    #scaling_factor = 10 ^ ceiling(log10(max_sample_sum / limit))
+
+    # max_sample_sum = max(sample_data$sq_calc_mean)
+    # scaling_factor = 10 ^ ceiling(log10(max_sample_sum / limit))
 
     # scale down to OTU matrix and cells per ml
     scaled_ps_matrix = ceiling(ps_matrix / scaling_factor)
@@ -238,7 +241,7 @@ rarefying = function(physeq = physeq,
 
     assign(paste0(project_name, "_rarefied_physeq"), psdata_rarefied, envir = .GlobalEnv)
 
-    output_file_path = paste0(output_asv_rds_files, project_name, "_phyloseq_asv_level_qpcr_normalised_celL_concentration_rarefied.rds")
+    output_file_path = paste0(output_asv_rds_files, project_name, "_phyloseq_asv_level_qpcr_normalised_cell_concentration_rarefied.rds")
     saveRDS(psdata_rarefied, file = output_file_path)
     log_message(paste("phyloseq qpcr normalised cell concentration (cells per ml/gram sample) asv level rarefied saved as .rds object in", output_file_path), log_file)
 

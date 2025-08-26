@@ -140,33 +140,6 @@ normalise_data = function(physeq = without_mock_physeq,
   psdata_copy_number_corrected = psdata
   otu_table(psdata_copy_number_corrected) = otu_corrected
 
-  # # anna16 correctie
-  # df_psdata = data.frame(otu_table(psdata))
-  # df_psdata$OTU = rownames(df_psdata)
-  # pstibble =
-  #   as_tibble(df_psdata) %>%
-  #   select(OTU, everything())
-  #
-  # anna16_file = list.files(destination_folder, pattern = "dna-sequences\\.csv$", full.names = TRUE)
-  # anna16_data = read_csv(anna16_file, show_col_types = FALSE) %>% rename(index = "OTU")
-  #
-  # joined_pstibble =
-  #   pstibble %>%
-  #   inner_join(., anna16_data, by = "OTU")
-  #
-  # corrected_joined_pstibble =
-  #   joined_pstibble %>%
-  #   rowwise() %>%
-  #   mutate(across(c(everything(), -OTU, -predicted_copy_number), ~ . / predicted_copy_number)) %>%
-  #   mutate(across(c(everything(), -OTU, -predicted_copy_number), ~ ceiling(.))) %>%
-  #   select(-predicted_copy_number)
-  #
-  # otu_corrected = otu_table(data.frame(corrected_joined_pstibble[, -1]), taxa_are_rows = TRUE)
-  # taxa_names(otu_corrected) = corrected_joined_pstibble$OTU
-  #
-  # psdata_anna16_corrected = psdata
-  # otu_table(psdata_anna16_corrected) = otu_corrected
-
   # FCM Normalization
   if (!is.null(norm_method) && norm_method == "fcm") {
 
@@ -187,11 +160,6 @@ normalise_data = function(physeq = without_mock_physeq,
     joined_pstibble_fcm <- psdata_fcm_long %>%
       inner_join(df_sample_data_fcm, by = "SampleID")
 
-    # joined_pstibble_fcm_norm <- joined_pstibble_fcm %>%
-    #   rowwise() %>%
-    #   mutate(norm_abund = ceiling(Abundance * cells_per_ml)) %>%
-    #   select(OTU, norm_abund, SampleID)
-
     joined_pstibble_fcm_norm <- joined_pstibble_fcm %>%
       group_by(SampleID) %>%
       mutate(relative_abund = Abundance / sum(Abundance)) %>%
@@ -211,6 +179,7 @@ normalise_data = function(physeq = without_mock_physeq,
 
     # qpcr normalisatie
   } else if (!is.null(norm_method) && norm_method == "qpcr") {
+    psdata = readRDS("Wetsus/micromics - Documents/General/micromics/microbiome_analysis/projects/MGAD_proj1_Q18279_phyloseq_asv_level_without_mock.rds")
 
     df_psdata_qpcr = data.frame(otu_table(psdata))
     df_psdata_qpcr$OTU = rownames(df_psdata_qpcr)
@@ -258,16 +227,16 @@ normalise_data = function(physeq = without_mock_physeq,
         log_message(paste("sq_calc_mean already exists, skipping its calculation for dna samples."), log_file)
       }
 
-      # Add sq_calc_mean to sample_data
-      df = data.frame(sample_data(psdata))
-      if (!("sq_calc_mean" %in% colnames(df))) {
-      df = df %>% mutate(SampleID = rownames(df))
-      df_2 = df %>% left_join(joined_pstibble_qpcr_norm_dna %>% select(SampleID, sq_calc_mean) %>% distinct(), by = "SampleID")
-
-      original_sample_names <- sample_names(psdata)
-      rownames(df_2) <- original_sample_names
-      sample_data(psdata) = sample_data(df_2)
-      }
+      # # Add sq_calc_mean to sample_data
+      # df = data.frame(sample_data(psdata))
+      # if (!("sq_calc_mean" %in% colnames(df))) {
+      # df = df %>% mutate(SampleID = rownames(df))
+      # df_2 = df %>% left_join(joined_pstibble_qpcr_norm_dna %>% select(SampleID, sq_calc_mean) %>% distinct(), by = "SampleID")
+      #
+      # original_sample_names <- sample_names(psdata)
+      # rownames(df_2) <- original_sample_names
+      # sample_data(psdata) = sample_data(df_2)
+      # }
     }
 
     if ("rna" %in% joined_pstibble_qpcr_copy_number$na_type) {
@@ -291,25 +260,25 @@ normalise_data = function(physeq = without_mock_physeq,
         log_message("sq_calc_mean already exists, skipping its calculation for RNA samples.", log_file)
       }
 
-      # Add sq_calc_mean to sample_data
-      df = data.frame(sample_data(psdata))
-      if (!("sq_calc_mean" %in% colnames(df))) {
-      df = df %>% mutate(SampleID = rownames(df))
-      df_2 = df %>% left_join(joined_pstibble_qpcr_norm_rna %>% select(SampleID, sq_calc_mean) %>% distinct(), by = "SampleID")
-
-      original_sample_names <- sample_names(psdata)
-      rownames(df_2) <- original_sample_names
-      sample_data(psdata) = sample_data(df_2)
-      }
+      # # Add sq_calc_mean to sample_data
+      # df = data.frame(sample_data(psdata))
+      # if (!("sq_calc_mean" %in% colnames(df))) {
+      # df = df %>% mutate(SampleID = rownames(df))
+      # df_2 = df %>% left_join(joined_pstibble_qpcr_norm_rna %>% select(SampleID, sq_calc_mean) %>% distinct(), by = "SampleID")
+      #
+      # original_sample_names <- sample_names(psdata)
+      # rownames(df_2) <- original_sample_names
+      # sample_data(psdata) = sample_data(df_2)
+      # }
     }
 
-    if ("dna" %in% joined_pstibble_qpcr_copy_number$na_type & "rna" %in% joined_pstibble_qpcr_copy_number$na_type & all(c("sq_calc_mean.x", "sq_calc_mean.y") %in% colnames(df))) {
-      df = data.frame(sample_data(psdata))
-      df_2 = df %>%
-        mutate(sq_calc_mean = coalesce(sq_calc_mean.x, sq_calc_mean.y)) %>%
-        select(-sq_calc_mean.x, -sq_calc_mean.y)
-      sample_data(psdata) = sample_data(df_2)
-    }
+    # if ("dna" %in% joined_pstibble_qpcr_copy_number$na_type & "rna" %in% joined_pstibble_qpcr_copy_number$na_type & all(c("sq_calc_mean.x", "sq_calc_mean.y") %in% colnames(df))) {
+    #   df = data.frame(sample_data(psdata))
+    #   df_2 = df %>%
+    #     mutate(sq_calc_mean = coalesce(sq_calc_mean.x, sq_calc_mean.y)) %>%
+    #     select(-sq_calc_mean.x, -sq_calc_mean.y)
+    #   sample_data(psdata) = sample_data(df_2)
+    # }
 
     if (!is.null(results_list$dna) && !is.null(results_list$rna)) {
       joined_pstibble_combined =
@@ -350,40 +319,6 @@ normalise_data = function(physeq = without_mock_physeq,
     psdata_qpcr_norm = psdata
     otu_table(psdata_qpcr_norm) = otu_qpcr_norm
   }
-
-  # # modify tax table
-  # modify_tax_table = function(psdata) {
-  #   tax_table_df = as.data.frame(tax_table(psdata))
-  #   otu_names = taxa_names(psdata)
-  #
-  #   tax_table_df =
-  #     tax_table_df %>%
-  #     rowwise() %>%
-  #     mutate(Genus = case_when(
-  #       grepl("\\d", Genus) ~ {
-  #         first_non_numeric <- case_when(
-  #           !grepl("\\d", Family) ~ paste0("Genus of ", Family, Genus, sep = " "),
-  #           !grepl("\\d", Order) ~ paste0("Genus of ", Order, Genus, sep = " "),
-  #           !grepl("\\d", Class) ~ paste0("Genus of ", Class, Genus, sep = " "),
-  #           !grepl("\\d", Phylum) ~ paste0("Genus of ", Phylum, Genus, sep = " "),
-  #           !grepl("\\d", Kingdom) ~ paste0("Genus of ", Kingdom, Genus, sep = " "),
-  #           TRUE ~ NA_character_
-  #         )
-  #         first_non_numeric
-  #       },
-  #       TRUE ~ Genus)) %>%
-  #     ungroup()
-  #
-  #   # tax_table_df =
-  #   #   tax_table_df %>%
-  #   #   dplyr::rename(Tax_label = Species)
-  #
-  #   tax_table_matrix = as.matrix(tax_table_df)
-  #   rownames(tax_table_matrix) = otu_names
-  #   tax_table(psdata) = tax_table_matrix
-  #
-  #   return(psdata)
-  # }
 
   if (copy_correction == TRUE) {
   # database folder
