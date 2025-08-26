@@ -500,7 +500,7 @@ normalise_data = function(physeq = without_mock_physeq,
   } else if (norm_method == "qpcr") {
     #psdata_qpcr_norm = modify_tax_table(psdata_qpcr_norm)
 
-    output_file_path = paste0(output_folder_rds_files_before, project_name, "_phyloseq_asv_level_qpcr_normalised_celL_concentration.rds")
+    output_file_path = paste0(output_folder_rds_files_before, project_name, "_phyloseq_asv_level_qpcr_normalised_cell_concentration.rds")
     saveRDS(psdata_qpcr_norm, file = output_file_path)
     log_message(paste("phyloseq qpcr normalised cell concentration (cells per ml/gram sample) asv level saved as .rds object in", output_file_path), log_file)
 
