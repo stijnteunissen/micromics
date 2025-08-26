@@ -158,8 +158,6 @@ decontam =  function(physeq = resolved_tree_physeq,
   ggsave(filename = figure_file_path, plot = p1)
   log_message(paste("Read Count plot saved as .pdf object in", figure_file_path), log_file)
 
-  print(p1)
-
   if (blank == TRUE) {
 
     presence_absence = transform_sample_counts(psdata, function(Abundance) 1 * (Abundance > 0))
@@ -200,7 +198,6 @@ decontam =  function(physeq = resolved_tree_physeq,
     ggsave(filename = figure_file_path, plot = p2)
     log_message(paste("Plot saved as .pdf object in", figure_file_path), log_file)
 
-    print(p2)
   }
 
   return(physeq_no_contam)

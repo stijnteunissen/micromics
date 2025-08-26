@@ -30,7 +30,7 @@ group_tax = function(physeq = rarefied_asv_physeq,
                      taxrank = c("Phylum", "Class", "Order", "Family", "Genus"),
                      copy_correction = TRUE) {
 
-  log_message(paste("Step 10: Tax glom: ASVs are merged at taxonomic ranks.", paste(projects, collapse = ", ")), log_file)
+  log_message(paste("Step 11: Tax glom: ASVs are merged at taxonomic ranks.", paste(projects, collapse = ", ")), log_file)
 
   project_name = projects
   project_folder = paste0(base_path, project_name)
