@@ -178,7 +178,7 @@ normalise_data = function(physeq = without_mock_physeq,
     otu_table(psdata_fcm_norm) <- otu_fcm_norm
 
     # qpcr normalisatie
-  } else if (!is.null(norm_method) && norm_method == "qpcr") {
+  } else if (!is.null(norm_method) && norm_method == "qpcr" && copy_correction == TRUE) {
 
     df_psdata_qpcr = data.frame(otu_table(psdata))
     df_psdata_qpcr$OTU = rownames(df_psdata_qpcr)
@@ -317,24 +317,29 @@ normalise_data = function(physeq = without_mock_physeq,
     taxa_names(otu_qpcr_norm) = qpcr_norm_wide$OTU
     psdata_qpcr_norm = psdata
     otu_table(psdata_qpcr_norm) = otu_qpcr_norm
+  } else if (!is.null(norm_method) && norm_method == "qpcr" && copy_correction == FALSE) {
+    log_message(paste("Error: norm_method is set to 'qpcr' but copy_correction is FALSE. The qPCR normalization method requires copy number correction to be enabled."), log_file)
+    stop("Error: norm_method is set to 'qpcr' but copy_correction is FALSE. The qPCR normalization method requires copy number correction to be enabled.")
   }
 
   if (copy_correction == TRUE) {
-  # database folder
+  # Downloading the rndb-database
   zip_file_path <- file.path(destination_folder, "rrnDB-5.9_pantaxa_stats_NCBI.tsv.zip")
   download.file("https://rrndb.umms.med.umich.edu/downloads/rrnDB-5.9_pantaxa_stats_NCBI.tsv.zip",
                 destfile = zip_file_path, mode = "wb")
 
-  # Controleer of het bestand bestaat en een niet-nul bestandsgrootte heeft
+  # Check if the file exists
   if (!file.exists(zip_file_path) || file.info(zip_file_path)$size == 0) {
     stop("Error: Downloaded ZIP file is missing or corrupted.")
   }
 
+  # unzip the downloaded database
   unzip(zip_file_path, exdir = destination_folder)
   rrndb_database_tsv_file = list.files(destination_folder, pattern = "pantaxa_stats_NCBI\\.tsv$", full.names = TRUE)
   rrndb_database_tsv = read_tsv(rrndb_database_tsv_file)
   rrndb_database = rrndb_database_tsv %>% filter(rank == "genus") %>% select(Genus = "name", everything())
 
+  # preparing the phyloseq data
   psmelt = psdata %>% psmelt() %>% as_tibble()
   psmelt = psmelt %>% select(OTU, Genus)
 
@@ -393,37 +398,29 @@ normalise_data = function(physeq = without_mock_physeq,
   }
 
   if (copy_correction == FALSE) {
-  #psdata_copy_number_corrected = modify_tax_table(psdata)
   psdata_copy_number_corrected = psdata
-
   output_file_path = paste0(output_asv_rds_files, project_name, "_phyloseq_asv_level_without_copy_number_corrected_counts.rds")
-  saveRDS(psdata_copy_number_corrected, file = output_file_path)
+  saveRDS(psdata, file = output_file_path)
   log_message(paste("phyloseq data without copy number corrected counts asv level saved as .rds object in", output_file_path), log_file)
 
   } else if (copy_correction == TRUE) {
-  #psdata_copy_number_corrected = modify_tax_table(psdata_copy_number_corrected)
-
   output_file_path = paste0(output_asv_rds_files, project_name, "_phyloseq_asv_level_copy_number_corrected_counts.rds")
   saveRDS(psdata_copy_number_corrected, file = output_file_path)
   log_message(paste("phyloseq data copy number corrected counts asv level saved as .rds object in", output_file_path), log_file)
+
   }
 
   if (is.null(norm_method)) {
     log_message("No normalization method specified for absolute data. Only copy number correction applied.", log_file)
-    return(list(psdata_asv_copy_number_corrected = psdata_copy_number_corrected))
   }
 
   if (norm_method == "fcm") {
     if (copy_correction == TRUE) {
-    #psdata_fcm_norm = modify_tax_table(psdata_fcm_norm)
-
     output_file_path = paste0(output_folder_rds_files_before, project_name, "_phyloseq_asv_level_fcm_normalised_cell_concentration.rds")
     saveRDS(psdata_fcm_norm, file = output_file_path)
     log_message(paste("Phyloseq data fcm normalised cell concentration (cells per ml/gram sample) asv level saved as .rds object in", output_file_path), log_file)
 
     } else if (copy_correction == FALSE) {
-    #psdata_fcm_norm = modify_tax_table(psdata_fcm_norm)
-
     output_file_path = paste0(output_folder_rds_files_before, project_name, "_phyloseq_asv_level_fcm_normalised_cell_concentration_withou_copy_number_corrected_count.rds")
     saveRDS(psdata_fcm_norm, file = output_file_path)
     log_message(paste("Phyloseq data fcm normalised cell concentration (cells per ml/gram sample) asv level saved as .rds object in", output_file_path), log_file)
@@ -432,8 +429,6 @@ normalise_data = function(physeq = without_mock_physeq,
     return(list(psdata_asv_copy_number_corrected = psdata_copy_number_corrected, psdata_asv_fcm_norm = psdata_fcm_norm))
 
   } else if (norm_method == "qpcr") {
-    #psdata_qpcr_norm = modify_tax_table(psdata_qpcr_norm)
-
     output_file_path = paste0(output_folder_rds_files_before, project_name, "_phyloseq_asv_level_qpcr_normalised_cell_concentration.rds")
     saveRDS(psdata_qpcr_norm, file = output_file_path)
     log_message(paste("phyloseq qpcr normalised cell concentration (cells per ml/gram sample) asv level saved as .rds object in", output_file_path), log_file)
@@ -445,8 +440,8 @@ normalise_data = function(physeq = without_mock_physeq,
     stop("Error: Invalid normalization method specified. Use 'fcm' or 'qpcr'.")
   }
 
-  if (copy_correction == TRUE){
-  log_message("Copy number correction successfully applied.", log_file)
+  if (copy_correction == TRUE) {
+    log_message("Copy number correction successfully applied.", log_file)
   } else if (copy_correction == FALSE) {
     log_message("Copy number correction has not been applied.", log_file)
   }
