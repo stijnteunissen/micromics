@@ -179,7 +179,6 @@ normalise_data = function(physeq = without_mock_physeq,
 
     # qpcr normalisatie
   } else if (!is.null(norm_method) && norm_method == "qpcr") {
-    psdata = readRDS("Wetsus/micromics - Documents/General/micromics/microbiome_analysis/projects/MGAD_proj1_Q18279_phyloseq_asv_level_without_mock.rds")
 
     df_psdata_qpcr = data.frame(otu_table(psdata))
     df_psdata_qpcr$OTU = rownames(df_psdata_qpcr)
