@@ -179,9 +179,6 @@ normalise_data = function(physeq = without_mock_physeq,
 
     # qpcr normalisatie
   } else if (!is.null(norm_method) && norm_method == "qpcr" && copy_correction == TRUE) {
-
-    psdata = readRDS("Wetsus/micromics - Documents/General/micromics/microbiome_analysis/projects/MGAD_proj1_Q18279_phyloseq_asv_level_without_mock.rds")
-
     df_psdata_qpcr = data.frame(otu_table(psdata))
     df_psdata_qpcr$OTU = rownames(df_psdata_qpcr)
 
@@ -260,6 +257,9 @@ normalise_data = function(physeq = without_mock_physeq,
                norm_abund = ceiling(absolute_abundance_qpcr / copy_number)) %>%
         ungroup() %>%
         select(OTU, norm_abund, SampleID)
+
+      joined_pstibble_combined2 =
+        bind_rows(results_list$dna, results_list$rna)
     } else if (!is.null(results_list$dna)) {
       joined_pstibble_combined =
         results_list$dna %>%
@@ -269,6 +269,9 @@ normalise_data = function(physeq = without_mock_physeq,
                norm_abund = ceiling(absolute_abundance_qpcr / copy_number)) %>%
         ungroup() %>%
         select(OTU, norm_abund, SampleID)
+
+      joined_pstibble_combined2 =
+        results_list$dna
     } else if (!is.null(results_list$rna)) {
       joined_pstibble_combined =
         results_list$rna %>%
@@ -278,6 +281,9 @@ normalise_data = function(physeq = without_mock_physeq,
                norm_abund = ceiling(absolute_abundance_qpcr / copy_number)) %>%
         ungroup() %>%
         select(OTU, norm_abund, SampleID)
+
+      joined_pstibble_combined2 =
+        results_list$rna
     }
 
     qpcr_norm_wide =
@@ -295,7 +301,7 @@ normalise_data = function(physeq = without_mock_physeq,
     df_tmp = df_tmp %>% mutate(SampleID = rownames(df_tmp))
 
     # Get unique values of SampleID and sq_calc_mean
-    df_sq = joined_pstibble_combined %>%
+    df_sq = joined_pstibble_combined2 %>%
       select(SampleID, sq_calc_mean) %>%
       distinct()
 
