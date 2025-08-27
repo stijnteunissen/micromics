@@ -192,16 +192,26 @@ rarefying = function(physeq = physeq,
     ps_matrix = as(t(otu_table(psdata_qpcr)), "matrix")
 
     # Determine the scaling factor based on the maxium value in the otu matrix
+    # max_sample_sum = max(sample_sums(psdata_qpcr))
+    # limit = 1e7
+    # scaling_factor = 10 ^ ceiling(log10(max_sample_sum / limit))
+
+    # Determine scaling factor to ensure ASV counts stay below the limit
     max_sample_sum = max(sample_sums(psdata_qpcr))
     limit = 1e7
-    scaling_factor = 10 ^ ceiling(log10(max_sample_sum / limit))
+
+    if (max_sample_sum > limit) {
+      scaling_factor = max_sample_sum / limit
+    } else {
+      scaling_factor = 1
+    }
+
+    # Scale down the ASV matrix an qPCR values
+    scaled_ps_matrix = ceiling(ps_matrix / scaling_factor)
+    sample_data$sq_calc_mean = sample_data$sq_calc_mean / scaling_factor
 
     # max_sample_sum = max(sample_data$sq_calc_mean)
     # scaling_factor = 10 ^ ceiling(log10(max_sample_sum / limit))
-
-    # scale down to OTU matrix and cells per ml
-    scaled_ps_matrix = ceiling(ps_matrix / scaling_factor)
-    sample_data$sq_calc_mean = sample_data$sq_calc_mean / scaling_factor
 
     sample_size = rowSums(scaled_ps_matrix) # total reads per sample
     copy_count_table = round(sample_data$sq_calc_mean, digits = 0) # extract copy counts???
@@ -227,8 +237,13 @@ rarefying = function(physeq = physeq,
       }
     }
 
-    # rescale the rarefied matrix back to the original scale
-    rarefied_matrix = ceiling(rarefied_matrix * scaling_factor)
+    # Rescale the rarefied matrix back only if scaling was applied
+    if (scaling_factor > 1) {
+      rarefied_matrix = ceiling(rarefied_matrix * scaling_factor)
+    }
+
+    # # rescale the rarefied matrix back to the original scale
+    # rarefied_matrix = ceiling(rarefied_matrix * scaling_factor)
 
     rarefied_matrix_t = t(rarefied_matrix)
     colnames(rarefied_matrix_t) = taxa_names(psdata_qpcr)
