@@ -191,20 +191,10 @@ rarefying = function(physeq = physeq,
     # convert otu table to matrix
     ps_matrix = as(t(otu_table(psdata_qpcr)), "matrix")
 
-    # Determine the scaling factor based on the maxium value in the otu matrix
+    # # Determine the scaling factor based on the maxium value in the otu matrix
     max_sample_sum = max(sample_sums(psdata_qpcr))
     limit = 1e7
     scaling_factor = 10 ^ ceiling(log10(max_sample_sum / limit))
-
-    # # Determine scaling factor to ensure ASV counts stay below the limit
-    # max_sample_sum = max(sample_sums(psdata_qpcr))
-    # limit = 1e7
-    #
-    # if (max_sample_sum > limit) {
-    #   scaling_factor = max_sample_sum / limit
-    # } else {
-    #   scaling_factor = 1
-    # }
 
     # Scale down the ASV matrix an qPCR values
     scaled_ps_matrix = ceiling(ps_matrix / scaling_factor)

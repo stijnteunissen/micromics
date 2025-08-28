@@ -249,20 +249,11 @@ normalise_data = function(physeq = without_mock_physeq,
     }
 
     if (!is.null(results_list$dna) && !is.null(results_list$rna)) {
-      joined_pstibble_combined =
-        bind_rows(results_list$dna, results_list$rna) %>%
-        group_by(SampleID) %>%
-        mutate(relative_abundance = Abundance / sum(Abundance),
-               absolute_abundance_qpcr = relative_abundance * sq_calc_mean,
-               norm_abund = ceiling(absolute_abundance_qpcr / copy_number)) %>%
-        ungroup() %>%
-        select(OTU, norm_abund, SampleID)
-
       joined_pstibble_combined2 =
         bind_rows(results_list$dna, results_list$rna)
-    } else if (!is.null(results_list$dna)) {
+
       joined_pstibble_combined =
-        results_list$dna %>%
+        joined_pstibble_combined2 %>%
         group_by(SampleID) %>%
         mutate(relative_abundance = Abundance / sum(Abundance),
                absolute_abundance_qpcr = relative_abundance * sq_calc_mean,
@@ -270,11 +261,12 @@ normalise_data = function(physeq = without_mock_physeq,
         ungroup() %>%
         select(OTU, norm_abund, SampleID)
 
+    } else if (!is.null(results_list$dna)) {
       joined_pstibble_combined2 =
         results_list$dna
-    } else if (!is.null(results_list$rna)) {
+
       joined_pstibble_combined =
-        results_list$rna %>%
+        joined_pstibble_combined2 %>%
         group_by(SampleID) %>%
         mutate(relative_abundance = Abundance / sum(Abundance),
                absolute_abundance_qpcr = relative_abundance * sq_calc_mean,
@@ -282,8 +274,18 @@ normalise_data = function(physeq = without_mock_physeq,
         ungroup() %>%
         select(OTU, norm_abund, SampleID)
 
+    } else if (!is.null(results_list$rna)) {
       joined_pstibble_combined2 =
         results_list$rna
+
+      joined_pstibble_combined =
+        joined_pstibble_combined2 %>%
+        group_by(SampleID) %>%
+        mutate(relative_abundance = Abundance / sum(Abundance),
+               absolute_abundance_qpcr = relative_abundance * sq_calc_mean,
+               norm_abund = ceiling(absolute_abundance_qpcr / copy_number)) %>%
+        ungroup() %>%
+        select(OTU, norm_abund, SampleID)
     }
 
     qpcr_norm_wide =
