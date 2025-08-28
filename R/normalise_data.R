@@ -352,12 +352,13 @@ normalise_data = function(physeq = without_mock_physeq,
   log_message(paste("unzip de database"), log_file)
 
   # preparing the phyloseq data
-  psmelt = psdata %>% psmelt() %>% as_tibble()
-  psmelt = psmelt %>% select(OTU, Genus)
+  tax = as.data.frame(tax_table(psdata)) %>%
+    tibble::rowid_to_column("OTU") %>%
+    select(OTU, Genus)
 
-  log_message(paste("psmelt psdata"), log_file)
+  log_message(paste("tax table"), log_file)
 
-  proj_tabel = left_join(psmelt, raspergade_df, by = "OTU")
+  proj_tabel = left_join(tax, raspergade_df, by = "OTU")
   final_tabel = left_join(proj_tabel, rrndb_database, by = "Genus")
 
   plot_data = final_tabel %>%
