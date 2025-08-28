@@ -140,6 +140,8 @@ normalise_data = function(physeq = without_mock_physeq,
   psdata_copy_number_corrected = psdata
   otu_table(psdata_copy_number_corrected) = otu_corrected
 
+  log_message(paste("na raspergade"), log_file)
+
   # FCM Normalization
   if (!is.null(norm_method) && norm_method == "fcm") {
 
@@ -200,6 +202,8 @@ normalise_data = function(physeq = without_mock_physeq,
       joined_pstibble_qpcr %>%
       inner_join(., raspergade_df %>% select(OTU, copy_number), by = "OTU")
 
+    log_message(paste("inladen en merge van psdata"), log_file)
+
     # cell equivlants abundance in plaats van relative
     # abdance is cell equivlants
     # aangeven wat de eenheiden zijn vor relatief als het relatief als is of absoluut en de juiste eenheid kan per gram of ml
@@ -248,6 +252,8 @@ normalise_data = function(physeq = without_mock_physeq,
       }
     }
 
+    log_message(paste("na de sq mean bereken"), log_file)
+
     if (!is.null(results_list$dna) && !is.null(results_list$rna)) {
       joined_pstibble_combined2 =
         bind_rows(results_list$dna, results_list$rna)
@@ -288,6 +294,8 @@ normalise_data = function(physeq = without_mock_physeq,
         select(OTU, norm_abund, SampleID)
     }
 
+    log_message(paste("na de absolute abundce te bereken"), log_file)
+
     qpcr_norm_wide =
       joined_pstibble_combined %>%
       pivot_wider(names_from = SampleID,
@@ -314,6 +322,8 @@ normalise_data = function(physeq = without_mock_physeq,
     # Rownames restore
     rownames(df_tmp2) = rownames(sample_data(psdata_qpcr_norm))
     sample_data(psdata_qpcr_norm) = sample_data(df_tmp2)
+
+    log_message(paste("na de psdata onieuw in elkaar te zetten"), log_file)
 
   } else if (!is.null(norm_method) && norm_method == "qpcr" && copy_correction == FALSE) {
     log_message(paste("Error: norm_method is set to 'qpcr' but copy_correction is FALSE. The qPCR normalization method requires copy number correction to be enabled."), log_file)
