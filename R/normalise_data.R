@@ -341,15 +341,21 @@ normalise_data = function(physeq = without_mock_physeq,
     stop("Error: Downloaded ZIP file is missing or corrupted.")
   }
 
+  log_message(paste("dowloaden van de rrndb database"), log_file)
+
   # unzip the downloaded database
   unzip(zip_file_path, exdir = destination_folder)
   rrndb_database_tsv_file = list.files(destination_folder, pattern = "pantaxa_stats_NCBI\\.tsv$", full.names = TRUE)
   rrndb_database_tsv = read_tsv(rrndb_database_tsv_file)
   rrndb_database = rrndb_database_tsv %>% filter(rank == "genus") %>% select(Genus = "name", everything())
 
+  log_message(paste("unzip de database"), log_file)
+
   # preparing the phyloseq data
   psmelt = psdata %>% psmelt() %>% as_tibble()
   psmelt = psmelt %>% select(OTU, Genus)
+
+  log_message(paste("psmelt psdata"), log_file)
 
   proj_tabel = left_join(psmelt, raspergade_df, by = "OTU")
   final_tabel = left_join(proj_tabel, rrndb_database, by = "Genus")
@@ -361,6 +367,8 @@ normalise_data = function(physeq = without_mock_physeq,
       probability > 0.9 ~ "High (> 0.9)",
       probability >= 0.5 & probability <= 0.9 ~ "Medium (>= 0.5 & <= 0.9)",
       probability < 0.5 ~ "Low (< 0.5)"))
+
+  log_message(paste("plot data aanpasen"), log_file)
 
   cor_test = cor.test(plot_data$mean, plot_data$copy_number, method = "pearson")
   r_val = cor_test$estimate
@@ -391,6 +399,8 @@ normalise_data = function(physeq = without_mock_physeq,
           legend.background = element_rect(fill = "white",  colour = "grey80")) +
     annotate("text", x = 2.25, y = 11, label = label_text,
              hjust = 1, vjust = 1, size = 5)
+
+  log_message(paste("maken van copy number plot"), log_file)
 
   # Save as PDF
   figure_file_path_pdf <- file.path(figure_folder_png, paste0(project_name, "_copy_number_comparison.pdf"))
