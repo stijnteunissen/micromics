@@ -125,24 +125,15 @@ rarefying = function(physeq = physeq,
     # convert otu table to matrix
     ps_matrix = as(t(otu_table(psdata_fcm)), "matrix")
 
-    # Determine the scaling factor based on the maxium value in the otu matrix
-    max_sample_sum = max(sample_sums(psdata_fcm))
-    limit = 1e7
-    scaling_factor = 10 ^ ceiling(log10(max_sample_sum / limit))
-
-    # scale down to OTU matrix and cells per ml
-    scaled_ps_matrix = ceiling(ps_matrix / scaling_factor)
-    sample_data$cells_per_ml = sample_data$cells_per_ml / scaling_factor
-
     # calculate sample sizes and rarefy depths
-    sample_size = rowSums(scaled_ps_matrix) # total reads per sample
+    sample_size = rowSums(ps_matrix) # total reads per sample
     cell_count_table = sample_data$cells_per_ml # extract cell counts
     sampling_depths = sample_size / cell_count_table # sampling depths (total reads divided by cell count)
     minimum_sampling_depth = min(sampling_depths) # minimum sampling depth across all samples
     rarefy_to = round(cell_count_table * minimum_sampling_depth, digits = 0) # number of reads to rarefy for each sample
 
     # psdata_phyloseq = otu_table(psdata_fcm, taxa_are_rows = FALSE)
-    psdata_phyloseq = t(scaled_ps_matrix)
+    psdata_phyloseq = t(ps_matrix)
 
     # rarefy each sample based on the calculated rarefying targets (rarfy_to)
     rarefied_matrix = matrix(nrow = nrow(psdata_phyloseq),
@@ -158,9 +149,6 @@ rarefying = function(physeq = physeq,
         rarefied_matrix[, sample_name] <- as.numeric(rarefied_sample)
       }
     }
-
-    # rescale the rarefied matrix back to the original scale
-    rarefied_matrix = ceiling(rarefied_matrix * scaling_factor)
 
     rarefied_matrix_t = t(rarefied_matrix)
     colnames(rarefied_matrix_t) = taxa_names(psdata_fcm)
@@ -191,23 +179,14 @@ rarefying = function(physeq = physeq,
     # convert otu table to matrix
     ps_matrix = as(t(otu_table(psdata_qpcr)), "matrix")
 
-    # # Determine the scaling factor based on the maxium value in the otu matrix
-    max_sample_sum = max(sample_sums(psdata_qpcr))
-    limit = 1e7
-    scaling_factor = 10 ^ ceiling(log10(max_sample_sum / limit))
-
-    # Scale down the ASV matrix an qPCR values
-    scaled_ps_matrix = ceiling(ps_matrix / scaling_factor)
-    sample_data$sq_calc_mean = sample_data$sq_calc_mean / scaling_factor
-
-    sample_size = rowSums(scaled_ps_matrix) # total reads per sample
+    sample_size = rowSums(ps_matrix) # total reads per sample
     copy_count_table = round(sample_data$sq_calc_mean, digits = 0) # extract copy counts???
     sampling_dephts = sample_size / copy_count_table # sampling dephts (total reads divided by copy counts??)
     minimum_sampling_depth = min(sampling_dephts) # minimum sampling depht across all samples
     rarefy_to = round(copy_count_table * minimum_sampling_depth, digits = 0) # number of read tot rarefy for each sample
 
     #psdata_phyloseq = otu_table(psdata_qpcr, taxa_are_rows = FALSE)
-    psdata_phyloseq = t(scaled_ps_matrix)
+    psdata_phyloseq = t(ps_matrix)
 
     # rarefy each sample based on the calculated rarefying targets (rarfy_to)
     rarefied_matrix = matrix(nrow = nrow(psdata_phyloseq),
@@ -223,9 +202,6 @@ rarefying = function(physeq = physeq,
         rarefied_matrix[, sample_name] <- as.numeric(rarefied_sample)
       }
     }
-
-    # rescale the rarefied matrix back to the original scale
-    rarefied_matrix = ceiling(rarefied_matrix * scaling_factor)
 
     rarefied_matrix_t = t(rarefied_matrix)
     colnames(rarefied_matrix_t) = taxa_names(psdata_qpcr)

@@ -401,10 +401,12 @@ barplot = function(physeq = rarefied_genus_psmelt,
 
       new_taxa <- setdiff(norm_taxa, names(colorset))
       num_new_taxa = length(new_taxa)
+      if (num_new_taxa > 0) {
       assigned_taxa <- names(colorset)
       available_colors <- setdiff(scales::hue_pal()(num_new_taxa + length(colorset)), colorset)
       colorset[new_taxa] <- available_colors[1:num_new_taxa]
       names(colorset)[(length(colorset) - num_new_taxa + 1):length(colorset)] <- new_taxa
+      }
       colorset[glue("Other max.<{scaled_legend_cutoff_value_norm}x10^{log10(scale_legend_cutoff_value_norm)}\ncell equivalents")] <- "#D3D3D3"
 
       plot_data_norm =

@@ -140,8 +140,6 @@ normalise_data = function(physeq = without_mock_physeq,
   psdata_copy_number_corrected = psdata
   otu_table(psdata_copy_number_corrected) = otu_corrected
 
-  log_message(paste("na raspergade"), log_file)
-
   # FCM Normalization
   if (!is.null(norm_method) && norm_method == "fcm") {
 
@@ -202,8 +200,6 @@ normalise_data = function(physeq = without_mock_physeq,
       joined_pstibble_qpcr %>%
       inner_join(., raspergade_df %>% select(OTU, copy_number), by = "OTU")
 
-    log_message(paste("inladen en merge van psdata"), log_file)
-
     # cell equivlants abundance in plaats van relative
     # abdance is cell equivlants
     # aangeven wat de eenheiden zijn vor relatief als het relatief als is of absoluut en de juiste eenheid kan per gram of ml
@@ -252,11 +248,12 @@ normalise_data = function(physeq = without_mock_physeq,
       }
     }
 
-    log_message(paste("na de sq mean bereken"), log_file)
-
     if (!is.null(results_list$dna) && !is.null(results_list$rna)) {
       joined_pstibble_combined2 =
-        bind_rows(results_list$dna, results_list$rna)
+        bind_rows(results_list$dna, results_list$rna) %>%
+        mutate(max_sq_calc_mean = max(sq_calc_mean, na.rm = TRUE),
+               scale_factor = ifelse(max_sq_calc_mean > 1e7, 10 ^ ceiling(log10(max_sq_calc_mean / 1e7)), 1),
+               sq_calc_mean = sq_calc_mean / scale_factor)
 
       joined_pstibble_combined =
         joined_pstibble_combined2 %>%
@@ -269,7 +266,10 @@ normalise_data = function(physeq = without_mock_physeq,
 
     } else if (!is.null(results_list$dna)) {
       joined_pstibble_combined2 =
-        results_list$dna
+        results_list$dna %>%
+        mutate(max_sq_calc_mean = max(sq_calc_mean, na.rm = TRUE),
+               scale_factor = ifelse(max_sq_calc_mean > 1e7, 10 ^ ceiling(log10(max_sq_calc_mean / 1e7)), 1),
+               sq_calc_mean = sq_calc_mean / scale_factor)
 
       joined_pstibble_combined =
         joined_pstibble_combined2 %>%
@@ -282,7 +282,10 @@ normalise_data = function(physeq = without_mock_physeq,
 
     } else if (!is.null(results_list$rna)) {
       joined_pstibble_combined2 =
-        results_list$rna
+        results_list$rna %>%
+        mutate(max_sq_calc_mean = max(sq_calc_mean, na.rm = TRUE),
+               scale_factor = ifelse(max_sq_calc_mean > 1e7, 10 ^ ceiling(log10(max_sq_calc_mean / 1e7)), 1),
+               sq_calc_mean = sq_calc_mean / scale_factor)
 
       joined_pstibble_combined =
         joined_pstibble_combined2 %>%
@@ -293,8 +296,6 @@ normalise_data = function(physeq = without_mock_physeq,
         ungroup() %>%
         select(OTU, norm_abund, SampleID)
     }
-
-    log_message(paste("na de absolute abundce te bereken"), log_file)
 
     qpcr_norm_wide =
       joined_pstibble_combined %>%
@@ -312,7 +313,7 @@ normalise_data = function(physeq = without_mock_physeq,
 
     # Get unique values of SampleID and sq_calc_mean
     df_sq = joined_pstibble_combined2 %>%
-      select(SampleID, sq_calc_mean) %>%
+      select(SampleID, sq_calc_mean, scale_factor) %>%
       distinct()
 
     # Merge with sample_data
@@ -322,8 +323,6 @@ normalise_data = function(physeq = without_mock_physeq,
     # Rownames restore
     rownames(df_tmp2) = rownames(sample_data(psdata_qpcr_norm))
     sample_data(psdata_qpcr_norm) = sample_data(df_tmp2)
-
-    log_message(paste("na de psdata onieuw in elkaar te zetten"), log_file)
 
   } else if (!is.null(norm_method) && norm_method == "qpcr" && copy_correction == FALSE) {
     log_message(paste("Error: norm_method is set to 'qpcr' but copy_correction is FALSE. The qPCR normalization method requires copy number correction to be enabled."), log_file)
@@ -341,15 +340,11 @@ normalise_data = function(physeq = without_mock_physeq,
     stop("Error: Downloaded ZIP file is missing or corrupted.")
   }
 
-  log_message(paste("dowloaden van de rrndb database"), log_file)
-
   # unzip the downloaded database
   unzip(zip_file_path, exdir = destination_folder)
   rrndb_database_tsv_file = list.files(destination_folder, pattern = "pantaxa_stats_NCBI\\.tsv$", full.names = TRUE)
   rrndb_database_tsv = read_tsv(rrndb_database_tsv_file)
   rrndb_database = rrndb_database_tsv %>% filter(rank == "genus") %>% select(Genus = "name", everything())
-
-  log_message(paste("unzip de database"), log_file)
 
   # preparing the phyloseq data
   # psmelt = psdata %>% psmelt() %>% as_tibble()
@@ -358,8 +353,6 @@ normalise_data = function(physeq = without_mock_physeq,
   tax = as.data.frame(tax_table(psdata)) %>%
     tibble::rownames_to_column("OTU") %>%
     select(OTU, Genus) %>% as_tibble()
-
-  log_message(paste("psmelt psdata"), log_file)
 
   proj_tabel = left_join(tax, raspergade_df, by = "OTU")
   final_tabel = left_join(proj_tabel, rrndb_database, by = "Genus")
@@ -371,8 +364,6 @@ normalise_data = function(physeq = without_mock_physeq,
       probability > 0.9 ~ "High (> 0.9)",
       probability >= 0.5 & probability <= 0.9 ~ "Medium (>= 0.5 & <= 0.9)",
       probability < 0.5 ~ "Low (< 0.5)"))
-
-  log_message(paste("plot data aanpasen"), log_file)
 
   cor_test = cor.test(plot_data$mean, plot_data$copy_number, method = "pearson")
   r_val = cor_test$estimate
@@ -403,8 +394,6 @@ normalise_data = function(physeq = without_mock_physeq,
           legend.background = element_rect(fill = "white",  colour = "grey80")) +
     annotate("text", x = 2.25, y = 11, label = label_text,
              hjust = 1, vjust = 1, size = 5)
-
-  log_message(paste("maken van copy number plot"), log_file)
 
   # Save as PDF
   figure_file_path_pdf <- file.path(figure_folder_png, paste0(project_name, "_copy_number_comparison.pdf"))
