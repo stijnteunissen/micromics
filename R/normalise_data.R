@@ -158,7 +158,11 @@ normalise_data = function(physeq = without_mock_physeq,
     df_sample_data_fcm$SampleID <- rownames(df_sample_data_fcm)
 
     joined_pstibble_fcm <- psdata_fcm_long %>%
-      inner_join(df_sample_data_fcm, by = "SampleID")
+      inner_join(df_sample_data_fcm, by = "SampleID") %>%
+      group_by(SampleID) %>%
+      mutate(max_cells_per_ml = max(cells_per_ml, na.rm = TRUE),
+             scale_factor = ifelse(max_cells_per_ml > 1e7, 10 ^ ceiling(log10(max_cells_per_ml / 1e7)), 1),
+             cells_per_ml = cells_per_ml / scale_factor)
 
     joined_pstibble_fcm_norm <- joined_pstibble_fcm %>%
       group_by(SampleID) %>%
@@ -176,6 +180,23 @@ normalise_data = function(physeq = without_mock_physeq,
 
     psdata_fcm_norm <- fcm_input
     otu_table(psdata_fcm_norm) <- otu_fcm_norm
+
+    # add scale factor to sample data
+    df_tmp = data.frane(sample_data(psdata_fcm_norm))
+    df_tmp = df_tmp %>% mutate(SampleID = rownames(df_tmp))
+
+    # get unique scale factor values per sample
+    df_sf = joined_pstibble_fcm %>%
+      select(SampleID, scale_factor) %>%
+      distinct()
+
+    # merge into sample data
+    df_tmp2 = df_tmp %>%
+      left_join(df_sf, by = "SampleID")
+
+    # restore rownames
+    rownames(df_tmp2) = rownames(sample_data(psdata_fcm_norm))
+    sample_data(psdata_fcm_norm) = sample_data(df_tmp2)
 
     # qpcr normalisatie
   } else if (!is.null(norm_method) && norm_method == "qpcr" && copy_correction == TRUE) {

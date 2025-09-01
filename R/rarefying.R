@@ -150,12 +150,27 @@ rarefying = function(physeq = physeq,
       }
     }
 
+    # transpose
     rarefied_matrix_t = t(rarefied_matrix)
     colnames(rarefied_matrix_t) = taxa_names(psdata_fcm)
     rownames(rarefied_matrix_t) = sample_names(psdata_fcm)
-    otu_rare = otu_table(rarefied_matrix_t, taxa_are_rows = FALSE)
+
+    # extract scale factor
+    df_scale = data.frame(sample_data(psdata_fcm))
+    df_scale = df_scale %>% mutate(SampleID = rownames(df_scale))
+
+    for (i in seq_len(nrow(df_scale))) {
+      sample_id = df_scale$SampleID[i]
+      scale_factor = df_scale$scale_factor[i]
+      if (!is.na(scale_factor) && scale_factor != 1) {
+        rarefied_matrix_t[sample_id, ] = rarefied_matrix_t[sample_id, ] * scale_factor
+      }
+    }
+
+    # put back intor phyloseq
+    otu_rescaled = otu_table(rarefied_matrix_t, taxa_are_rows = FALSE)
     psdata_rarefied = psdata_fcm
-    otu_table(psdata_rarefied) = otu_rare
+    otu_table(psdata_rarefied) = otu_rescaled
 
     assign(paste0(project_name, "_rarefied_physeq"), psdata_rarefied, envir = .GlobalEnv)
 
@@ -180,12 +195,11 @@ rarefying = function(physeq = physeq,
     ps_matrix = as(t(otu_table(psdata_qpcr)), "matrix")
 
     sample_size = rowSums(ps_matrix) # total reads per sample
-    copy_count_table = round(sample_data$sq_calc_mean, digits = 0) # extract copy counts???
+    copy_count_table = sample_data$sq_calc_mean # extract copy counts
     sampling_dephts = sample_size / copy_count_table # sampling dephts (total reads divided by copy counts??)
     minimum_sampling_depth = min(sampling_dephts) # minimum sampling depht across all samples
     rarefy_to = round(copy_count_table * minimum_sampling_depth, digits = 0) # number of read tot rarefy for each sample
 
-    #psdata_phyloseq = otu_table(psdata_qpcr, taxa_are_rows = FALSE)
     psdata_phyloseq = t(ps_matrix)
 
     # rarefy each sample based on the calculated rarefying targets (rarfy_to)
@@ -203,12 +217,28 @@ rarefying = function(physeq = physeq,
       }
     }
 
+    # transpose
     rarefied_matrix_t = t(rarefied_matrix)
     colnames(rarefied_matrix_t) = taxa_names(psdata_qpcr)
     rownames(rarefied_matrix_t) = sample_names(psdata_qpcr)
-    otu_rare = otu_table(rarefied_matrix_t, taxa_are_rows = FALSE)
+
+    # extract the scale factor
+    df_scale = data.frame(sample_data(psdata_qpcr))
+    df_scale = df_scale %>% mutate(SampleID = rownames(df_scale))
+
+    # multiply each column (sample) in th erearefied matrix by its corresponding scale factor
+    for (i in seq_len(nrow(df_scale))) {
+      sample_id = df_scale$SampleID[i]
+      scale_factor = df_scale$scale_factor[i]
+      if (!is.na(scale_factor) && scale_factor != 1) {
+        rarefied_matrix_t[sample_id, ] = rarefied_matrix_t[sample_id, ] * scale_factor
+      }
+    }
+
+    # Convert back to phyloseq OTU table
+    otu_rescaled = otu_table(rarefied_matrix_t, taxa_are_rows = FALSE)
     psdata_rarefied = psdata_qpcr
-    otu_table(psdata_rarefied) = otu_rare
+    otu_table(psdata_rarefied) = otu_rescaled
 
     assign(paste0(project_name, "_rarefied_physeq"), psdata_rarefied, envir = .GlobalEnv)
 
