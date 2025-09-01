@@ -229,8 +229,6 @@ heatmap = function(physeq = rarefied_genus_psmelt,
     heatmap_relative = plot_grid(combined_heatmap_rel, legend, ncol = 2, rel_widths = c(3, 0.5))
   }
 
-  print(heatmap_relative)
-
   figure_file_path = paste0(tax_folder_png, project_name, "_heatmap_relative_", tax, "_level.png")
   ggsave(filename = figure_file_path, plot = heatmap_relative, width = plot_width, height = 8, limitsize = FALSE, dpi = 600)
   log_message(paste("Relative heatmap saved as .png object in", figure_file_path), log_file)

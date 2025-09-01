@@ -233,8 +233,6 @@ beta_diversity <- function(physeq = physeq,
       combined_plot_relative <- cowplot::plot_grid(combined_plot_relative, legend, ncol = 2,
                                                    rel_widths = c(3, 0.8))
 
-      print(combined_plot_relative)
-
       # Save the relative beta diversity plot (using the provided 'level' in the filename)
       figure_file_path <- paste0(asv_folder_png, project_name, "_beta_diversity_relative_", ordination_method, "_asv_level.png")
       ggsave(filename = figure_file_path, plot = combined_plot_relative, width = 10, height = 5, dpi = 600)
@@ -249,7 +247,6 @@ beta_diversity <- function(physeq = physeq,
         plot_man <- base_beta_plot(psdata_absolute, ordination_method, "manhattan", "Manhattan\n(PCoA)",
                                    color_factor, shape_factor, size_factor, alpha_factor) +
           theme(legend.position = "right")
-        print(plot_man)
 
         figure_file_path <- paste0(asv_folder_png, project_name, "_beta_diversity_absolute_", ordination_method, "_asv_level.png")
         ggsave(filename = figure_file_path, plot = plot_man, width = 10, height = 5, dpi = 600)
@@ -282,8 +279,6 @@ beta_diversity <- function(physeq = physeq,
       combined_plot_relative_dna <- cowplot::plot_grid(combined_plot_relative_dna, legend_dna, ncol = 2,
                                                        rel_widths = c(3, 0.8))
 
-      print(combined_plot_relative_dna)
-
       figure_file_path <- paste0(asv_folder_png, project_name, "_beta_diversity_relative_", ordination_method, "_asv_level_dna.png")
       ggsave(filename = figure_file_path, plot = combined_plot_relative_dna, width = 10, height = 5, dpi = 600)
       log_message(paste("Relative beta diversity DNA plot saved:", figure_file_path), log_file)
@@ -297,7 +292,6 @@ beta_diversity <- function(physeq = physeq,
         plot_man_dna <- base_beta_plot(psdata_absolute_dna, ordination_method, "manhattan", "Manhattan\n(PCoA)",
                                        color_factor, shape_factor, size_factor, alpha_factor) +
           theme(legend.position = "right")
-        print(plot_man_dna)
 
         figure_file_path <- paste0(asv_folder_png, project_name, "_beta_diversity_absolute_", ordination_method, "_asv_level_dna.png")
         ggsave(filename = figure_file_path, plot = plot_man_dna, width = 10, height = 5, dpi = 600)
@@ -328,8 +322,6 @@ beta_diversity <- function(physeq = physeq,
       combined_plot_relative_rna <- cowplot::plot_grid(combined_plot_relative_rna, legend_rna, ncol = 2,
                                                        rel_widths = c(3, 0.8))
 
-      print(combined_plot_relative_rna)
-
       figure_file_path <- paste0(asv_folder_png, project_name, "_beta_diversity_relative_", ordination_method, "_asv_level_rna.png")
       ggsave(filename = figure_file_path, plot = combined_plot_relative_rna, width = 10, height = 5, dpi = 600)
       log_message(paste("Relative beta diversity RNA plot saved:", figure_file_path), log_file)
@@ -343,7 +335,6 @@ beta_diversity <- function(physeq = physeq,
         plot_man_rna <- base_beta_plot(psdata_absolute_rna, ordination_method, "manhattan", "Manhattan\n(PCoA)",
                                        color_factor, shape_factor, size_factor, alpha_factor) +
           theme(legend.position = "right")
-        print(plot_man_rna)
 
         figure_file_path <- paste0(asv_folder_png, project_name, "_beta_diversity_absolute_", ordination_method, "_asv_level_rna.png")
         ggsave(filename = figure_file_path, plot = plot_man_rna, width = 10, height = 5, dpi = 600)
@@ -433,8 +424,6 @@ beta_diversity <- function(physeq = physeq,
         combined_plot_relative <- cowplot::plot_grid(combined_plot_relative, legend, ncol = 2,
                                                      rel_widths = c(3, 0.8))
 
-        print(combined_plot_relative)
-
         figure_file_path <- paste0(tax_folder_png, project_name, "_beta_diversity_relative_", ordination_method, "_", tax, "_level.png")
         ggsave(filename = figure_file_path, plot = combined_plot_relative, width = 10, height = 5, dpi = 600)
         log_message(paste("Relative beta diversity plot saved:", figure_file_path), log_file)
@@ -447,7 +436,6 @@ beta_diversity <- function(physeq = physeq,
           plot_man <- base_beta_plot(psdata_absolute, ordination_method, "manhattan", "Manhattan\n(PCoA)",
                                      color_factor, shape_factor, size_factor, alpha_factor) +
             theme(legend.position = "right")
-          print(plot_man)
 
           figure_file_path <- paste0(tax_folder_png, project_name, "_beta_diversity_absolute_", ordination_method, "_", tax, "_level.png")
           ggsave(filename = figure_file_path, plot = plot_man, width = 10, height = 5, dpi = 600)
@@ -478,8 +466,6 @@ beta_diversity <- function(physeq = physeq,
         combined_plot_relative_dna <- cowplot::plot_grid(combined_plot_relative_dna, legend_dna, ncol = 2,
                                                          rel_widths = c(3, 0.8))
 
-        print(combined_plot_relative_dna)
-
         figure_file_path <- paste0(tax_folder_png, project_name, "_beta_diversity_relative_", ordination_method, "_", tax, "_level_dna.png")
         ggsave(filename = figure_file_path, plot = combined_plot_relative_dna, width = 10, height = 5, dpi = 600)
         log_message(paste("Relative beta diversity DNA plot saved:", figure_file_path), log_file)
@@ -493,7 +479,6 @@ beta_diversity <- function(physeq = physeq,
           plot_man_dna <- base_beta_plot(psdata_absolute_dna, ordination_method, "manhattan", "Manhattan\n(PCoA)",
                                          color_factor, shape_factor, size_factor, alpha_factor) +
             theme(legend.position = "right")
-          print(plot_man_dna)
 
           figure_file_path <- paste0(tax_folder_png, project_name, "_beta_diversity_absolute_", ordination_method, "_", tax, "_level_dna.png")
           ggsave(filename = figure_file_path, plot = plot_man_dna, width = 10, height = 5, dpi = 600)
@@ -524,8 +509,6 @@ beta_diversity <- function(physeq = physeq,
         combined_plot_relative_rna <- cowplot::plot_grid(combined_plot_relative_rna, legend_rna, ncol = 2,
                                                          rel_widths = c(3, 0.8))
 
-        print(combined_plot_relative_rna)
-
         figure_file_path <- paste0(tax_folder_png, project_name, "_beta_diversity_relative_", ordination_method, "_", tax, "_level_rna.png")
         ggsave(filename = figure_file_path, plot = combined_plot_relative_rna, width = 10, height = 5, dpi = 600)
         log_message(paste("Relative beta diversity RNA plot saved:", figure_file_path), log_file)
@@ -539,8 +522,6 @@ beta_diversity <- function(physeq = physeq,
           plot_man_rna <- base_beta_plot(psdata_absolute_rna, ordination_method, "manhattan", "Manhattan\n(PCoA)",
                                          color_factor, shape_factor, size_factor, alpha_factor) +
             theme(legend.position = "right")
-
-          print(plot_man_rna)
 
           figure_file_path <- paste0(tax_folder_png, project_name, "_beta_diversity_absolute_", ordination_method, "_", tax, "_level_rna.png")
           ggsave(filename = figure_file_path, plot = plot_man_rna, width = 10, height = 5, dpi = 600)

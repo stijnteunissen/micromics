@@ -255,8 +255,6 @@ alpha_diversity = function(physeq = physeq,
         ncol = 1)
     }
 
-    print(combined_plot)
-
     figure_file_path = paste0(asv_folder_png, project_name, "_alpha_diversity_asv_level.png")
     ggsave(filename = figure_file_path, plot = combined_plot, width = 12, height = 5, dpi = 600)
     log_message(paste("alpha diversity asv level saved as .png object in", figure_file_path), log_file)
@@ -384,8 +382,6 @@ alpha_diversity = function(physeq = physeq,
           plot_grid(rna_label, separator_line, combined_plot_rna, ncol = 1, rel_heights = c(0.1, 0.05, 1)),
           ncol = 1)
       }
-
-      print(combined_plot)
 
       figure_file_path = paste0(tax_folder_png, project_name, "_alpha_diversity_", tax, "_level.png")
       ggsave(filename = figure_file_path, plot = combined_plot, width = 12, height = 5, dpi = 600)
