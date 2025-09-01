@@ -167,7 +167,7 @@ rarefying = function(physeq = physeq,
       }
     }
 
-    # put back intor phyloseq
+    # put back in phyloseq
     otu_rescaled = otu_table(rarefied_matrix_t, taxa_are_rows = FALSE)
     psdata_rarefied = psdata_fcm
     otu_table(psdata_rarefied) = otu_rescaled
