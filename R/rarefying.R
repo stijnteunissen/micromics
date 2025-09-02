@@ -185,8 +185,6 @@ rarefying = function(physeq = physeq,
     psdata_ccn = physeq[["psdata_asv_copy_number_corrected"]]
     psdata_qpcr = physeq[["psdata_asv_qpcr_norm"]]
 
-    psdata_qpcr = readRDS("~/Wetsus/micromics - Documents/General/micromics/microbiome_analysis/ABOU_proj1_Q18517_qpcr_phyloseq_asv_level_qpcr_normalised_cell_concentration.rds")
-
     psdata_qpcr <- prune_samples(sample_sums(psdata_qpcr) > 0, psdata_qpcr) # Remove samples with zero counts
     psdata_qpcr <- prune_taxa(rowSums(otu_table(psdata_qpcr)) > 0, psdata_qpcr) # Remove taxa with zero counts across all samples
 
