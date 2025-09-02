@@ -467,8 +467,6 @@ barplot = function(physeq = rarefied_genus_psmelt,
           ylabel = "Cell equivalents (Cells/gram) sample"
         }
 
-        plot_data_norm = readRDS("~/Wetsus/micromics - Documents/General/micromics/microbiome_analysis/projects/MGAD/MGAD_proj1_Q18279/output_data/rds_files/After_cleaning_rds_files/Genus/MGAD_proj1_Q18279_pstibble_absolute_data_Genus_level.rds")
-
         if (!is.null(group_by_factor)) {
           all_plots = list()
           factors = unique(plot_data_norm[[group_by_factor]])
