@@ -215,6 +215,17 @@ alpha_diversity = function(physeq = physeq,
       combined_plot = plot_grid(chao1_plot + theme(legend.position = "none"), shannon_plot + theme(legend.position = "none"),
                                 align = "hv", labels = c("A", "B"), nrow = 1)
 
+      n_samples <- length(unique(alpha_data_full$sampleid))
+      fig.width <- max(12, n_samples * 0.40)
+
+      figure_file_path = paste0(asv_folder_png, project_name, "_alpha_diversity_asv_level.png")
+      ggsave(filename = figure_file_path, plot = combined_plot, width = fig.width, height = 6, dpi = 600)
+      log_message(paste("alpha diversity asv level saved as .png object in", figure_file_path), log_file)
+
+      figure_file_path = paste0(asv_folder_pdf, project_name, "_alpha_diversity_asv_level.pdf")
+      ggsave(filename = figure_file_path, plot = combined_plot, width = fig.width, height = 6)
+      log_message(paste("alpha diversity asv level saved as .pdf object in", figure_file_path), log_file)
+
     } else if (length(na_types) == 2) {
       alpha_data_full_dna = alpha_data_full %>% filter(na_type == "dna")
 
@@ -253,15 +264,29 @@ alpha_diversity = function(physeq = physeq,
         plot_grid(dna_label, separator_line, combined_plot_dna, ncol = 1, rel_heights = c(0.1, 0.05, 1)),
         plot_grid(rna_label, separator_line, combined_plot_rna, ncol = 1, rel_heights = c(0.1, 0.05, 1)),
         ncol = 1)
+
+      n_samples_dna <- length(unique(alpha_data_full_dna$sampleid))
+      fig.width_dna <- max(12, n_samples_dna * 0.40)
+
+      n_samples_rna <- length(unique(alpha_data_full_rna$sampleid))
+      fig.width_rna <- max(12, n_samples_rna * 0.20)
+
+      figure_file_path = paste0(asv_folder_png, project_name, "_alpha_diversity_dna_asv_level.png")
+      ggsave(filename = figure_file_path, plot = combined_plot_dna, width = fig.width_dna, height = 6, dpi = 600)
+      log_message(paste("alpha diversity asv level saved as .png object in", figure_file_path), log_file)
+
+      figure_file_path = paste0(asv_folder_pdf, project_name, "_alpha_diversity_dna_asv_level.pdf")
+      ggsave(filename = figure_file_path, plot = combined_plot_dna, width = fig.width_dna, height = 6)
+      log_message(paste("alpha diversity asv level saved as .pdf object in", figure_file_path), log_file)
+
+      figure_file_path = paste0(asv_folder_png, project_name, "_alpha_diversity_rna_asv_level.png")
+      ggsave(filename = figure_file_path, plot = combined_plot_rna, width = fig.width_rna, height = 6, dpi = 600)
+      log_message(paste("alpha diversity asv level saved as .png object in", figure_file_path), log_file)
+
+      figure_file_path = paste0(asv_folder_pdf, project_name, "_alpha_diversity_rna_asv_level.pdf")
+      ggsave(filename = figure_file_path, plot = combined_plot_rna, width = fig.width_rna, height = 6)
+      log_message(paste("alpha diversity asv level saved as .pdf object in", figure_file_path), log_file)
     }
-
-    figure_file_path = paste0(asv_folder_png, project_name, "_alpha_diversity_asv_level.png")
-    ggsave(filename = figure_file_path, plot = combined_plot, width = 12, height = 5, dpi = 600)
-    log_message(paste("alpha diversity asv level saved as .png object in", figure_file_path), log_file)
-
-    figure_file_path = paste0(asv_folder_pdf, project_name, "_alpha_diversity_asv_level.pdf")
-    ggsave(filename = figure_file_path, plot = combined_plot, width = 12, height = 5)
-    log_message(paste("alpha diversity asv level saved as .pdf object in", figure_file_path), log_file)
 
   } else {
 
@@ -343,6 +368,17 @@ alpha_diversity = function(physeq = physeq,
         combined_plot = plot_grid(chao1_plot + theme(legend.position = "none"), shannon_plot + theme(legend.position = "none"),
                                   align = "hv", labels = c("A", "B"), nrow = 1)
 
+        n_samples <- length(unique(alpha_data_full$sampleid))
+        fig.width <- max(12, n_samples * 0.40)
+
+        figure_file_path = paste0(tax_folder_png, project_name, "_alpha_diversity_", tax, "_level.png")
+        ggsave(filename = figure_file_path, plot = combined_plot, width = fig.width, height = 6, dpi = 600)
+        log_message(paste("alpha diversity asv level saved as .png object in", figure_file_path), log_file)
+
+        figure_file_path = paste0(tax_folder_pdf, project_name, "_alpha_diversity_", tax, "_level.pdf")
+        ggsave(filename = figure_file_path, plot = combined_plot, width = fig.width, height = 6)
+        log_message(paste("alpha diversity asv level saved as .pdf object in", figure_file_path), log_file)
+
       } else if (length(na_types) == 2) {
         alpha_data_full_dna = alpha_data_full %>% filter(na_type == "dna")
 
@@ -383,12 +419,26 @@ alpha_diversity = function(physeq = physeq,
           ncol = 1)
       }
 
-      figure_file_path = paste0(tax_folder_png, project_name, "_alpha_diversity_", tax, "_level.png")
-      ggsave(filename = figure_file_path, plot = combined_plot, width = 12, height = 5, dpi = 600)
+      n_samples_dna <- length(unique(alpha_data_full_dna$sampleid))
+      fig.width_dna <- max(12, n_samples_dna * 0.40)
+
+      n_samples_rna <- length(unique(alpha_data_full_rna$sampleid))
+      fig.width_rna <- max(12, n_samples_rna * 0.20)
+
+      figure_file_path = paste0(tax_folder_png, project_name, "_alpha_diversity_dna_", tax, "_level.png")
+      ggsave(filename = figure_file_path, plot = combined_plot_dna, width = fig.width_dna, height = 6, dpi = 600)
       log_message(paste("alpha diversity", tax, "level saved as .png object in", figure_file_path), log_file)
 
-      figure_file_path = paste0(tax_folder_pdf, project_name, "_alpha_diversity_", tax, "_level.pdf")
-      ggsave(filename = figure_file_path, plot = combined_plot, width = 12, height = 5)
+      figure_file_path = paste0(tax_folder_pdf, project_name, "_alpha_diversity_dna_", tax, "_level.pdf")
+      ggsave(filename = figure_file_path, plot = combined_plot_dna, width = fig.width_dna, height = 6)
+      log_message(paste("alpha diversity", tax, "level saved as .pdf object in", figure_file_path), log_file)
+
+      figure_file_path = paste0(tax_folder_png, project_name, "_alpha_diversity_rna_", tax, "_level.png")
+      ggsave(filename = figure_file_path, plot = combined_plot_rna, width = fig.width_rna, height = 6, dpi = 600)
+      log_message(paste("alpha diversity", tax, "level saved as .png object in", figure_file_path), log_file)
+
+      figure_file_path = paste0(tax_folder_pdf, project_name, "_alpha_diversity_rna_", tax, "_level.pdf")
+      ggsave(filename = figure_file_path, plot = combined_plot_rna, width = fig.width_rna, height = 6)
       log_message(paste("alpha diversity", tax, "level saved as .pdf object in", figure_file_path), log_file)
     }
   }

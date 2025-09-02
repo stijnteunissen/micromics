@@ -308,7 +308,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
       fig.width_dna <- max(12, n_samples_dna * 0.40)
 
       n_samples_rna <- length(unique(plot_data_rel_rna$Sample))
-      fig.width_rna <- max(12, n_samples_rna * 0.20)
+      fig.width_rna <- max(12, n_samples_rna * 0.40)
 
       # save figure as png
       figure_file_path = paste0(tax_folder_png, project_name, "_barplot_relative_dna_", tax, "_level.png")
@@ -509,7 +509,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
         }
 
         n_samples <- length(unique(plot_data_norm$Sample))
-        fig.width <- max(12, n_samples * 0.20)
+        fig.width <- max(12, n_samples * 0.40)
 
         # figures saved as png
         figure_file_path = paste0(tax_folder_png, project_name, "_barplot_absolute_", tax, "_level.png")
@@ -620,7 +620,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
         fig.width_dna <- max(12, n_samples_dna * 0.40)
 
         n_samples_rna <- length(unique(plot_data_norm_rna$Sample))
-        fig.width_rna <- max(12, n_samples_rna * 0.20)
+        fig.width_rna <- max(12, n_samples_rna * 0.40)
 
         # figures saved as png
         figure_file_path = paste0(tax_folder_png, project_name, "_barplot_absolute_dna_", tax, "_level.png")

@@ -173,22 +173,22 @@ heatmap = function(physeq = rarefied_genus_psmelt,
     mutate(!!sym(tax) := factor(!!sym(tax)),
            !!sym(tax) := fct_reorder(!!sym(tax), median, .desc = TRUE))
 
-  number_samples =
-    plot_data_rel %>%
-    distinct(Sample) %>%
-    nrow()
-
-  base_width = 8
-  width_increment = 0.3
-  plot_width = base_width + (number_samples * width_increment)
-
-  na_types = unique(plot_data_rel$na_type)
-
   if (length(na_types) == 1) {
     heatmap_relative =
       base_heatmap(plot_data_rel, "Sample", "mean_rel_abund", legend_name = "Relative\nAbundance (%)", x_label = "Sample", tax) +
       scale_color_identity() +
       facet_add(present_factors)
+
+    n_samples <- length(unique(plot_data_rel$Sample))
+    fig.width <- max(12, n_samples * 0.40)
+
+    figure_file_path = paste0(tax_folder_png, project_name, "_heatmap_relative_", tax, "_level.png")
+    ggsave(filename = figure_file_path, plot = heatmap_relative, width = fig.width, height = 10, limitsize = FALSE, dpi = 600)
+    log_message(paste("Relative heatmap saved as .png object in", figure_file_path), log_file)
+
+    figure_file_path = paste0(tax_folder_pdf, project_name, "_heatmap_relative_", tax, "_level.pdf")
+    ggsave(filename = figure_file_path, plot = heatmap_relative, width = fig.width, height = 10, limitsize = FALSE)
+    log_message(paste("Relative heatmap saved as .pdf object in", figure_file_path), log_file)
 
   } else if (length(na_types) == 2) {
     plot_data_rel_dna =
@@ -199,7 +199,7 @@ heatmap = function(physeq = rarefied_genus_psmelt,
       base_heatmap(plot_data_rel_dna, "Sample", "mean_rel_abund", legend_name = "Relative\nAbundance (%)", x_label = "Sample", tax) +
       scale_color_identity() +
       facet_add(present_factors, include_na_type = TRUE) +
-      theme(legend.position = "none")
+      theme(legend.position = "right")
 
     plot_data_rel_rna =
       plot_data_rel %>%
@@ -210,7 +210,7 @@ heatmap = function(physeq = rarefied_genus_psmelt,
       scale_color_identity() +
       facet_add(present_factors, include_na_type = TRUE) +
       theme(axis.text.y = element_blank(),
-            legend.position = "none")
+            legend.position = "right")
 
     num_samples_dna = plot_data_rel_dna %>% distinct(Sample) %>% nrow()
     num_samples_rna = plot_data_rel_rna %>% distinct(Sample) %>% nrow()
@@ -227,15 +227,29 @@ heatmap = function(physeq = rarefied_genus_psmelt,
                                      ncol = 2, labels = c("A", "B"), rel_widths = rel_widths)
 
     heatmap_relative = plot_grid(combined_heatmap_rel, legend, ncol = 2, rel_widths = c(3, 0.5))
+
+    n_samples_dna <- length(unique(plot_data_rel_dna$Sample))
+    fig.width_dna <- max(12, n_samples_dna * 0.40)
+
+    n_samples_rna <- length(unique(plot_data_rel_rna$Sample))
+    fig.width_rna <- max(12, n_samples_rna * 0.40)
+
+    figure_file_path = paste0(tax_folder_png, project_name, "_heatmap_relative_dna_", tax, "_level.png")
+    ggsave(filename = figure_file_path, plot = heatmap_relative_dna, width = fig.width_dna, height = 10, limitsize = FALSE, dpi = 600)
+    log_message(paste("Relative heatmap saved as .png object in", figure_file_path), log_file)
+
+    figure_file_path = paste0(tax_folder_pdf, project_name, "_heatmap_relative_dna_", tax, "_level.pdf")
+    ggsave(filename = figure_file_path, plot = heatmap_relative_dna, width = fig.width_dna, height = 10, limitsize = FALSE)
+    log_message(paste("Relative heatmap saved as .pdf object in", figure_file_path), log_file)
+
+    figure_file_path = paste0(tax_folder_png, project_name, "_heatmap_relative_rna_", tax, "_level.png")
+    ggsave(filename = figure_file_path, plot = heatmap_relative_rna, width = fig.width_dna, height = 10, limitsize = FALSE, dpi = 600)
+    log_message(paste("Relative heatmap saved as .png object in", figure_file_path), log_file)
+
+    figure_file_path = paste0(tax_folder_pdf, project_name, "_heatmap_relative_rna_", tax, "_level.pdf")
+    ggsave(filename = figure_file_path, plot = heatmap_relative_rna, width = fig.width_dna, height = 10, limitsize = FALSE)
+    log_message(paste("Relative heatmap saved as .pdf object in", figure_file_path), log_file)
   }
-
-  figure_file_path = paste0(tax_folder_png, project_name, "_heatmap_relative_", tax, "_level.png")
-  ggsave(filename = figure_file_path, plot = heatmap_relative, width = plot_width, height = 10, limitsize = FALSE, dpi = 600)
-  log_message(paste("Relative heatmap saved as .png object in", figure_file_path), log_file)
-
-  figure_file_path = paste0(tax_folder_pdf, project_name, "_heatmap_relative_", tax, "_level.pdf")
-  ggsave(filename = figure_file_path, plot = heatmap_relative, width = plot_width, height = 10, limitsize = FALSE)
-  log_message(paste("Relative heatmap saved as .pdf object in", figure_file_path), log_file)
   }
 
   log_message("Heatmap successfully plotted.", log_file)
