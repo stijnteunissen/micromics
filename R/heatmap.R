@@ -173,6 +173,8 @@ heatmap = function(physeq = rarefied_genus_psmelt,
     mutate(!!sym(tax) := factor(!!sym(tax)),
            !!sym(tax) := fct_reorder(!!sym(tax), median, .desc = TRUE))
 
+  na_types = unique(plot_data_rel$na_type)
+
   if (length(na_types) == 1) {
     heatmap_relative =
       base_heatmap(plot_data_rel, "Sample", "mean_rel_abund", legend_name = "Relative\nAbundance (%)", x_label = "Sample", tax) +
