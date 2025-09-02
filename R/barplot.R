@@ -175,12 +175,14 @@ barplot = function(physeq = rarefied_genus_psmelt,
         TRUE ~ str_replace(!!sym(current_tax), "^(\\S*)$", "*\\1*")
       ))
 
+    # if date factor is presetn it is put in correct format and chronological order
     if (!is.null(date_factor) && date_factor %in% present_factors) {
       genus_abund_rel <- genus_abund_rel %>%
         mutate(!!sym(date_factor) := as.Date(!!sym(date_factor), format = "%d/%m/%Y")) %>%
         arrange(!!sym(date_factor))
     }
 
+    # create a wide table with tax rank and relative abundance
     genus_abund_wide_rel =
       genus_abund_rel %>%
       select(!!!syms(higher_levels), Sample, mean_rel_abund) %>%
@@ -194,15 +196,18 @@ barplot = function(physeq = rarefied_genus_psmelt,
       mutate(across(where(is.numeric), ~round(.x, digits = 2))) %>%
       select(!!!syms(higher_levels), everything())
 
+    # create a folder for each taxonomic rank table
     barplot_csv_folder = paste0(output_folder_csv_files, "Barplot/")
     if(!dir.exists(barplot_csv_folder)) { dir.create(barplot_csv_folder) }
     tax_csv_folder = paste0(barplot_csv_folder, tax, "/")
     if(!dir.exists(tax_csv_folder)) { dir.create(tax_csv_folder) }
 
+    # save the wide table
     output_file_path = paste0(tax_csv_folder, project_name, "_barplot_relative_data_", tax, "_level.csv")
     write_csv(genus_abund_wide_rel, file = output_file_path, col_names = TRUE)
     log_message(paste("Relative data saved as .csv object in", output_file_path), log_file)
 
+    # calculate the top ntaxa shown in the legend
     legend_cutoff_rel =
       genus_abund_rel %>%
       group_by(!!sym(current_tax)) %>%
@@ -221,6 +226,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
 
     colorset <- unique(c(dark2_colors, paired_colors, set_colors, set1_colors, spectral_colors, additional_palette))
 
+    # assign a color to all top ntaxa
     inner_join(genus_abund_rel, genus_pool_rel, by = current_tax) %>%
       mutate(!!sym(current_tax) := if_else(!!sym(current_tax) %in% legend_cutoff_names_rel,
                                            !!sym(current_tax),
@@ -236,6 +242,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
 
     colorset[glue("Other max.<{round(legend_cutoff_value_rel, 2)}%")] <- "#D3D3D3"
 
+    # creating the plot data for relative barplots
     plot_data_rel =
       inner_join(genus_abund_rel, genus_pool_rel, by = current_tax) %>%
       mutate(!!sym(current_tax) := if_else(!!sym(current_tax) %in% legend_cutoff_names_rel,
@@ -256,6 +263,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
 
     na_types = unique(plot_data_rel$na_type)
 
+    # creating relative barplots for number of na_types
     if (length(na_types) == 1) {
       barplot_relative =
         base_barplot(plot_data_rel, "Sample", "mean_rel_abund", colorset, current_tax,
@@ -264,12 +272,15 @@ barplot = function(physeq = rarefied_genus_psmelt,
         facet_add(present_factors) +
         scale_y_continuous(expand = c(0, 0))
 
+      n_samples <- length(unique(plot_data_rel$Sample))
+      fig.width <- max(12, n_samples * 0.40)
+
       figure_file_path = paste0(tax_folder_png, project_name, "_barplot_relative_", tax, "_level.png")
-      ggsave(filename = figure_file_path, plot = barplot_relative, width = 12, height = 8, dpi = 300)
+      ggsave(filename = figure_file_path, plot = barplot_relative, width = fig.width, height = 10, dpi = 300)
       log_message(paste("Relative barplot saved as .png object in", figure_file_path), log_file)
 
       figure_file_path = paste0(tax_folder_pdf, project_name, "_barplot_relative_", tax, "_level.pdf")
-      ggsave(filename = figure_file_path, plot = barplot_relative, width = 12, height = 8)
+      ggsave(filename = figure_file_path, plot = barplot_relative, width = fig.width, height = 10)
       log_message(paste("Relative barplot saved as .pdf object in", figure_file_path), log_file)
 
     } else if (length(na_types) == 2) {
@@ -293,27 +304,34 @@ barplot = function(physeq = rarefied_genus_psmelt,
         facet_add(present_factors) +
         scale_y_continuous(expand = c(0, 0))
 
+      n_samples_dna <- length(unique(plot_data_rel_dna$Sample))
+      fig.width_dna <- max(12, n_samples_dna * 0.40)
+
+      n_samples_rna <- length(unique(plot_data_rel_rna$Sample))
+      fig.width_rna <- max(12, n_samples_rna * 0.20)
+
       # save figure as png
       figure_file_path = paste0(tax_folder_png, project_name, "_barplot_relative_dna_", tax, "_level.png")
-      ggsave(filename = figure_file_path, plot = barplot_relative_dna, width = 12, height = 8, dpi = 600)
+      ggsave(filename = figure_file_path, plot = barplot_relative_dna, width = fig.width_dna, height = 10, dpi = 600)
       log_message(paste("Relative barplot saved as .png object in", figure_file_path), log_file)
 
       figure_file_path = paste0(tax_folder_png, project_name, "_barplot_relative_rna_", tax, "_level.png")
-      ggsave(filename = figure_file_path, plot = barplot_relative_rna, width = 12, height = 8, dpi = 600)
+      ggsave(filename = figure_file_path, plot = barplot_relative_rna, width = fig.width_rna, height = 10, dpi = 600)
       log_message(paste("Relative barplot saved as .png object in", figure_file_path), log_file)
 
       # save figure as pdf
       figure_file_path = paste0(tax_folder_pdf, project_name, "_barplot_relative_dna_", tax, "_level.pdf")
-      ggsave(filename = figure_file_path, plot = barplot_relative_dna, width = 12, height = 8)
+      ggsave(filename = figure_file_path, plot = barplot_relative_dna, width = fig.width_dna, height = 10)
       log_message(paste("Relative barplot saved as .pdf object in", figure_file_path), log_file)
 
       figure_file_path = paste0(tax_folder_pdf, project_name, "_barplot_relative_rna_", tax, "_level.pdf")
-      ggsave(filename = figure_file_path, plot = barplot_relative_rna, width = 12, height = 8)
+      ggsave(filename = figure_file_path, plot = barplot_relative_rna, width = fig.width_rna, height = 10)
       log_message(paste("Relative barplot saved as .pdf object in", figure_file_path), log_file)
 
     }
 
     # Absolute data plots
+    # if normalized data is present, an absolute barplot is created
     if (is.null(norm_method)) {
       log_message("No absolute data provided; skipping absolute barplot creation", log_file)
     } else if (norm_method == "fcm" || norm_method == "qpcr") {
@@ -328,6 +346,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
       current_index <- match(current_tax, taxonomy_order)
       higher_levels <- taxonomy_order[1:(current_index)]
 
+      # modify taxonomic labels
       genus_abund_norm =
         absolute_data %>%
         group_by(Sample, !!!syms(higher_levels), na_type, !!!syms(present_factors)) %>%
@@ -340,6 +359,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
           TRUE ~ str_replace(!!sym(current_tax), "^(\\S*)$", "*\\1*")
         ))
 
+      # create a wide table with tax rank and absolute abundance
       genus_abund_wide_norm =
         genus_abund_norm %>%
         select(!!!syms(higher_levels), Sample, norm_abund) %>%
@@ -353,15 +373,18 @@ barplot = function(physeq = rarefied_genus_psmelt,
         mutate(across(where(is.numeric), ~round(.x, digits = 2))) %>%
         select(!!!syms(higher_levels), everything())
 
+      # create a folder for each taxonomic rank table
       barplot_csv_folder = paste0(output_folder_csv_files, "Barplot/")
       if(!dir.exists(barplot_csv_folder)) { dir.create(barplot_csv_folder) }
       tax_csv_folder = paste0(barplot_csv_folder, tax, "/")
       if(!dir.exists(tax_csv_folder)) { dir.create(tax_csv_folder) }
 
+      # save the wide table
       output_file_path = paste0(tax_csv_folder, project_name, "_barplot_absolute_data_", tax, "_level.csv")
       write_csv(genus_abund_wide_norm, file = output_file_path, col_names = TRUE)
       log_message(paste("Absolute data saved as .csv object in", output_file_path), log_file)
 
+      # calculate the top ntaxa shown in the legend
       legend_cutoff_norm =
         genus_abund_norm %>%
         group_by(!!sym(current_tax)) %>%
@@ -375,6 +398,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
       scale_legend_cutoff_value_norm = 10^floor(log10(legend_cutoff_value_norm))
       scaled_legend_cutoff_value_norm = round(legend_cutoff_value_norm / scale_legend_cutoff_value_norm, 1)
 
+      # assign a color to all top ntaxa
       genus_pool_norm =
         genus_abund_norm %>%
         group_by(!!sym(current_tax)) %>%
@@ -404,6 +428,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
       }
       colorset[glue("Other max.<{scaled_legend_cutoff_value_norm}x10^{log10(scale_legend_cutoff_value_norm)}\ncell equivalents")] <- "#D3D3D3"
 
+      # creating the plot data for absolute barplots
       plot_data_norm =
         inner_join(genus_abund_norm, genus_pool_norm, by = current_tax) %>%
         mutate(!!sym(current_tax) := if_else(!!sym(current_tax) %in% legend_cutoff_names_norm,
@@ -435,11 +460,14 @@ barplot = function(physeq = rarefied_genus_psmelt,
       na_types = unique(plot_data_norm$na_type)
 
       if (length(na_types) == 1) {
+        # choice of `liquid` for cells per ml annotation on the y as of the barplot or `solid` for cells per gram
         if (sample_matrix == "liquid") {
           ylabel = "Cell equivalents (Cells/ml) sample"
         } else if (sample_matrix == "solid") {
           ylabel = "Cell equivalents (Cells/gram) sample"
         }
+
+        plot_data_norm = readRDS("~/Wetsus/micromics - Documents/General/micromics/microbiome_analysis/projects/MGAD/MGAD_proj1_Q18279/output_data/rds_files/After_cleaning_rds_files/Genus/MGAD_proj1_Q18279_pstibble_absolute_data_Genus_level.rds")
 
         if (!is.null(group_by_factor)) {
           all_plots = list()
@@ -482,14 +510,17 @@ barplot = function(physeq = rarefied_genus_psmelt,
             }, expand = c(0, 0), limits = c(0, NA))
         }
 
+        n_samples <- length(unique(plot_data_norm$Sample))
+        fig.width <- max(12, n_samples * 0.20)
+
         # figures saved as png
         figure_file_path = paste0(tax_folder_png, project_name, "_barplot_absolute_", tax, "_level.png")
-        ggsave(filename = figure_file_path, plot = barplot_absolute, width = 12, height = 8, dpi = 600)
+        ggsave(filename = figure_file_path, plot = barplot_absolute, width = fig.width, height = 10, dpi = 600)
         log_message(paste("Absolute barplot saved as .png object in", figure_file_path), log_file)
 
         # figure saved as pdf
         figure_file_path = paste0(tax_folder_pdf, project_name, "_barplot_absolute_", tax, "_level.pdf")
-        ggsave(filename = figure_file_path, plot = barplot_absolute, width = 12, height = 8)
+        ggsave(filename = figure_file_path, plot = barplot_absolute, width = fig.width, height = 10)
         log_message(paste("Absolute barplot saved as .pdf object in", figure_file_path), log_file)
 
       } else if (length(na_types) == 2) {
@@ -587,22 +618,28 @@ barplot = function(physeq = rarefied_genus_psmelt,
             }, expand = c(0, 0), limits = c(0, NA))
         }
 
+        n_samples_dna <- length(unique(plot_data_norm_dna$Sample))
+        fig.width_dna <- max(12, n_samples_dna * 0.40)
+
+        n_samples_rna <- length(unique(plot_data_norm_rna$Sample))
+        fig.width_rna <- max(12, n_samples_rna * 0.20)
+
         # figures saved as png
         figure_file_path = paste0(tax_folder_png, project_name, "_barplot_absolute_dna_", tax, "_level.png")
-        ggsave(filename = figure_file_path, plot = barplot_absolute_dna, width = 12, height = 8, dpi = 600)
+        ggsave(filename = figure_file_path, plot = barplot_absolute_dna, width = fig.width_dna, height = 10, dpi = 600)
         log_message(paste("Absolute barplot saved as .png object in", figure_file_path), log_file)
 
         figure_file_path = paste0(tax_folder_png, project_name, "_barplot_absolute_rna_", tax, "_level.png")
-        ggsave(filename = figure_file_path, plot = barplot_absolute_rna, width = 12, height = 8, dpi = 600)
+        ggsave(filename = figure_file_path, plot = barplot_absolute_rna, width = fig.width_rna, height = 8, dpi = 600)
         log_message(paste("Absolute barplot saved as .png object in", figure_file_path), log_file)
 
         # figures saved as pdf
         figure_file_path = paste0(tax_folder_pdf, project_name, "_barplot_absolute_dna_", tax, "_level.pdf")
-        ggsave(filename = figure_file_path, plot = barplot_absolute_dna, width = 12, height = 8)
+        ggsave(filename = figure_file_path, plot = barplot_absolute_dna, width = fig.width_dna, height = 8)
         log_message(paste("Absolute barplot saved as .pdf object in", figure_file_path), log_file)
 
         figure_file_path = paste0(tax_folder_pdf, project_name, "_barplot_absolute_rna_", tax, "_level.pdf")
-        ggsave(filename = figure_file_path, plot = barplot_absolute_rna, width = 12, height = 8)
+        ggsave(filename = figure_file_path, plot = barplot_absolute_rna, width = fig.width_rna, height = 8)
         log_message(paste("Absolute barplot saved as .pdf object in", figure_file_path), log_file)
       }
     }
