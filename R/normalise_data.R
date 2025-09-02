@@ -182,13 +182,18 @@ normalise_data = function(physeq = without_mock_physeq,
     otu_table(psdata_fcm_norm) <- otu_fcm_norm
 
     # add scale factor to sample data
-    df_tmp = data.frane(sample_data(psdata_fcm_norm))
+    df_tmp = data.frame(sample_data(psdata_fcm_norm))
     df_tmp = df_tmp %>% mutate(SampleID = rownames(df_tmp))
 
     # get unique scale factor values per sample
     df_sf = joined_pstibble_fcm %>%
       select(SampleID, scale_factor) %>%
       distinct()
+
+    # if `sq_calc_mean` already exist in sample data, rename it to `orgin_sq_clac_mean`
+    if ("cells_per_ml" %in% colnames(df_tmp)) {
+      colnames(df_tmp)[colnames(df_tmp) == "cells_per_ml"] <- "orgin_cells_per_ml"
+    }
 
     # merge into sample data
     df_tmp2 = df_tmp %>%
@@ -336,6 +341,11 @@ normalise_data = function(physeq = without_mock_physeq,
     df_sq = joined_pstibble_combined2 %>%
       select(SampleID, sq_calc_mean, scale_factor) %>%
       distinct()
+
+    # if `sq_calc_mean` already exist in sample data, rename it to `orgin_sq_clac_mean`
+    if ("sq_calc_mean" %in% colnames(df_tmp)) {
+      colnames(df_tmp)[colnames(df_tmp) == "sq_calc_mean"] <- "orgin_sq_calc_mean"
+    }
 
     # Merge with sample_data
     df_tmp2 = df_tmp %>%
