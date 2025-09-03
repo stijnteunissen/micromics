@@ -211,8 +211,7 @@ heatmap = function(physeq = rarefied_genus_psmelt,
       base_heatmap(plot_data_rel_rna, "Sample", "mean_rel_abund", legend_name = "Relative\nAbundance (%)", x_label = "Sample", tax) +
       scale_color_identity() +
       facet_add(present_factors, include_na_type = TRUE) +
-      theme(axis.text.y = element_blank(),
-            legend.position = "right")
+      theme(legend.position = "right")
 
     num_samples_dna = plot_data_rel_dna %>% distinct(Sample) %>% nrow()
     num_samples_rna = plot_data_rel_rna %>% distinct(Sample) %>% nrow()
@@ -256,5 +255,3 @@ heatmap = function(physeq = rarefied_genus_psmelt,
 
   log_message("Heatmap successfully plotted.", log_file)
 }
-
-
