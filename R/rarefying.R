@@ -130,7 +130,7 @@ rarefying = function(physeq = physeq,
 
     # calculate sample sizes and rarefy depths
     sample_size = rowSums(ps_matrix) # total reads per sample
-    cell_count_table = sample_data$cells_per_ml # extract cell counts
+    cell_count_table = sample_data$scaled_cells_per_ml # extract cell counts
     sampling_depths = sample_size / cell_count_table # sampling depths (total reads divided by cell count)
     minimum_sampling_depth = min(sampling_depths) # minimum sampling depth across all samples
     rarefy_to = round(cell_count_table * minimum_sampling_depth, digits = 0) # number of reads to rarefy for each sample
@@ -199,7 +199,7 @@ rarefying = function(physeq = physeq,
     ps_matrix = as(t(otu_table(psdata_qpcr)), "matrix")
 
     sample_size = rowSums(ps_matrix) # total reads per sample
-    copy_count_table = sample_data$sq_calc_mean # extract copy counts
+    copy_count_table = sample_data$scaled_sq_calc_mean # extract copy counts
     sampling_dephts = sample_size / copy_count_table # sampling dephts (total reads divided by copy counts??)
     minimum_sampling_depth = min(sampling_dephts) # minimum sampling depht across all samples
     rarefy_to = round(copy_count_table * minimum_sampling_depth, digits = 0) # number of read tot rarefy for each sample
