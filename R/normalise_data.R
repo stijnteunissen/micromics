@@ -162,13 +162,13 @@ normalise_data = function(physeq = without_mock_physeq,
       group_by(SampleID) %>%
       mutate(max_cells_per_ml = max(cells_per_ml, na.rm = TRUE),
              scale_factor = ifelse(max_cells_per_ml > 1e7, 10 ^ ceiling(log10(max_cells_per_ml / 1e7)), 1),
-             cells_per_ml = cells_per_ml / scale_factor)
+             scaled_cells_per_ml = cells_per_ml / scale_factor)
 
     joined_pstibble_fcm_norm <- joined_pstibble_fcm %>%
       group_by(SampleID) %>%
       mutate(relative_abund = Abundance / sum(Abundance)) %>%
       ungroup() %>%
-      mutate(norm_abund = ceiling(relative_abund * cells_per_ml)) %>%
+      mutate(norm_abund = ceiling(relative_abund * scaled_cells_per_ml)) %>%
       select(OTU, norm_abund, SampleID)
 
     fcm_norm_wide <- joined_pstibble_fcm_norm %>%
@@ -187,13 +187,8 @@ normalise_data = function(physeq = without_mock_physeq,
 
     # get unique scale factor values per sample
     df_sf = joined_pstibble_fcm %>%
-      select(SampleID, scale_factor) %>%
+      select(SampleID, scaled_cells_per_ml, scale_factor) %>%
       distinct()
-
-    # if `sq_calc_mean` already exist in sample data, rename it to `orgin_sq_clac_mean`
-    if ("cells_per_ml" %in% colnames(df_tmp)) {
-      colnames(df_tmp)[colnames(df_tmp) == "cells_per_ml"] <- "orgin_cells_per_ml"
-    }
 
     # merge into sample data
     df_tmp2 = df_tmp %>%
@@ -279,7 +274,7 @@ normalise_data = function(physeq = without_mock_physeq,
         bind_rows(results_list$dna, results_list$rna) %>%
         mutate(max_sq_calc_mean = max(sq_calc_mean, na.rm = TRUE),
                scale_factor = ifelse(max_sq_calc_mean > 1e7, 10 ^ ceiling(log10(max_sq_calc_mean / 1e7)), 1),
-               sq_calc_mean = sq_calc_mean / scale_factor)
+               scaled_sq_calc_mean = sq_calc_mean / scale_factor)
 
       joined_pstibble_combined =
         joined_pstibble_combined2 %>%
@@ -295,7 +290,7 @@ normalise_data = function(physeq = without_mock_physeq,
         results_list$dna %>%
         mutate(max_sq_calc_mean = max(sq_calc_mean, na.rm = TRUE),
                scale_factor = ifelse(max_sq_calc_mean > 1e7, 10 ^ ceiling(log10(max_sq_calc_mean / 1e7)), 1),
-               sq_calc_mean = sq_calc_mean / scale_factor)
+               scaled_sq_calc_mean = sq_calc_mean / scale_factor)
 
       joined_pstibble_combined =
         joined_pstibble_combined2 %>%
@@ -311,7 +306,7 @@ normalise_data = function(physeq = without_mock_physeq,
         results_list$rna %>%
         mutate(max_sq_calc_mean = max(sq_calc_mean, na.rm = TRUE),
                scale_factor = ifelse(max_sq_calc_mean > 1e7, 10 ^ ceiling(log10(max_sq_calc_mean / 1e7)), 1),
-               sq_calc_mean = sq_calc_mean / scale_factor)
+               scaled_sq_calc_mean = sq_calc_mean / scale_factor)
 
       joined_pstibble_combined =
         joined_pstibble_combined2 %>%
@@ -339,13 +334,8 @@ normalise_data = function(physeq = without_mock_physeq,
 
     # Get unique values of SampleID and sq_calc_mean
     df_sq = joined_pstibble_combined2 %>%
-      select(SampleID, sq_calc_mean, scale_factor) %>%
+      select(SampleID, scaled_sq_calc_mean, scale_factor) %>%
       distinct()
-
-    # if `sq_calc_mean` already exist in sample data, rename it to `orgin_sq_clac_mean`
-    if ("sq_calc_mean" %in% colnames(df_tmp)) {
-      colnames(df_tmp)[colnames(df_tmp) == "sq_calc_mean"] <- "orgin_sq_calc_mean"
-    }
 
     # Merge with sample_data
     df_tmp2 = df_tmp %>%
