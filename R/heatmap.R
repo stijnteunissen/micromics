@@ -244,13 +244,14 @@ heatmap = function(physeq = rarefied_genus_psmelt,
     log_message(paste("Relative heatmap saved as .pdf object in", figure_file_path), log_file)
 
     figure_file_path = paste0(tax_folder_png, project_name, "_heatmap_relative_rna_", tax, "_level.png")
-    ggsave(filename = figure_file_path, plot = heatmap_relative_rna, width = fig.width_dna, height = 10, limitsize = FALSE, dpi = 600)
+    ggsave(filename = figure_file_path, plot = heatmap_relative_rna, width = fig.width_rna, height = 10, limitsize = FALSE, dpi = 600)
     log_message(paste("Relative heatmap saved as .png object in", figure_file_path), log_file)
 
     figure_file_path = paste0(tax_folder_pdf, project_name, "_heatmap_relative_rna_", tax, "_level.pdf")
-    ggsave(filename = figure_file_path, plot = heatmap_relative_rna, width = fig.width_dna, height = 10, limitsize = FALSE)
+    ggsave(filename = figure_file_path, plot = heatmap_relative_rna, width = fig.width_rna, height = 10, limitsize = FALSE)
     log_message(paste("Relative heatmap saved as .pdf object in", figure_file_path), log_file)
-  }
+    }
   }
   log_message("Heatmap successfully plotted.", log_file)
 }
+

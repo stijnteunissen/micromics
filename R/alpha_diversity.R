@@ -216,7 +216,7 @@ alpha_diversity = function(physeq = physeq,
                                 align = "hv", labels = c("A", "B"), nrow = 1)
 
       n_samples <- length(unique(alpha_data_full$sampleid))
-      fig.width <- max(12, n_samples * 0.40)
+      fig.width <- max(12, n_samples * 0.42)
 
       figure_file_path = paste0(asv_folder_png, project_name, "_alpha_diversity_asv_level.png")
       ggsave(filename = figure_file_path, plot = combined_plot, width = fig.width, height = 6, dpi = 600)
@@ -266,10 +266,10 @@ alpha_diversity = function(physeq = physeq,
         ncol = 1)
 
       n_samples_dna <- length(unique(alpha_data_full_dna$sampleid))
-      fig.width_dna <- max(12, n_samples_dna * 0.40)
+      fig.width_dna <- max(12, n_samples_dna * 0.42)
 
       n_samples_rna <- length(unique(alpha_data_full_rna$sampleid))
-      fig.width_rna <- max(12, n_samples_rna * 0.20)
+      fig.width_rna <- max(12, n_samples_rna * 0.42)
 
       figure_file_path = paste0(asv_folder_png, project_name, "_alpha_diversity_dna_asv_level.png")
       ggsave(filename = figure_file_path, plot = combined_plot_dna, width = fig.width_dna, height = 6, dpi = 600)
@@ -369,7 +369,7 @@ alpha_diversity = function(physeq = physeq,
                                   align = "hv", labels = c("A", "B"), nrow = 1)
 
         n_samples <- length(unique(alpha_data_full$sampleid))
-        fig.width <- max(12, n_samples * 0.40)
+        fig.width <- max(12, n_samples * 0.42)
 
         figure_file_path = paste0(tax_folder_png, project_name, "_alpha_diversity_", tax, "_level.png")
         ggsave(filename = figure_file_path, plot = combined_plot, width = fig.width, height = 6, dpi = 600)
@@ -419,10 +419,10 @@ alpha_diversity = function(physeq = physeq,
           ncol = 1)
 
         n_samples_dna <- length(unique(alpha_data_full_dna$sampleid))
-        fig.width_dna <- max(12, n_samples_dna * 0.40)
+        fig.width_dna <- max(12, n_samples_dna * 0.42)
 
         n_samples_rna <- length(unique(alpha_data_full_rna$sampleid))
-        fig.width_rna <- max(12, n_samples_rna * 0.20)
+        fig.width_rna <- max(12, n_samples_rna * 0.42)
 
         figure_file_path = paste0(tax_folder_png, project_name, "_alpha_diversity_dna_", tax, "_level.png")
         ggsave(filename = figure_file_path, plot = combined_plot_dna, width = fig.width_dna, height = 6, dpi = 600)
