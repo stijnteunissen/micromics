@@ -79,7 +79,7 @@ heatmap = function(physeq = rarefied_genus_psmelt,
     }
 
     if (!is.null(factors_to_add) && length(factors_to_add) > 0) {
-      return(facet_nested(cols = vars(!!!syms(factors_to_add)), scales = "free", space = "free", nest_line = element_line(linetype = 1)))
+      return(facet_nested(cols = vars(!!!syms(factors_to_add)), scales = "free_x", space = "free_x", nest_line = element_line(linetype = 1)))
     } else {
       return(NULL)
     }
