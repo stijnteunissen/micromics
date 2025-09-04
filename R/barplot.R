@@ -84,7 +84,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
     if (!is.null(present_factors) && length(present_factors) > 0) {
       return(
         facet_nested(
-          cols = vars(!!!syms(present_factors)), scales = "free_x", space = "free_x",
+          cols = vars(!!!syms(present_factors)), scales = "free", space = "free",
           nest_line = element_line(linetype = 1)
         )
       )
