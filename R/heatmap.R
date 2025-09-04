@@ -252,6 +252,5 @@ heatmap = function(physeq = rarefied_genus_psmelt,
     log_message(paste("Relative heatmap saved as .pdf object in", figure_file_path), log_file)
   }
   }
-
   log_message("Heatmap successfully plotted.", log_file)
 }

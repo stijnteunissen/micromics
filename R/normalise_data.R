@@ -280,7 +280,7 @@ normalise_data = function(physeq = without_mock_physeq,
         joined_pstibble_combined2 %>%
         group_by(SampleID) %>%
         mutate(relative_abundance = Abundance / sum(Abundance),
-               absolute_abundance_qpcr = relative_abundance * sq_calc_mean,
+               absolute_abundance_qpcr = relative_abundance * scaled_sq_calc_mean,
                norm_abund = ceiling(absolute_abundance_qpcr / copy_number)) %>%
         ungroup() %>%
         select(OTU, norm_abund, SampleID)
@@ -296,7 +296,7 @@ normalise_data = function(physeq = without_mock_physeq,
         joined_pstibble_combined2 %>%
         group_by(SampleID) %>%
         mutate(relative_abundance = Abundance / sum(Abundance),
-               absolute_abundance_qpcr = relative_abundance * sq_calc_mean,
+               absolute_abundance_qpcr = relative_abundance * scaled_sq_calc_mean,
                norm_abund = ceiling(absolute_abundance_qpcr / copy_number)) %>%
         ungroup() %>%
         select(OTU, norm_abund, SampleID)
@@ -312,7 +312,7 @@ normalise_data = function(physeq = without_mock_physeq,
         joined_pstibble_combined2 %>%
         group_by(SampleID) %>%
         mutate(relative_abundance = Abundance / sum(Abundance),
-               absolute_abundance_qpcr = relative_abundance * sq_calc_mean,
+               absolute_abundance_qpcr = relative_abundance * scaled_sq_calc_mean,
                norm_abund = ceiling(absolute_abundance_qpcr / copy_number)) %>%
         ungroup() %>%
         select(OTU, norm_abund, SampleID)
