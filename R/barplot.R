@@ -595,11 +595,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
               theme(legend.position = "none")
             all_plots[[x]] <- plot
           }
-          legend = get_legend(all_plots[[1]] +
-                                theme(legend.position = "bottom") +
-                                guides(fill = guide_legend(title.position = "top", title.hjust = 0.5)) +
-                                theme(legend.title = element_text(hjust = 0.5),
-                                      legend.box.margin = margin(t = 10)))
+          legend = get_legend(all_plots[[1]] + theme(legend.position = "right"))
 
           nplots = length(all_plots)
           final_plot = wrap_plots(all_plots, ncol = nplots) +
