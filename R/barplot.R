@@ -538,7 +538,6 @@ barplot = function(physeq = rarefied_genus_psmelt,
             data_filtered = plot_data_norm_dna %>% filter(.data[[group_by_factor]] == x)
             plot <- base_barplot(data_filtered, "Sample", "norm_abund", colorset, current_tax,
                                  x_label = "Sample", y_label = ylabel) +
-              ggtitle("Absolute Abundance - DNA") +
               facet_add(present_factors) +
               scale_y_continuous(labels = function(x) {
                 ifelse(x == 0, "0", sapply(x, function(num) {
@@ -582,7 +581,6 @@ barplot = function(physeq = rarefied_genus_psmelt,
             data_filtered = plot_data_norm_rna %>% filter(.data[[group_by_factor]] == x)
             plot <- base_barplot(data_filtered, "Sample", "norm_abund", colorset, current_tax,
                                  x_label = "Sample", y_label = ylabel) +
-              ggtitle("Absolute Abundance - RNA") +
               facet_add(present_factors) +
               scale_y_continuous(labels = function(x) {
                 ifelse(x == 0, "0", sapply(x, function(num) {
@@ -599,7 +597,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
 
           nplots = length(all_plots)
           final_plot = wrap_plots(all_plots, ncol = nplots) +
-            plot_annotation(title = "Absolute Abundance - DNA")
+            plot_annotation(title = "Absolute Abundance - RNA")
           barplot_absolute_rna = plot_grid(final_plot, legend, ncol = 1, rel_heights = c(3, 1))
         } else {
           barplot_absolute_rna =
