@@ -351,10 +351,14 @@ normalise_data = function(physeq = without_mock_physeq,
   }
 
   if (copy_correction == TRUE) {
-  # Downloading the rndb-database
-  zip_file_path <- file.path(destination_folder, "rrnDB-5.9_pantaxa_stats_NCBI.tsv.zip")
-  download.file("https://rrndb.umms.med.umich.edu/downloads/rrnDB-5.9_pantaxa_stats_NCBI.tsv.zip",
-                destfile = zip_file_path, mode = "wb")
+  # # Downloading the rndb-database
+  # zip_file_path <- file.path(destination_folder, "rrnDB-5.9_pantaxa_stats_NCBI.tsv.zip")
+  # download.file("https://rrndb.umms.med.umich.edu/downloads/rrnDB-5.9_pantaxa_stats_NCBI.tsv.zip",
+  #               destfile = zip_file_path, mode = "wb")
+
+  # Path to database folder and zip file
+  database_folder <- "/export/microlab/users/STEU/automation_analysis/Database"
+  zip_file_path <- file.path(database_folder, "rrnDB-5.9_pantaxa_stats_NCBI.tsv.zip")
 
   # Check if the file exists
   if (!file.exists(zip_file_path) || file.info(zip_file_path)$size == 0) {
