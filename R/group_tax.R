@@ -50,7 +50,7 @@ group_tax = function(physeq = rarefied_asv_physeq,
     if(!dir.exists(tax_folder)){dir.create(tax_folder)}
 
     if (is.null(norm_method)) {
-      psdata = physeq
+      psdata = physeq[["psdata_asv_copy_number_corrected"]]
       psdata_tax = tax_glom(psdata, taxrank = tax)
 
       output_file_path = paste0(tax_folder, "/", project_name, "_phyloseq_", tax, "_level_", cc, "copy_number_corrected_counts.rds")
@@ -58,7 +58,7 @@ group_tax = function(physeq = rarefied_asv_physeq,
       log_message(paste("phyloseq data copy number corrected counts", tax, "level saved as .rds object in", output_file_path), log_file)
 
       results[[paste0("psdata_copy_number_corrected_", tax)]] <- psdata_tax
-    } else if (norm_method == "fcm") {
+    } else if (!is.null(norm_method) && norm_method == "fcm") {
       psdata = physeq[["psdata_asv_copy_number_corrected"]]
       psdata_tax = tax_glom(psdata, taxrank = tax)
 
@@ -75,7 +75,7 @@ group_tax = function(physeq = rarefied_asv_physeq,
 
       results[[paste0("psdata_copy_number_corrected_", tax)]] <- psdata_tax
       results[[paste0("psdata_fcm_norm_rarefied_", tax)]] <- psdata_tax_fcm
-    } else if (norm_method == "qpcr") {
+    } else if (!is.null(norm_method) && norm_method == "qpcr") {
       psdata = physeq[["psdata_asv_copy_number_corrected"]]
       psdata_tax = tax_glom(psdata, taxrank = tax)
 
