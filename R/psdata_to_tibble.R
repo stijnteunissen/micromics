@@ -64,7 +64,7 @@ psdata_to_tibble = function(physeq = rarefied_genus_physeq,
     if(!dir.exists(tax_folder)){dir.create(tax_folder)}
 
     if (is.null(norm_method)) {
-      psdata = physeq
+      psdata = physeq[[paste0("psdata_copy_number_corrected_", tax)]]
       psdata_tibble = psdata %>% psmelt() %>% as_tibble()
 
       output_file_path = paste0(tax_folder, "/", project_name, "_psmelt_", tax, "_level_copy_number_corrected_counts.rds")
