@@ -110,9 +110,9 @@ rarefying = function(physeq = physeq,
 
     log_message(paste("Message: Normalization method is NULL. Returning unchanged phyloseq object."), log_file)
 
-    return(psdata_asv_copy_number_corrected = psdata)
+    return(list(psdata_asv_copy_number_corrected = psdata))
 
-  } else if (norm_method == "fcm") {
+  } else if (!is.null(norm_method) && norm_method == "fcm") {
     psdata = physeq[["psdata_asv_copy_number_corrected"]]
     psdata_fcm = physeq[["psdata_asv_fcm_norm"]]
 
@@ -180,7 +180,7 @@ rarefying = function(physeq = physeq,
 
     return(list(psdata_asv_copy_number_corrected = psdata, psdata_asv_fcm_norm_rarefied = psdata_rarefied))
 
-  } else if (norm_method == "qpcr") {
+  } else if (!is.null(norm_method) && norm_method == "qpcr") {
 
     psdata_ccn = physeq[["psdata_asv_copy_number_corrected"]]
     psdata_qpcr = physeq[["psdata_asv_qpcr_norm"]]
