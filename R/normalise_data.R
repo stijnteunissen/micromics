@@ -435,6 +435,7 @@ normalise_data = function(physeq = without_mock_physeq,
 
   if (copy_correction == FALSE) {
   psdata_copy_number_corrected = psdata
+
   output_file_path = paste0(output_asv_rds_files, project_name, "_phyloseq_asv_level_without_copy_number_corrected_counts.rds")
   saveRDS(psdata, file = output_file_path)
   log_message(paste("phyloseq data without copy number corrected counts asv level saved as .rds object in", output_file_path), log_file)
@@ -448,9 +449,11 @@ normalise_data = function(physeq = without_mock_physeq,
 
   if (is.null(norm_method)) {
     log_message("No normalization method specified for absolute data. Only copy number correction applied.", log_file)
+
+    return(list(psdata_asv_copy_number_corrected = psdata_copy_number_corrected))
   }
 
-  if (norm_method == "fcm") {
+  if (!is.null(norm_method) && norm_method == "fcm") {
     if (copy_correction == TRUE) {
     output_file_path = paste0(output_folder_rds_files_before, project_name, "_phyloseq_asv_level_fcm_normalised_cell_concentration.rds")
     saveRDS(psdata_fcm_norm, file = output_file_path)
@@ -464,7 +467,7 @@ normalise_data = function(physeq = without_mock_physeq,
 
     return(list(psdata_asv_copy_number_corrected = psdata_copy_number_corrected, psdata_asv_fcm_norm = psdata_fcm_norm))
 
-  } else if (norm_method == "qpcr") {
+  } else if (!is.null(norm_method) && norm_method == "qpcr") {
     output_file_path = paste0(output_folder_rds_files_before, project_name, "_phyloseq_asv_level_qpcr_normalised_cell_concentration.rds")
     saveRDS(psdata_qpcr_norm, file = output_file_path)
     log_message(paste("phyloseq qpcr normalised cell concentration (cells per ml/gram sample) asv level saved as .rds object in", output_file_path), log_file)
