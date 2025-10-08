@@ -72,7 +72,7 @@ tax_clean = function(physeq = physeq,
     tax.clean %>%
     mutate_if(is.factor, as.character) %>%
     mutate(across(everything(),
-                  ~ str_replace_all(.x,  "Ambiguous_taxa|metagenome|uncultured archeaon|uncultured bacterium|uncultured prokaryote|uncultured soil bacterium|uncultured rumen bacterium|uncultured compost bacterium|uncultured organism|^uncultured|uncultured$",
+                  ~ str_replace_all(.x,  "Incertae_Sedis|Ambiguous_taxa|metagenome|uncultured archeaon|uncultured bacterium|uncultured prokaryote|uncultured soil bacterium|uncultured rumen bacterium|uncultured compost bacterium|uncultured organism|^uncultured|uncultured$",
                                     replacement = NA_character_
                   ))) %>%
     replace(is.na(.), NA_character_) %>%
