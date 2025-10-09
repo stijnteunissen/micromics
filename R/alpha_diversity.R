@@ -136,6 +136,7 @@ alpha_diversity = function(physeq = physeq,
   figure_folder_png = paste0(project_folder, "/figures/PNG_figures/")
   if(!dir.exists(figure_folder_png)) { dir.create(figure_folder_png) }
   output_folder_csv_files = paste0(project_folder, "/output_data/csv_files/")
+  if(!dir.exists(output_folder_csv_files)) { dir.create(output_folder_csv_files) }
 
   if (tolower(taxrank[1]) == "asv") {
     log_message("Processing ASV-level alpha diversity", log_file)

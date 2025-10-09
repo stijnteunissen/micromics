@@ -92,8 +92,6 @@ heatmap = function(physeq = rarefied_genus_psmelt,
   if(!dir.exists(figure_folder_pdf)) { dir.create(figure_folder_pdf) }
   figure_folder_png = paste0(project_folder, "/figures/PNG_figures/")
   if(!dir.exists(figure_folder_png)) { dir.create(figure_folder_png) }
-  destination_folder = paste0(project_folder, "/input_data/")
-  output_folder = paste0(project_folder, "/output_data/")
 
   if (is.null(ntaxa)) {
     ntaxa = 23

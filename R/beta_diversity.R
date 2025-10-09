@@ -86,8 +86,8 @@ beta_diversity <- function(physeq = physeq,
   if(!dir.exists(figure_folder_pdf)) { dir.create(figure_folder_pdf) }
   figure_folder_png = paste0(project_folder, "/figures/PNG_figures/")
   if(!dir.exists(figure_folder_png)) { dir.create(figure_folder_png) }
-  destination_folder <- paste0(project_folder, "/input_data/")
   output_folder_csv_files <- paste0(project_folder, "/output_data/csv_files/")
+  if(!dir.exists(output_folder_csv_files)) { dir.create(output_folder_csv_files) }
 
   # Function for creating the base beta-diversity plot
   base_beta_plot <- function(psdata, ordination_method, distance_method, title,

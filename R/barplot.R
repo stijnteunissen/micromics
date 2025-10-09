@@ -100,9 +100,10 @@ barplot = function(physeq = rarefied_genus_psmelt,
   if(!dir.exists(figure_folder_pdf)) { dir.create(figure_folder_pdf) }
   figure_folder_png = paste0(project_folder, "/figures/PNG_figures/")
   if(!dir.exists(figure_folder_png)) { dir.create(figure_folder_png) }
-  destination_folder = paste0(project_folder, "/input_data/")
   output_folder_csv_files = paste0(project_folder, "/output_data/csv_files/")
+  if(!dir.exists(output_folder_csv_files)) { dir.create(output_folder_csv_files) }
   output_folder_rds_files = paste0(project_folder, "/output_data/rds_files/After_cleaning_rds_files/")
+  if(!dir.exists(output_folder_rds_files)) { dir.create(output_folder_rds_files) }
 
   # Define the color palette
   dark2_colors <- brewer.pal(8, "Dark2")
