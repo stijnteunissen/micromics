@@ -83,11 +83,11 @@ beta_diversity <- function(physeq = physeq,
   project_name <- projects
   project_folder <- paste0(base_path, project_name)
   figure_folder_pdf = paste0(project_folder, "/figures/PDF_figures/")
-  if(!dir.exists(figure_folder_pdf)) { dir.create(figure_folder_pdf) }
+  if(!dir.exists(figure_folder_pdf)) { dir.create(figure_folder_pdf, recursive = TRUE) }
   figure_folder_png = paste0(project_folder, "/figures/PNG_figures/")
-  if(!dir.exists(figure_folder_png)) { dir.create(figure_folder_png) }
+  if(!dir.exists(figure_folder_png)) { dir.create(figure_folder_png, recursive = TRUE) }
   output_folder_csv_files <- paste0(project_folder, "/output_data/csv_files/")
-  if(!dir.exists(output_folder_csv_files)) { dir.create(output_folder_csv_files) }
+  if(!dir.exists(output_folder_csv_files)) { dir.create(output_folder_csv_files, recursive = TRUE) }
 
   # Function for creating the base beta-diversity plot
   base_beta_plot <- function(psdata, ordination_method, distance_method, title,
@@ -146,10 +146,10 @@ beta_diversity <- function(physeq = physeq,
 
   # Create the main beta-diversity folder
   beta_div_folder_png <- paste0(figure_folder_png, "Beta_diversity/")
-  if (!dir.exists(beta_div_folder_png)){dir.create(beta_div_folder_png)}
+  if (!dir.exists(beta_div_folder_png)){dir.create(beta_div_folder_png, recursive = TRUE)}
 
   beta_div_folder_pdf <- paste0(figure_folder_pdf, "Beta_diversity/")
-  if (!dir.exists(beta_div_folder_pdf)){dir.create(beta_div_folder_pdf)}
+  if (!dir.exists(beta_div_folder_pdf)){dir.create(beta_div_folder_pdf, recursive = TRUE)}
 
   if (tolower(taxrank[1]) == "asv") {
     log_message("Processing ASV-level beta diversity", log_file)
@@ -166,10 +166,10 @@ beta_diversity <- function(physeq = physeq,
 
     # Create the ASV folder under beta-diversity
     asv_folder_png <- paste0(beta_div_folder_png, "ASV/")
-    if (!dir.exists(asv_folder_png)){dir.create(asv_folder_png)}
+    if (!dir.exists(asv_folder_png)){dir.create(asv_folder_png, recursive = TRUE)}
 
     asv_folder_pdf <- paste0(beta_div_folder_pdf, "ASV/")
-    if (!dir.exists(asv_folder_pdf)){dir.create(asv_folder_pdf)}
+    if (!dir.exists(asv_folder_pdf)){dir.create(asv_folder_pdf, recursive = TRUE)}
 
     # Transform counts to relative abundance (percentage)
     psdata_relative <- transform_sample_counts(psdata_relative, function(x) x / sum(x) * 100)

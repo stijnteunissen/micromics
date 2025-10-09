@@ -89,9 +89,9 @@ heatmap = function(physeq = rarefied_genus_psmelt,
 
   project_folder = paste0(base_path, project_name)
   figure_folder_pdf = paste0(project_folder, "/figures/PDF_figures/")
-  if(!dir.exists(figure_folder_pdf)) { dir.create(figure_folder_pdf) }
+  if(!dir.exists(figure_folder_pdf)) { dir.create(figure_folder_pdf, recursive = TRUE) }
   figure_folder_png = paste0(project_folder, "/figures/PNG_figures/")
-  if(!dir.exists(figure_folder_png)) { dir.create(figure_folder_png) }
+  if(!dir.exists(figure_folder_png)) { dir.create(figure_folder_png, recursive = TRUE) }
 
   if (is.null(ntaxa)) {
     ntaxa = 23
@@ -109,14 +109,14 @@ heatmap = function(physeq = rarefied_genus_psmelt,
 
     # Create output folders (barplot folder and tax folder)
     heatmap_folder_png = paste0(figure_folder_png, "Heatmap/")
-    if(!dir.exists(heatmap_folder_png)) { dir.create(heatmap_folder_png) }
+    if(!dir.exists(heatmap_folder_png)) { dir.create(heatmap_folder_png, recursive = TRUE) }
     tax_folder_png = paste0(heatmap_folder_png, tax, "/")
-    if(!dir.exists(tax_folder_png)) { dir.create(tax_folder_png) }
+    if(!dir.exists(tax_folder_png)) { dir.create(tax_folder_png, recursive = TRUE) }
 
     heatmap_folder_pdf = paste0(figure_folder_pdf, "Heatmap/")
-    if(!dir.exists(heatmap_folder_pdf)) { dir.create(heatmap_folder_pdf) }
+    if(!dir.exists(heatmap_folder_pdf)) { dir.create(heatmap_folder_pdf, recursive = TRUE) }
     tax_folder_pdf = paste0(heatmap_folder_pdf, tax, "/")
-    if(!dir.exists(tax_folder_pdf)) { dir.create(tax_folder_pdf) }
+    if(!dir.exists(tax_folder_pdf)) { dir.create(tax_folder_pdf, recursive = TRUE) }
 
   variable_columns = intersect(present_variable_factors, colnames(copy_number_corrected_data))
   factor_columns = unique(c(variable_columns))

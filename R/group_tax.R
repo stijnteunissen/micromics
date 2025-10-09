@@ -35,7 +35,7 @@ group_tax = function(physeq = rarefied_asv_physeq,
   project_name = projects
   project_folder = paste0(base_path, project_name)
   output_folder_rds_files = paste0(project_folder, "/output_data/rds_files/After_cleaning_rds_files/")
-  if(!dir.exists(output_folder_rds_files)){dir.create(output_folder_rds_files)}
+  if(!dir.exists(output_folder_rds_files)){dir.create(output_folder_rds_files, recursive = TRUE)}
 
   if (copy_correction == TRUE) {
     cc = ""
@@ -48,7 +48,7 @@ group_tax = function(physeq = rarefied_asv_physeq,
   for (tax in taxrank) {
     log_message(paste("Processing taxonomic level:", tax), log_file)
     tax_folder = file.path(output_folder_rds_files, paste0(tax))
-    if(!dir.exists(tax_folder)){dir.create(tax_folder)}
+    if(!dir.exists(tax_folder)){dir.create(tax_folder, recursive = TRUE)}
 
     if (is.null(norm_method)) {
       psdata = physeq[["psdata_asv_copy_number_corrected"]]
