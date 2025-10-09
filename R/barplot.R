@@ -45,7 +45,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
                    taxrank = c("Phylum", "Class", "Order", "Family", "Genus"),
                    date_factor = NULL) {
 
-  log_message(paste("Step 12: Creating barplot.", paste(projects, collapse = ", ")), log_file)
+  log_message(paste("Step 13: Creating barplot.", paste(projects, collapse = ", ")), log_file)
 
   # Internal function for creating basic barplots with a dynamic taxonomic column
   base_barplot = function(plot_data, x_value, y_value, colorset, tax_column,

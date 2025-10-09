@@ -155,7 +155,7 @@ beta_diversity <- function(physeq = physeq,
     log_message("Processing ASV-level beta diversity", log_file)
 
     if (is.null(norm_method)) {
-      psdata_relative <- physeq
+      psdata_relative <- physeq[["psdata_asv_copy_number_corrected"]]
     } else if (norm_method == "fcm") {
       psdata_relative <- physeq[["psdata_asv_copy_number_corrected"]]
       psdata_absolute <- physeq[["psdata_asv_fcm_norm_rarefied"]]
@@ -350,7 +350,7 @@ beta_diversity <- function(physeq = physeq,
       log_message(paste("Processing taxonomic level:", tax), log_file)
 
       if (is.null(norm_method)) {
-        psdata_relative <- physeq
+        psdata_relative <- physeq[[paste0("psdata_copy_number_corrected_", tax)]]
         psdata_absolute <- NULL
       } else if (norm_method == "fcm") {
         psdata_relative <- physeq[[paste0("psdata_copy_number_corrected_", tax)]]

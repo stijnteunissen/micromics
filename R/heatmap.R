@@ -47,7 +47,7 @@ heatmap = function(physeq = rarefied_genus_psmelt,
                    taxrank = c("Phylum", "Class", "Order", "Family", "Genus"),
                    date_factor = NULL) {
 
-  log_message(paste("Step 13: Creating heatmap.", paste(projects, collapse = ", ")), log_file)
+  log_message(paste("Step 14: Creating heatmap.", paste(projects, collapse = ", ")), log_file)
 
   base_heatmap = function(plot_data, x_value, abund_value, legend_name, x_label = "Sample", tax_column) {
     ggplot(plot_data, aes(x = Sample,

@@ -294,7 +294,7 @@ alpha_diversity = function(physeq = physeq,
       log_message(paste("Processing taxonomic level:", tax), log_file)
 
       if (is.null(norm_method)) {
-        psdata = physeq
+        psdata = physeq[[paste0("psdata_copy_number_corrected_", tax)]]
       } else if (norm_method == "fcm") {
         psdata = physeq[[paste0("psdata_fcm_norm_rarefied_", tax)]]
       } else if (norm_method == "qpcr") {
