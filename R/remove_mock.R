@@ -57,7 +57,13 @@ remove_mock = function(physeq = decontam_physeq,
   output_folder_rds_files = paste0(project_folder, "/output_data/rds_files/Before_cleaning_rds_files/")
 
   if (mock == FALSE) {
-    physeq_filtered = psdata
+    # Filter phyloseq to remove mock samples
+    physeq_no_mock =
+      psdata %>%
+      subset_samples(., sample_or_control == "sample") %>%
+      prune_taxa(taxa_sums(.) > 0, .)
+
+    physeq_filtered = physeq_no_mock
     message = paste0("message: mock parameter is FALSE. mock ASVs not filtered")
     log_message(message, log_file)
   } else if (mock == TRUE) {
