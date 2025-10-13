@@ -80,7 +80,5 @@ rarefaction_curve <- function(physeq = resolved_tree_physeq, color = NULL, base_
   cairo_pdf(file = figure_path, width = 7, height = 5)
   amp_rarecurve(physeq, color = color, legend.position = "bottomright", xlim = c(0, max(sample_sums(physeq))))
   dev.off()
-  return(rarefaction_plot)
-
   log_message("Created successfully rarefaction curve.", log_file)
 }
