@@ -28,7 +28,7 @@
 #' @export
 export_data <- function() {
 
-  log_message(paste("Step 16: Export figures and rds files.", paste(projects, collapse = ", ")), log_file)
+  log_message(paste("Step 17: Export figures and rds files.", paste(projects, collapse = ", ")), log_file)
 
   # Check that the required global variables exist
   if (!exists("base_path") || !exists("projects")) {

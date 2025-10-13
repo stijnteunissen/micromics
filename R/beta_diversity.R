@@ -77,7 +77,7 @@ beta_diversity <- function(physeq = physeq,
                            size_factor = NULL,
                            alpha_factor = NULL) {
 
-  log_message(paste("Step 15: Creating beta diversity.", paste(projects, collapse = ", ")), log_file)
+  log_message(paste("Step 16: Creating beta diversity.", paste(projects, collapse = ", ")), log_file)
 
   # Set up project and folder paths
   project_name <- projects
