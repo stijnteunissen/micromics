@@ -444,7 +444,6 @@ normalise_data = function(physeq = without_mock_physeq,
   output_file_path = paste0(output_folder_rds_files_before, project_name, "_phyloseq_asv_level_copy_number_corrected_counts.rds")
   saveRDS(psdata_copy_number_corrected, file = output_file_path)
   log_message(paste("phyloseq data copy number corrected counts asv level saved as .rds object in", output_file_path), log_file)
-
   }
 
   if (is.null(norm_method)) {
