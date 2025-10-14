@@ -54,7 +54,8 @@
 #' @export
 rarefying = function(physeq = physeq,
                      norm_method = NULL,
-                     iteration = 100) {
+                     iteration = 100,
+                     copy_correction = TRUE) {
 
   log_message(paste("Step 10: rarefied data", paste(projects, collapse = ", ")), log_file)
 
