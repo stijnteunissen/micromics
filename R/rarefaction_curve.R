@@ -57,7 +57,7 @@ amp_rarecurve <- function(data, step = 100, ylim = NULL, xlim = NULL, label = FA
 #' rarefaction_curve(physeq = physeq)
 #'
 #' @export
-rarefaction_curve <- function(physeq = resolved_tree_physeq, color = NULL, base_path = "./") {
+rarefaction_curve <- function(physeq = resolved_tree_physeq, color = NULL) {
 
   log_message(paste("Step 6: Creating rarefaction curve: creating rarefaction curve before cleaning on ASV level.", paste(projects, collapse = ", ")), log_file)
 
