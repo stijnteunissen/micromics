@@ -108,6 +108,7 @@ rarefying = function(physeq = physeq,
 
   if (is.null(norm_method)) {
     psdata = physeq[["psdata_asv_copy_number_corrected"]]
+    psdata = readRDS("~/Desktop/Macrogen_BKIS_CGAG_DPOL_phyloseq_asv_level_copy_number_corrected_counts.rds")
 
     log_message(paste("Message: Normalization method is NULL. Performing standard rarefaction."), log_file)
 
@@ -121,8 +122,11 @@ rarefying = function(physeq = physeq,
     set.seed(711)
     rarefied_matrix <- avgrarefy(x = ps_matrix, rarefy_to = min_sample, iterations = iteration, seed = 711)
 
+    rownames(rarefied_matrix) <- rownames(ps_matrix)  # samples
+    colnames(rarefied_matrix) <- colnames(ps_matrix)  # taxa
+
     # create phyloseq object with rarefied data
-    rarefied_table <- otu_table(data.frame(t(rarefied_matrix)), taxa_are_rows = TRUE)
+    rarefied_table <- otu_table(rarefied_matrix, taxa_are_rows = FALSE)
     psdata_rarefied <- psdata
     otu_table(psdata_rarefied) <- rarefied_table
 
