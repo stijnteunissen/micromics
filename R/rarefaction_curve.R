@@ -2,7 +2,10 @@ amp_rarecurve <- function(data, step = 100, ylim = NULL, xlim = NULL, label = FA
   abund = otu_table(data)
   abund = as.data.frame(abund)
 
-  max_depth <- max(rowSums(abund))
+  pdf(NULL)
+  capture.output({rc <- vegan::rarecurve(t(abund), step = 100, label = FALSE)})
+  dev.off()
+  max_depth <- max(sapply(rc, function(x) max(attr(x, "Subsample"))))
 
   if (!is.null(color)) {
     gg_color_hue <- function(n) {
