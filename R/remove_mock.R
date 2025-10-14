@@ -73,20 +73,21 @@ remove_mock = function(physeq = decontam_physeq,
     # } else
     #   mock_genera = mock_genera
 
+    physeq_mock =
+      psdata %>%
+      subset_samples(sample_or_control == "mock") %>%
+      prune_taxa(taxa_sums(.) > 0, .)
+
     # extract mock ASV mock_genera
     mock_ASVs =
-      psdata %>%
+      physeq_mock %>%
       subset_taxa(Genus %in% mock_genera) %>%
       taxa_names()
 
     # Filter phyloseq to remove mock samples
-    physeq_no_mock =
-      psdata %>%
-      subset_samples(., sample_or_control == "sample") %>%
-      prune_taxa(taxa_sums(.) > 0, .)
-
     physeq_filtered =
-      physeq_no_mock %>%
+      psdata %>%
+      subset_samples(sample_or_control == "sample") %>%
       prune_taxa(!taxa_names(.) %in% mock_ASVs, .)
   }
 
