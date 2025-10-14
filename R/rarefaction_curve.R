@@ -2,6 +2,8 @@ amp_rarecurve <- function(data, step = 100, ylim = NULL, xlim = NULL, label = FA
   abund = otu_table(data)
   abund = as.data.frame(abund)
 
+  max_depth <- max(rowSums(abund))
+
   if (!is.null(color)) {
     gg_color_hue <- function(n) {
       hues = seq(15, 375, length = n + 1)
@@ -27,13 +29,13 @@ amp_rarecurve <- function(data, step = 100, ylim = NULL, xlim = NULL, label = FA
     vegan::rarecurve(t(abund), step = step, label = label, col = col_vector, xlab = "Sequencing depth", ylab = "Total ASV")
   }
   if (!is.null(ylim) & !is.null(xlim)) {
-    vegan::rarecurve(t(abund), step = step, ylim = ylim, xlim = c(0, 120000), label = label, col = col_vector, xlab = "Sequencing depth", ylab = "Total ASV")
+    vegan::rarecurve(t(abund), step = step, ylim = ylim, xlim = c(0, max_depth), label = label, col = col_vector, xlab = "Sequencing depth", ylab = "Total ASV")
   }
   if (!is.null(ylim) & is.null(xlim)) {
     vegan::rarecurve(t(abund), step = step, ylim = ylim, label = label, col = col_vector, xlab = "Sequencing depth", ylab = "Total ASV")
   }
   if (is.null(ylim) & !is.null(xlim)) {
-    vegan::rarecurve(t(abund), step = step, xlim = c(0, 120000), label = label, col = col_vector, xlab = "Sequencing depth", ylab = "Total ASV")
+    vegan::rarecurve(t(abund), step = step, xlim = c(0, max_depth), label = label, col = col_vector, xlab = "Sequencing depth", ylab = "Total ASV")
   }
   if (!is.null(color) & legend) {
     legend(legend.position, legend = groups, fill = cols, bty = "n")

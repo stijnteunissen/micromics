@@ -108,9 +108,39 @@ rarefying = function(physeq = physeq,
   if (is.null(norm_method)) {
     psdata = physeq[["psdata_asv_copy_number_corrected"]]
 
-    log_message(paste("Message: Normalization method is NULL. Returning unchanged phyloseq object."), log_file)
+    log_message(paste("Message: Normalization method is NULL. Performing standard rarefaction."), log_file)
 
-    return(list(psdata_asv_copy_number_corrected = psdata))
+    # convert phyloseq to matrix
+    ps_matrix = as(t(otu_table(psdata)), "matrix")
+
+    # determine minimal sampling depth
+    min_sample <- min(sample_sums(psdata))
+
+    # rarefaction taking mean of 100 iterations
+    set.seed(711)
+    rarefied_matrix <- avgrarefy(x = ps_matrix, rarefy_to = min_sample, iterations = iteration, seed = 711)
+
+    # create phyloseq object with rarefied data
+    rarefied_table <- otu_table(data.frame(t(rarefied_matrix)), taxa_are_rows = TRUE)
+    psdata_rarefied <- psdata
+    otu_table(psdata_rarefied) <- rarefied_table
+
+    if (copy_correction == FALSE) {
+      # save
+      assign(paste0(project_name, "_rarefied_physeq"), psdata_rarefied, envir = .GlobalEnv)
+      output_file_path = paste0(output_asv_rds_files, project_name, "_phyloseq_asv_level_without_copy_number_corrected_counts_rarefied.rds")
+      saveRDS(psdata_rarefied, file = output_file_path)
+      log_message(paste("Standard rarefied ASV-level phyloseq saved as:", output_file_path), log_file)
+
+    } else if (copy_correction == TRUE) {
+      # save
+      assign(paste0(project_name, "_rarefied_physeq"), psdata_rarefied, envir = .GlobalEnv)
+      output_file_path = paste0(output_asv_rds_files, project_name, "_phyloseq_asv_level_copy_number_corrected_counts_rarefied.rds")
+      saveRDS(psdata_rarefied, file = output_file_path)
+      log_message(paste("Standard rarefied ASV-level phyloseq saved as:", output_file_path), log_file)
+    }
+
+    return(list(psdata_asv_copy_number_corrected = psdata_rarefied))
 
   } else if (!is.null(norm_method) && norm_method == "fcm") {
     psdata = physeq[["psdata_asv_copy_number_corrected"]]

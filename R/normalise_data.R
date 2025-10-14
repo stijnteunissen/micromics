@@ -436,12 +436,12 @@ normalise_data = function(physeq = without_mock_physeq,
   if (copy_correction == FALSE) {
   psdata_copy_number_corrected = psdata
 
-  output_file_path = paste0(output_asv_rds_files, project_name, "_phyloseq_asv_level_without_copy_number_corrected_counts.rds")
+  output_file_path = paste0(output_folder_rds_files_before, project_name, "_phyloseq_asv_level_without_copy_number_corrected_counts.rds")
   saveRDS(psdata, file = output_file_path)
   log_message(paste("phyloseq data without copy number corrected counts asv level saved as .rds object in", output_file_path), log_file)
 
   } else if (copy_correction == TRUE) {
-  output_file_path = paste0(output_asv_rds_files, project_name, "_phyloseq_asv_level_copy_number_corrected_counts.rds")
+  output_file_path = paste0(output_folder_rds_files_before, project_name, "_phyloseq_asv_level_copy_number_corrected_counts.rds")
   saveRDS(psdata_copy_number_corrected, file = output_file_path)
   log_message(paste("phyloseq data copy number corrected counts asv level saved as .rds object in", output_file_path), log_file)
 
