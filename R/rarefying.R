@@ -108,8 +108,6 @@ rarefying = function(physeq = physeq,
 
   if (is.null(norm_method)) {
     psdata = physeq[["psdata_asv_copy_number_corrected"]]
-    psdata = readRDS("~/Desktop/Macrogen_BKIS_CGAG_DPOL_phyloseq_asv_level_copy_number_corrected_counts.rds")
-
     log_message(paste("Message: Normalization method is NULL. Performing standard rarefaction."), log_file)
 
     # convert phyloseq to matrix
