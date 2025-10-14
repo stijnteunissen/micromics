@@ -109,14 +109,14 @@ heatmap = function(physeq = rarefied_genus_psmelt,
 
     # Create output folders (barplot folder and tax folder)
     heatmap_folder_png = paste0(figure_folder_png, "Heatmap/")
-    if(!dir.exists(heatmap_folder_png)) { dir.create(heatmap_folder_png, recursive = TRUE) }
+    if(!dir.exists(heatmap_folder_png)) { dir.create(heatmap_folder_png) }
     tax_folder_png = paste0(heatmap_folder_png, tax, "/")
-    if(!dir.exists(tax_folder_png)) { dir.create(tax_folder_png, recursive = TRUE) }
+    if(!dir.exists(tax_folder_png)) { dir.create(tax_folder_png) }
 
     heatmap_folder_pdf = paste0(figure_folder_pdf, "Heatmap/")
-    if(!dir.exists(heatmap_folder_pdf)) { dir.create(heatmap_folder_pdf, recursive = TRUE) }
+    if(!dir.exists(heatmap_folder_pdf)) { dir.create(heatmap_folder_pdf) }
     tax_folder_pdf = paste0(heatmap_folder_pdf, tax, "/")
-    if(!dir.exists(tax_folder_pdf)) { dir.create(tax_folder_pdf, recursive = TRUE) }
+    if(!dir.exists(tax_folder_pdf)) { dir.create(tax_folder_pdf) }
 
   variable_columns = intersect(present_variable_factors, colnames(copy_number_corrected_data))
   factor_columns = unique(c(variable_columns))

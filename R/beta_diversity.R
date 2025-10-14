@@ -146,10 +146,10 @@ beta_diversity <- function(physeq = physeq,
 
   # Create the main beta-diversity folder
   beta_div_folder_png <- paste0(figure_folder_png, "Beta_diversity/")
-  if (!dir.exists(beta_div_folder_png)){dir.create(beta_div_folder_png, recursive = TRUE)}
+  if (!dir.exists(beta_div_folder_png)){dir.create(beta_div_folder_png)}
 
   beta_div_folder_pdf <- paste0(figure_folder_pdf, "Beta_diversity/")
-  if (!dir.exists(beta_div_folder_pdf)){dir.create(beta_div_folder_pdf, recursive = TRUE)}
+  if (!dir.exists(beta_div_folder_pdf)){dir.create(beta_div_folder_pdf)}
 
   if (tolower(taxrank[1]) == "asv") {
     log_message("Processing ASV-level beta diversity", log_file)
@@ -166,10 +166,10 @@ beta_diversity <- function(physeq = physeq,
 
     # Create the ASV folder under beta-diversity
     asv_folder_png <- paste0(beta_div_folder_png, "ASV/")
-    if (!dir.exists(asv_folder_png)){dir.create(asv_folder_png, recursive = TRUE)}
+    if (!dir.exists(asv_folder_png)){dir.create(asv_folder_png)}
 
     asv_folder_pdf <- paste0(beta_div_folder_pdf, "ASV/")
-    if (!dir.exists(asv_folder_pdf)){dir.create(asv_folder_pdf, recursive = TRUE)}
+    if (!dir.exists(asv_folder_pdf)){dir.create(asv_folder_pdf)}
 
     # Transform counts to relative abundance (percentage)
     psdata_relative <- transform_sample_counts(psdata_relative, function(x) x / sum(x) * 100)
@@ -361,10 +361,10 @@ beta_diversity <- function(physeq = physeq,
       }
 
       tax_folder_png <- paste0(beta_div_folder_png, tax, "/")
-      if (!dir.exists(tax_folder_png)) {dir.create(tax_folder_png, recursive = TRUE)}
+      if (!dir.exists(tax_folder_png)) {dir.create(tax_folder_png)}
 
       tax_folder_pdf <- paste0(beta_div_folder_pdf, tax, "/")
-      if (!dir.exists(tax_folder_pdf)) {dir.create(tax_folder_pdf, recursive = TRUE)}
+      if (!dir.exists(tax_folder_pdf)) {dir.create(tax_folder_pdf)}
 
       psdata_relative <- transform_sample_counts(psdata_relative, function(x) x / sum(x) * 100)
 

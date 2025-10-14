@@ -62,7 +62,7 @@ psdata_to_tibble = function(physeq = rarefied_genus_physeq,
   for (tax in taxrank) {
     log_message(paste("Processing taxonomic level:", tax), log_file)
     tax_folder = file.path(output_folder_rds_files, paste0(tax))
-    if(!dir.exists(tax_folder)){dir.create(tax_folder, recursive = TRUE)}
+    if(!dir.exists(tax_folder)){dir.create(tax_folder)}
 
     if (is.null(norm_method)) {
       psdata = physeq[[paste0("psdata_copy_number_corrected_", tax)]]

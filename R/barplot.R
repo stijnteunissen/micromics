@@ -141,14 +141,14 @@ barplot = function(physeq = rarefied_genus_psmelt,
 
     # Create output folders (barplot folder and tax folder)
     barplot_folder_png = paste0(figure_folder_png, "Barplot/")
-    if(!dir.exists(barplot_folder_png)) { dir.create(barplot_folder_png, recursive = TRUE) }
+    if(!dir.exists(barplot_folder_png)) { dir.create(barplot_folder_png) }
     tax_folder_png = paste0(barplot_folder_png, tax, "/")
-    if(!dir.exists(tax_folder_png)) { dir.create(tax_folder_png, recursive = TRUE) }
+    if(!dir.exists(tax_folder_png)) { dir.create(tax_folder_png) }
 
     barplot_folder_pdf = paste0(figure_folder_pdf, "Barplot/")
-    if(!dir.exists(barplot_folder_pdf)) { dir.create(barplot_folder_pdf, recursive = TRUE) }
+    if(!dir.exists(barplot_folder_pdf)) { dir.create(barplot_folder_pdf) }
     tax_folder_pdf = paste0(barplot_folder_pdf, tax, "/")
-    if(!dir.exists(tax_folder_pdf)) { dir.create(tax_folder_pdf, recursive = TRUE) }
+    if(!dir.exists(tax_folder_pdf)) { dir.create(tax_folder_pdf) }
 
     variable_columns = intersect(present_variable_factors, colnames(copy_number_corrected_data))
     factor_columns = unique(c(variable_columns))
@@ -199,9 +199,9 @@ barplot = function(physeq = rarefied_genus_psmelt,
 
     # create a folder for each taxonomic rank table
     barplot_csv_folder = paste0(output_folder_csv_files, "Barplot/")
-    if(!dir.exists(barplot_csv_folder)) { dir.create(barplot_csv_folder, recursive = TRUE) }
+    if(!dir.exists(barplot_csv_folder)) { dir.create(barplot_csv_folder) }
     tax_csv_folder = paste0(barplot_csv_folder, tax, "/")
-    if(!dir.exists(tax_csv_folder)) { dir.create(tax_csv_folder, recursive = TRUE) }
+    if(!dir.exists(tax_csv_folder)) { dir.create(tax_csv_folder) }
 
     # save the wide table
     output_file_path = paste0(tax_csv_folder, project_name, "_barplot_relative_data_", tax, "_level.csv")
@@ -256,7 +256,7 @@ barplot = function(physeq = rarefied_genus_psmelt,
              !!sym(current_tax) := fct_reorder(!!sym(current_tax), median, .desc = TRUE))
 
     tax_rds_folder = paste0(output_folder_rds_files, tax, "/")
-    if(!dir.exists(tax_rds_folder)) { dir.create(tax_rds_folder, recursive = TRUE) }
+    if(!dir.exists(tax_rds_folder)) { dir.create(tax_rds_folder) }
 
     output_file_path = paste0(tax_rds_folder, project_name, "_pstibble_relative_data.rds")
     saveRDS(plot_data_rel, file = output_file_path)
@@ -376,9 +376,9 @@ barplot = function(physeq = rarefied_genus_psmelt,
 
       # create a folder for each taxonomic rank table
       barplot_csv_folder = paste0(output_folder_csv_files, "Barplot/")
-      if(!dir.exists(barplot_csv_folder)) { dir.create(barplot_csv_folder, recursive = TRUE) }
+      if(!dir.exists(barplot_csv_folder)) { dir.create(barplot_csv_folder) }
       tax_csv_folder = paste0(barplot_csv_folder, tax, "/")
-      if(!dir.exists(tax_csv_folder)) { dir.create(tax_csv_folder, recursive = TRUE) }
+      if(!dir.exists(tax_csv_folder)) { dir.create(tax_csv_folder) }
 
       # save the wide table
       output_file_path = paste0(tax_csv_folder, project_name, "_barplot_absolute_data_", tax, "_level.csv")
@@ -442,21 +442,21 @@ barplot = function(physeq = rarefied_genus_psmelt,
                !!sym(current_tax) := fct_reorder(!!sym(current_tax), median, .desc = TRUE))
 
       tax_rds_folder = paste0(output_folder_rds_files, tax, "/")
-      if(!dir.exists(tax_rds_folder)) { dir.create(tax_rds_folder, recursive = TRUE) }
+      if(!dir.exists(tax_rds_folder)) { dir.create(tax_rds_folder) }
 
       output_file_path = paste0(tax_rds_folder, project_name, "_pstibble_absolute_data_", tax, "_level.rds")
       saveRDS(plot_data_norm, file = output_file_path)
       log_message(paste("Absolute pstibble data saved as .rds object in", output_file_path), log_file)
 
       barplot_folder_png = paste0(figure_folder_png, "Barplot/")
-      if(!dir.exists(barplot_folder_png)) { dir.create(barplot_folder_png, recursive = TRUE) }
+      if(!dir.exists(barplot_folder_png)) { dir.create(barplot_folder_png) }
       tax_folder_png = paste0(barplot_folder_png, tax, "/")
-      if(!dir.exists(tax_folder_png)) { dir.create(tax_folder_png, recursive = TRUE) }
+      if(!dir.exists(tax_folder_png)) { dir.create(tax_folder_png) }
 
       barplot_folder_pdf = paste0(figure_folder_pdf, "Barplot/")
-      if(!dir.exists(barplot_folder_pdf)) { dir.create(barplot_folder_pdf, recursive = TRUE) }
+      if(!dir.exists(barplot_folder_pdf)) { dir.create(barplot_folder_pdf) }
       tax_folder_pdf = paste0(barplot_folder_pdf, tax, "/")
-      if(!dir.exists(tax_folder_pdf)) { dir.create(tax_folder_pdf, recursive = TRUE) }
+      if(!dir.exists(tax_folder_pdf)) { dir.create(tax_folder_pdf) }
 
       na_types = unique(plot_data_norm$na_type)
 
