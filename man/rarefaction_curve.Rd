@@ -4,11 +4,7 @@
 \alias{rarefaction_curve}
 \title{Generate and Save Rarefaction Curve}
 \usage{
-rarefaction_curve(
-  physeq = resolved_tree_physeq,
-  color = NULL,
-  base_path = "./"
-)
+rarefaction_curve(physeq = resolved_tree_physeq, color = NULL)
 }
 \arguments{
 \item{physeq}{A \code{phyloseq} object containing the microbiome data.

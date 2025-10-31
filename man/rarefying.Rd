@@ -4,7 +4,12 @@
 \alias{rarefying}
 \title{Rarefying Phyloseq Data}
 \usage{
-rarefying(physeq = physeq, norm_method = NULL, iteration = 100)
+rarefying(
+  physeq = physeq,
+  norm_method = NULL,
+  iteration = 100,
+  copy_correction = TRUE
+)
 }
 \arguments{
 \item{physeq}{A \code{phyloseq} object containing the microbiome data.
@@ -15,6 +20,14 @@ This is the input object that the function processes.}
 \item \code{NULL}: Use this option if no FCM or qPCR data is available, or if you wish to retain only relative abundances.
 \item \code{"fcm"}: Use this option if the data have been normalized using flow cytometry (FCM).
 \item \code{"qpcr"}: Use this option if the data have been normalized using quantitative PCR (qPCR).
+}}
+
+\item{copy_correction}{A logical value indicating whether the data should be corrected for
+the predicted 16S rRNA copy numbers prior to biomass normalization. Options are:
+\itemize{
+\item \code{TRUE}: Both relative and absolute abundances are corrected using the predicted copy numbers.
+\item \code{FALSE}: Abundances are not corrected by copy number. Note that qPCR normalization requires
+copy number correction to provide absolute data.
 }}
 }
 \value{

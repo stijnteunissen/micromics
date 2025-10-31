@@ -23,6 +23,14 @@ This is the input object that the function processes.}
 }}
 
 \item{taxrank}{A character vector indicating the taxonomic levels at which to group the data.}
+
+\item{copy_correction}{A logical value indicating whether the data should be corrected for
+the predicted 16S rRNA copy numbers prior to biomass normalization. Options are:
+\itemize{
+\item \code{TRUE}: Both relative and absolute abundances are corrected using the predicted copy numbers.
+\item \code{FALSE}: Abundances are not corrected by copy number. Note that qPCR normalization requires
+copy number correction to provide absolute data.
+}}
 }
 \value{
 The function saves multiple \code{phyloseq} objects as RDS files.
