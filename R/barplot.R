@@ -167,16 +167,21 @@ barplot = function(physeq = rarefied_genus_psmelt,
       summarise(abund = sum(Abundance), .groups = "drop") %>%
       group_by(Sample) %>%
       mutate(mean_rel_abund = abund/sum(abund) * 100) %>%
-      ungroup() %>%
+      ungroup()
+
+    genus_abund_rel_csv = genus_abund_rel
+
+    genus_abund_rel =
+      genus_abund_rel %>%
       group_by(Sample, !!sym(current_tax)) %>%
       mutate(!!sym(current_tax) := str_replace(!!sym(current_tax), "(.*)_unclassified", "Unclassified *\\1*")) %>%
       mutate(!!sym(current_tax) := case_when(
         str_detect(!!sym(current_tax), "Genus of") ~ str_replace(!!sym(current_tax), "Genus of (\\S+)", "Genus of *\\1*"),
-        str_detect(!!sym(current_tax), "(\\S+)\\s+(\\S+)") ~ str_replace(!!sym(current_tax), "(\\S+)\\s+(\\S+)", "*\\1* (*\\2*)"),
+        str_detect(!!sym(current_tax), "(\\S+)\\s+(\\S+)") ~ str_replace(!!sym(current_tax), "(\\S+)\\s+(\\S+)", "*\\1*"),
         TRUE ~ str_replace(!!sym(current_tax), "^(\\S*)$", "*\\1*")
       ))
 
-    # if date factor is presetn it is put in correct format and chronological order
+    # if date factor is present it is put in correct format and chronological order
     if (!is.null(date_factor) && date_factor %in% present_factors) {
       genus_abund_rel <- genus_abund_rel %>%
         mutate(!!sym(date_factor) := as.Date(!!sym(date_factor), format = "%d/%m/%Y")) %>%
@@ -185,7 +190,14 @@ barplot = function(physeq = rarefied_genus_psmelt,
 
     # create a wide table with tax rank and relative abundance
     genus_abund_wide_rel =
-      genus_abund_rel %>%
+      genus_abund_rel_csv %>%
+      group_by(Sample, !!sym(current_tax)) %>%
+      mutate(!!sym(current_tax) := str_replace(!!sym(current_tax), "(.*)_unclassified", "Unclassified \\1")) %>%
+      mutate(!!sym(current_tax) := case_when(
+        str_detect(!!sym(current_tax), "Genus of") ~ str_replace(!!sym(current_tax), "Genus of (\\S+)", "Genus of \\1"),
+        str_detect(!!sym(current_tax), "(\\S+)\\s+(\\S+)") ~ str_replace(!!sym(current_tax), "(\\S+)\\s+(\\S+)", "\\1 (\\2)"),
+        TRUE ~ str_replace(!!sym(current_tax), "^(\\S*)$", "\\1")
+      )) %>%
       select(!!!syms(higher_levels), Sample, mean_rel_abund) %>%
       pivot_wider(names_from = Sample, values_from = mean_rel_abund, values_fill = 0) %>%
       group_by_at(vars(!!!syms(higher_levels))) %>%
@@ -352,17 +364,30 @@ barplot = function(physeq = rarefied_genus_psmelt,
         absolute_data %>%
         group_by(Sample, !!!syms(higher_levels), na_type, !!!syms(present_factors)) %>%
         summarise(norm_abund = sum(Abundance), .groups = "drop") %>%
+        ungroup()
+
+      genus_abund_norm_csv = genus_abund_norm
+
+      genus_abund_norm =
+        genus_abund_norm %>%
         group_by(Sample, !!sym(current_tax)) %>%
         mutate(!!sym(current_tax) := str_replace(!!sym(current_tax), "(.*)_unclassified", "Unclassified *\\1*")) %>%
         mutate(!!sym(current_tax) := case_when(
           str_detect(!!sym(current_tax), "Genus of") ~ str_replace(!!sym(current_tax), "Genus of (\\S+)", "Genus of *\\1*"),
-          str_detect(!!sym(current_tax), "(\\S+)\\s+(\\S+)") ~ str_replace(!!sym(current_tax), "(\\S+)\\s+(\\S+)", "*\\1* (*\\2*)"),
+          str_detect(!!sym(current_tax), "(\\S+)\\s+(\\S+)") ~ str_replace(!!sym(current_tax), "(\\S+)\\s+(\\S+)", "*\\1*"),
           TRUE ~ str_replace(!!sym(current_tax), "^(\\S*)$", "*\\1*")
         ))
 
       # create a wide table with tax rank and absolute abundance
       genus_abund_wide_norm =
-        genus_abund_norm %>%
+        genus_abund_norm_csv %>%
+        group_by(Sample, !!sym(current_tax)) %>%
+        mutate(!!sym(current_tax) := str_replace(!!sym(current_tax), "(.*)_unclassified", "Unclassified \\1")) %>%
+        mutate(!!sym(current_tax) := case_when(
+          str_detect(!!sym(current_tax), "Genus of") ~ str_replace(!!sym(current_tax), "Genus of (\\S+)", "Genus of \\1"),
+          str_detect(!!sym(current_tax), "(\\S+)\\s+(\\S+)") ~ str_replace(!!sym(current_tax), "(\\S+)\\s+(\\S+)", "\\1* (\\2)"),
+          TRUE ~ str_replace(!!sym(current_tax), "^(\\S*)$", "\\1")
+        )) %>%
         select(!!!syms(higher_levels), Sample, norm_abund) %>%
         pivot_wider(names_from = Sample, values_from = norm_abund, values_fill = 0) %>%
         group_by_at(vars(!!!syms(higher_levels))) %>%
