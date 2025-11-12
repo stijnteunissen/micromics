@@ -175,9 +175,10 @@ barplot = function(physeq = rarefied_genus_psmelt,
       genus_abund_rel %>%
       group_by(Sample, !!sym(current_tax)) %>%
       mutate(!!sym(current_tax) := str_replace(!!sym(current_tax), "(.*)_unclassified", "Unclassified *\\1*")) %>%
+      mutate(!!sym(current_tax) := str_replace_all(!!sym(current_tax), "\\s*\\([^)]*\\)", "")) %>%
       mutate(!!sym(current_tax) := case_when(
         str_detect(!!sym(current_tax), "Genus of") ~ str_replace(!!sym(current_tax), "Genus of (\\S+)", "Genus of *\\1*"),
-        str_detect(!!sym(current_tax), "(\\S+)\\s+(\\S+)") ~ str_replace(!!sym(current_tax), "(\\S+)\\s+(\\S+)", "*\\1*"),
+        str_detect(!!sym(current_tax), "(\\S+)\\s+(\\S+)") ~ str_replace(!!sym(current_tax), "(\\S+)\\s+(\\S+)", "*\\1* (*\\2*)"),
         TRUE ~ str_replace(!!sym(current_tax), "^(\\S*)$", "*\\1*")
       ))
 
