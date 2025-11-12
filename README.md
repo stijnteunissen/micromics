@@ -4,7 +4,7 @@
 
 ## Installation
 
-*micromics* is implemented in R (3.5.0). You can install *micromics* using *devtools*:
+*micromics* is implemented in R (4.5.1). You can install *micromics* using *devtools*:
 
 ``` r
 # install.packages
