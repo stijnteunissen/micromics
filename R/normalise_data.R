@@ -476,8 +476,7 @@ normalise_data = function(physeq = without_mock_physeq,
     return(list(psdata_asv_copy_number_corrected = psdata_copy_number_corrected, psdata_asv_qpcr_norm = psdata_qpcr_norm))
 
   } else {
-    log_message("Error: Invalid normalization method specified. Use 'fcm' or 'qpcr'.")
-    stop("Error: Invalid normalization method specified. Use 'fcm' or 'qpcr'.")
+    log_message("Error: Invalid normalization method specified. Use 'fcm' or 'qpcr'.", log_file)
   }
 
   if (copy_correction == TRUE) {
