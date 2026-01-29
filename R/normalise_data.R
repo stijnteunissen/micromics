@@ -106,6 +106,7 @@ normalise_data = function(physeq = without_mock_physeq,
   output_asv_rds_files = paste0(output_folder_rds_files_after, "ASV/")
   if(!dir.exists(output_asv_rds_files)){dir.create(output_asv_rds_files)}
 
+  if (copy_correction == TRUE) {
   # raspergate
   df_psdata = data.frame(otu_table(psdata))
   df_psdata$OTU = rownames(df_psdata)
@@ -348,6 +349,7 @@ normalise_data = function(physeq = without_mock_physeq,
   } else if (!is.null(norm_method) && norm_method == "qpcr" && copy_correction == FALSE) {
     log_message(paste("Error: norm_method is set to 'qpcr' but copy_correction is FALSE. The qPCR normalization method requires copy number correction to be enabled."), log_file)
     stop("Error: norm_method is set to 'qpcr' but copy_correction is FALSE. The qPCR normalization method requires copy number correction to be enabled.")
+  }
   }
 
   if (copy_correction == TRUE) {
