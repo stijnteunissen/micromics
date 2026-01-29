@@ -446,7 +446,6 @@ normalise_data = function(physeq = without_mock_physeq,
   output_file_path = paste0(output_folder_rds_files_before, project_name, "_phyloseq_asv_level_copy_number_corrected_counts.rds")
   saveRDS(psdata_copy_number_corrected, file = output_file_path)
   log_message(paste("phyloseq data copy number corrected counts asv level saved as .rds object in", output_file_path), log_file)
-  }
 
   if (is.null(norm_method)) {
     log_message("No normalization method specified for absolute data. Only copy number correction applied.", log_file)
@@ -478,6 +477,7 @@ normalise_data = function(physeq = without_mock_physeq,
   } else {
     log_message("Error: Invalid normalization method specified. Use 'fcm' or 'qpcr'.", log_file)
   }
+}
 
   if (copy_correction == TRUE) {
     log_message("Copy number correction successfully applied.", log_file)
