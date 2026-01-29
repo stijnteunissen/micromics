@@ -368,7 +368,7 @@ normalise_data = function(physeq = without_mock_physeq,
   # unzip the downloaded database
   unzip(zip_file_path, exdir = destination_folder)
   rrndb_database_tsv_file = list.files(destination_folder, pattern = "pantaxa_stats_NCBI\\.tsv$", full.names = TRUE)
-  rrndb_database_tsv = read_tsv(rrndb_database_tsv_file)
+  rrndb_database_tsv = readr::read_tsv(rrndb_database_tsv_file)
   rrndb_database = rrndb_database_tsv %>% filter(rank == "genus") %>% select(Genus = "name", everything())
 
   # preparing the phyloseq data
