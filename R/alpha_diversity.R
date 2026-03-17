@@ -81,7 +81,6 @@ alpha_diversity = function(physeq = physeq,
         theme(
           legend.position = "bottom",
           legend.text = element_markdown(),
-          axis.text.x = element_blank(),
           axis.ticks.x = element_blank(),
           strip.placement = "outside",
           strip.text = element_text(face = "bold"),
@@ -109,7 +108,6 @@ alpha_diversity = function(physeq = physeq,
         theme(
           legend.position = "bottom",
           legend.text = element_markdown(),
-          axis.text.x = element_blank(),
           axis.ticks.x = element_blank(),
           strip.placement = "outside",
           strip.text = element_text(face = "bold"),
@@ -117,6 +115,11 @@ alpha_diversity = function(physeq = physeq,
           strip.background = element_blank(),
           ggh4x.facet.nestline = element_line(colour = "black")) +
         scale_y_continuous(expand = c(0, 0))
+    }
+    if (!is.null(present_factors)) {
+      plot = plot + theme(axis.text.x = element_blank())
+    } else {
+      plot = plot + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0))
     }
     return(plot)
   }

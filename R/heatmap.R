@@ -50,15 +50,14 @@ heatmap = function(physeq = rarefied_genus_psmelt,
   log_message(paste("Step 14: Creating heatmap.", paste(projects, collapse = ", ")), log_file)
 
   base_heatmap = function(plot_data, x_value, abund_value, legend_name, x_label = "Sample", tax_column) {
-    ggplot(plot_data, aes(x = Sample,
+    p <- ggplot(plot_data, aes(x = Sample,
                           y = !!sym(tax_column))) +
       geom_tile(aes(fill = !!sym(abund_value)), color = NA) +
       scale_fill_gradient(low = "white", high = "darkred", name = legend_name) +
       labs(x = x_label,
            y = tax_column) +
       theme_classic() +
-      theme(axis.text.x = element_blank(),
-            axis.text.y = element_markdown(size = 10),
+      theme(axis.text.y = element_markdown(size = 10),
             axis.ticks.x = element_blank(),
             strip.placement = "outside",
             strip.background = element_blank(),
@@ -69,6 +68,13 @@ heatmap = function(physeq = rarefied_genus_psmelt,
       geom_text(aes(label = ifelse(mean_rel_abund > 3, paste0(round(mean_rel_abund, 0)), ifelse(mean_rel_abund == 0, ".", "")),
                     color = ifelse(mean_rel_abund > 50, "#D3D3D3", "black")),
                 size = 3)
+
+    if (!is.null(present_factors)) {
+      p = p + theme(axis.text.x = element_blank())
+    } else {
+      p = p + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0))
+    }
+    return(p)
   }
 
   facet_add = function(present_factors, include_na_type = FALSE) {
