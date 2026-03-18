@@ -205,9 +205,23 @@ beta_diversity <- function(physeq = physeq,
       n_sizes <- length(unique(sample_data(psdata_relative)[[size_factor]]))
       sizeset <<- seq(2, 2 + 1.2 * (n_sizes - 1), by = 1.2)
     }
+    # if (!is.null(alpha_factor)) {
+    #   sample_data(psdata_relative)[[alpha_factor]] <- as.factor(sample_data(psdata_relative)[[alpha_factor]])
+    #   alphaset <<- scale_alpha_continuous(range = c(0.3, 1))
+    # }
+
     if (!is.null(alpha_factor)) {
-      sample_data(psdata_relative)[[alpha_factor]] <- as.factor(sample_data(psdata_relative)[[alpha_factor]])
-      alphaset <<- scale_alpha_continuous(range = c(0.3, 1))
+      alpha_var <- sample_data(psdata_relative)[[alpha_factor]]
+
+      if (is.numeric(alpha_var)) {
+        alphaset <<- scale_alpha_continuous(range = c(0.3, 1))
+      } else if (is.character(alpha_var) && all(!is.na(as.numeric(alpha_var)))) {
+        sample_data(psdata_relative)[[alpha_factor]] <- as.numeric(alpha_var)
+        alphaset <<- scale_alpha_continuous(range = c(0.3, 1))
+      } else {
+        sample_data(psdata_relative)[[alpha_factor]] <- as.factor(alpha_var)
+        alphaset <<- scale_alpha_discrete(range = c(0.3, 1))
+      }
     }
 
     na_types <- unique(sample_data(psdata_relative)$na_type)
