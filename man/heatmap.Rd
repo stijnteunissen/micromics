@@ -9,7 +9,8 @@ heatmap(
   ntaxa = NULL,
   norm_method = NULL,
   taxrank = c("Phylum", "Class", "Order", "Family", "Genus"),
-  date_factor = NULL
+  date_factor = NULL,
+  SampleID_xas = FALSE
 )
 }
 \arguments{
