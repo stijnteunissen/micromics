@@ -11,7 +11,8 @@ barplot(
   sample_matrix = NULL,
   group_by_factor = NULL,
   taxrank = c("Phylum", "Class", "Order", "Family", "Genus"),
-  date_factor = NULL
+  date_factor = NULL,
+  SampleID_xas = FALSE
 )
 }
 \arguments{
