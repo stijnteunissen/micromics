@@ -43,7 +43,8 @@ barplot = function(physeq = rarefied_genus_psmelt,
                    sample_matrix = NULL,
                    group_by_factor = NULL,
                    taxrank = c("Phylum", "Class", "Order", "Family", "Genus"),
-                   date_factor = NULL) {
+                   date_factor = NULL,
+                   SampleID_xas = FALSE) {
 
   log_message(paste("Step 13: Creating barplot.", paste(projects, collapse = ", ")), log_file)
 
@@ -73,6 +74,8 @@ barplot = function(physeq = rarefied_genus_psmelt,
 
     if (!is.null(present_factors)) {
       p = p + theme(axis.text.x = element_blank())
+    } else if (isTRUE(SampleID_xas)) {
+      p = p + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0))
     } else {
       p = p + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0))
     }
