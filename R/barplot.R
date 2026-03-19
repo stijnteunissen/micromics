@@ -72,10 +72,8 @@ barplot = function(physeq = rarefied_genus_psmelt,
       p = p + guides(fill = guide_legend(nrow = 8))
     }
 
-    if (!is.null(present_factors)) {
+    if (!is.null(present_factors) && !isTRUE(SampleID_xas)) {
       p = p + theme(axis.text.x = element_blank())
-    } else if (isTRUE(SampleID_xas)) {
-      p = p + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0))
     } else {
       p = p + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0))
     }
