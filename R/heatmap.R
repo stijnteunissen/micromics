@@ -45,7 +45,8 @@ heatmap = function(physeq = rarefied_genus_psmelt,
                    ntaxa = NULL,
                    norm_method = NULL,
                    taxrank = c("Phylum", "Class", "Order", "Family", "Genus"),
-                   date_factor = NULL) {
+                   date_factor = NULL,
+                   SampleID_xas = FALSE) {
 
   log_message(paste("Step 14: Creating heatmap.", paste(projects, collapse = ", ")), log_file)
 
@@ -69,7 +70,7 @@ heatmap = function(physeq = rarefied_genus_psmelt,
                     color = ifelse(mean_rel_abund > 50, "#D3D3D3", "black")),
                 size = 3)
 
-    if (!is.null(present_factors)) {
+    if (!is.null(present_factors) && !isTRUE(SampleID_xas)) {
       p = p + theme(axis.text.x = element_blank())
     } else {
       p = p + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0))
