@@ -13,7 +13,8 @@ beta_diversity(
   color_continuous = TRUE,
   shape_factor = NULL,
   size_factor = NULL,
-  alpha_factor = NULL
+  alpha_factor = NULL,
+  fill_factor = NULL
 )
 }
 \arguments{

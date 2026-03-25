@@ -75,7 +75,8 @@ beta_diversity <- function(physeq = physeq,
                            color_continuous = TRUE,
                            shape_factor = NULL,
                            size_factor = NULL,
-                           alpha_factor = NULL) {
+                           alpha_factor = NULL,
+                           fill_factor = NULL) {
 
   log_message(paste("Step 16: Creating beta diversity.", paste(projects, collapse = ", ")), log_file)
 
@@ -107,9 +108,10 @@ beta_diversity <- function(physeq = physeq,
     if (!is.null(shape_factor)) aes_params$shape <- sym(shape_factor)
     if (!is.null(size_factor))  aes_params$size  <- sym(size_factor)
     if (!is.null(alpha_factor)) aes_params$alpha <- sym(alpha_factor)
+    if (!is.null(fill_factor)) aes_params$fill <- sym(fill_factor)
 
     # Add points with the specified aesthetics
-    base_plot <- base_plot + geom_point(mapping = do.call(aes, aes_params))
+    base_plot <- base_plot + geom_point(mapping = do.call(aes, aes_params), stroke = 1)
 
     # Apply color scales based on whether the color factor is continuous or discrete
     if (!is.null(color_factor)) {
@@ -120,10 +122,20 @@ beta_diversity <- function(physeq = physeq,
       }
     }
     if (!is.null(shape_factor)) {
-      base_plot <- base_plot + scale_shape_manual(values = shapeset)
+      base_plot <- base_plot + scale_shape_manual(values = shapeset) +
+        guides(shape = guide_legend(override.aes = list(fill = "black")))
     }
     if (!is.null(size_factor)) {
       base_plot <- base_plot + scale_size_manual(values = sizeset)
+    }
+    if (!is.null(fill_factor)) {
+      fixed_fill_colors <- c("grey80", "black")
+
+      base_plot <- base_plot + scale_fill_manual(
+        values = setNames(fixed_fill_colors, levels(sample_data(psdata)[[fill_factor]])))
+
+      base_plot <- base_plot + guides(
+        fill = guide_legend(override.aes = list(shape = 21)))
     }
     if (!is.null(alpha_factor)) {
       base_plot <- base_plot + scale_alpha_continuous(range = c(0.3, 1))  # Set transparency for alpha
@@ -198,30 +210,20 @@ beta_diversity <- function(physeq = physeq,
     if (!is.null(shape_factor)) {
       sample_data(psdata_relative)[[shape_factor]] <- as.factor(sample_data(psdata_relative)[[shape_factor]])
       n_shapes <- length(unique(sample_data(psdata_relative)[[shape_factor]]))
-      shapeset <<- seq_len(n_shapes)
+      if (!is.null(fill_factor)) {
+        shapeset <<- 21:(20 + n_shapes)
+      } else {
+        shapeset <<- seq_len(n_shapes)
+      }
     }
     if (!is.null(size_factor)) {
       sample_data(psdata_relative)[[size_factor]] <- as.factor(sample_data(psdata_relative)[[size_factor]])
       n_sizes <- length(unique(sample_data(psdata_relative)[[size_factor]]))
       sizeset <<- seq(2, 2 + 1.2 * (n_sizes - 1), by = 1.2)
     }
-    # if (!is.null(alpha_factor)) {
-    #   sample_data(psdata_relative)[[alpha_factor]] <- as.factor(sample_data(psdata_relative)[[alpha_factor]])
-    #   alphaset <<- scale_alpha_continuous(range = c(0.3, 1))
-    # }
-
     if (!is.null(alpha_factor)) {
-      alpha_var <- sample_data(psdata_relative)[[alpha_factor]]
-
-      if (is.numeric(alpha_var)) {
-        alphaset <<- scale_alpha_continuous(range = c(0.3, 1))
-      } else if (is.character(alpha_var) && all(!is.na(as.numeric(alpha_var)))) {
-        sample_data(psdata_relative)[[alpha_factor]] <- as.numeric(alpha_var)
-        alphaset <<- scale_alpha_continuous(range = c(0.3, 1))
-      } else {
-        sample_data(psdata_relative)[[alpha_factor]] <- as.factor(alpha_var)
-        alphaset <<- scale_alpha_discrete(range = c(0.3, 1))
-      }
+      sample_data(psdata_relative)[[alpha_factor]] <- as.factor(sample_data(psdata_relative)[[alpha_factor]])
+      alphaset <<- scale_alpha_continuous(range = c(0.3, 1))
     }
 
     na_types <- unique(sample_data(psdata_relative)$na_type)
@@ -404,7 +406,11 @@ beta_diversity <- function(physeq = physeq,
       if (!is.null(shape_factor)) {
         sample_data(psdata_relative)[[shape_factor]] <- as.factor(sample_data(psdata_relative)[[shape_factor]])
         n_shapes <- length(unique(sample_data(psdata_relative)[[shape_factor]]))
-        shapeset <<- seq_len(n_shapes)
+        if (!is.null(fill_factor)) {
+          shapeset <<- 21:(20 + n_shapes)
+        } else {
+          shapeset <<- seq_len(n_shapes)
+        }
       }
       if (!is.null(size_factor)) {
         sample_data(psdata_relative)[[size_factor]] <- as.factor(sample_data(psdata_relative)[[size_factor]])
