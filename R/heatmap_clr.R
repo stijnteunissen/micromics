@@ -232,11 +232,11 @@ heatmap_clr <- function(physeq = rarefied_genus_psmelt,
       fig.width <- max(12, n_samples * 0.40)
 
       # save mean
-      figure_file_path = paste0(tax_folder_png, project_name, "_heatmap_CLR_mean_", tax, "_level.png")
+      figure_file_path = paste0(tax_folder_png, project_name, "_heatmap_CLR_", tax, "_level.png")
       ggsave(filename = figure_file_path, plot = heatmap_clr_mean, width = fig.width, height = 10, limitsize = FALSE, dpi = 600)
       log_message(paste("Relative heatmap saved as .png object in", figure_file_path), log_file)
 
-      figure_file_path = paste0(tax_folder_pdf, project_name, "_heatmap_CLR_mean_", tax, "_level.pdf")
+      figure_file_path = paste0(tax_folder_pdf, project_name, "_heatmap_CLR_", tax, "_level.pdf")
       ggsave(filename = figure_file_path, plot = heatmap_clr_mean, width = fig.width, height = 10, limitsize = FALSE)
       log_message(paste("Relative heatmap saved as .pdf object in", figure_file_path), log_file)
 
