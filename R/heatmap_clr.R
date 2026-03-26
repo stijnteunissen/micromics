@@ -1,6 +1,43 @@
-### heatmap clr ####
-
-heatmap_clr = function(physeq = rarefied_genus_psmelt,
+#' Generate a Heatmap of CLR Abundance
+#'
+#' This function creates a heatmap of CLR transformed abundance data from a phyloseq
+#' object. It performs a CLR transformation and generates heatmaps.
+#' The heatmap is then faceted based on additional sample metadata if available and saved
+#' as a PDF and PNG.
+#'
+#' @param physeq A phyloseq object containing normalized genus-level data. The default is \code{rarefied_genus_psmelt}.
+#' @param ntaxa An integer specifying the maximum number of taxa to display individually. Taxa below the threshold are grouped into "Other". If \code{NULL}, \code{ntaxa} is set to 23.
+#' @param norm_method A character string specifying the normalization method. If \code{NULL}, the function uses the provided \code{physeq} directly. If set to \code{"fcm"} or \code{"qpcr"}, the function extracts the corresponding \code{psmelt_copy_number_corrected_} data based on the taxonomic rank.
+#' @param taxrank A character string indicating the taxonomic rank to use for grouping taxa. The default is \code{"Genus"}.
+#'
+#' @details
+#' The function performs the following steps:
+#' \enumerate{
+#'   \item Sets up project folder paths for figures and output data.
+#'   \item Preforms a CLR transformation on the phyloseq and a psmelt.
+#'   \item Creates a base heatmap using \code{ggplot2}, with samples on the x-axis and taxa on the y-axis. The fill color reflects the relative abundance, and text labels are added for values exceeding a threshold.
+#'   \item If more than one \code{na_type} is present (e.g., both DNA and RNA), separate heatmaps are generated for each and then combined.
+#'   \item Saves the final heatmap as a PDF file in the project's figures folder.
+#' }
+#'
+#' @return A \code{ggplot} object representing the heatmap of relative abundance.
+#'
+#' @examples
+#' \dontrun{
+#'   # Generate a heatmap using default parameters
+#'   heatmap_plot <- heatmap(physeq = rarefied_genus_psmelt)
+#'
+#'   # Generate a heatmap with a specified number of taxa and a normalization method
+#'   heatmap_plot <- heatmap(
+#'     physeq = rarefied_genus_psmelt,
+#'     ntaxa = 20,
+#'     norm_method = "fcm",
+#'     taxrank = c("Phylum", "Class", "Order", "Family", "Genus")
+#'   )
+#' }
+#'
+#' @export
+heatmap_clr <- function(physeq = rarefied_genus_psmelt,
                        ntaxa = NULL,
                        norm_method = NULL,
                        taxrank = c("Phylum", "Class", "Order", "Family", "Genus"),
