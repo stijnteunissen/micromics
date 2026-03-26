@@ -55,6 +55,8 @@ metadata, R package version 1.0.0, GitHub.
   : Aggregate Phyloseq Data by Taxonomic Level
 - [`heatmap()`](https://stijnteunissen.github.io/micromics/reference/heatmap.md)
   : Generate a Heatmap of Relative Abundance
+- [`heatmap_clr()`](https://stijnteunissen.github.io/micromics/reference/heatmap_clr.md)
+  : Generate a Heatmap of CLR Abundance
 - [`hello()`](https://stijnteunissen.github.io/micromics/reference/hello.md)
   : Hello, world!
 - [`normalise_data()`](https://stijnteunissen.github.io/micromics/reference/normalise_data.md)
