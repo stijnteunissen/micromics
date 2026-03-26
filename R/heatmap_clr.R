@@ -153,7 +153,15 @@ heatmap_clr <- function(physeq = rarefied_genus_psmelt,
       arrange(desc(mean_abund_sample)) %>%
       slice_head(n = ntaxa)
 
-    top_taxa_mean <- taxa_mean[[tax]]
+    taxa_levels <- taxa_mean %>%
+      mutate(!!sym(tax) := str_replace(!!sym(tax), "(.*)_unclassified", "Unclassified *\\1*")) %>%
+      mutate(!!sym(tax) := case_when(
+        str_detect(!!sym(tax), "Genus of") ~ str_replace(!!sym(tax), "Genus of (\\S+)", "Genus of *\\1*"),
+        str_detect(!!sym(tax), "(\\S+)\\s+(\\S+)") ~ str_replace(!!sym(tax), "(\\S+)\\s+(\\S+)", "*\\1* (*\\2*)"),
+        TRUE ~ str_replace(!!sym(tax), "^(\\S*)$", "*\\1*")
+      ))
+
+    top_taxa_mean <- taxa_levels[[tax]]
 
     # Define the complete taxonomic order and extract all higher levels than the current tax
     taxonomy_order <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus")
@@ -167,15 +175,7 @@ heatmap_clr <- function(physeq = rarefied_genus_psmelt,
       summarise(clr_value = sum(Abundance), .groups = "drop") %>%
       ungroup()
 
-    # filter taxa
-    plot_data_clr_mean <- genus_abund_clr %>%
-      filter((!!sym(tax)) %in% top_taxa_mean) %>%
-      mutate(!!sym(tax) := factor(!!sym(tax),
-                                  levels = taxa_mean %>%
-                                    arrange(desc(mean_abund_sample)) %>%
-                                    pull(!!sym(tax))))
-
-    plot_data_clr_mean <- plot_data_clr_mean %>%
+    genus_abund_clr_2 <- genus_abund_clr %>%
       group_by(Sample, !!sym(tax)) %>%
       mutate(!!sym(tax) := str_replace(!!sym(tax), "(.*)_unclassified", "Unclassified *\\1*")) %>%
       mutate(!!sym(tax) := case_when(
@@ -183,6 +183,15 @@ heatmap_clr <- function(physeq = rarefied_genus_psmelt,
         str_detect(!!sym(tax), "(\\S+)\\s+(\\S+)") ~ str_replace(!!sym(tax), "(\\S+)\\s+(\\S+)", "*\\1* (*\\2*)"),
         TRUE ~ str_replace(!!sym(tax), "^(\\S*)$", "*\\1*")
       ))
+
+    # filter taxa
+    plot_data_clr_mean <- genus_abund_clr_2 %>%
+      filter((!!sym(tax)) %in% top_taxa_mean) %>%
+      select(Sample, !!sym(tax), clr_value, na_type, !!!syms(present_factors)) %>%
+      mutate(!!sym(tax) := factor(!!sym(tax),
+                                  levels = taxa_levels %>%
+                                    arrange(desc(mean_abund_sample)) %>%
+                                    pull(!!sym(tax))))
 
     if (!is.null(date_factor) && date_factor %in% present_factors) {
       genus_abund_clr <- genus_abund_clr %>%
