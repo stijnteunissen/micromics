@@ -49,6 +49,11 @@ creating_physeq_object = function(projects) {
   # Search for the required files
   table_file <- list.files(destination_folder, pattern = "table.*\\.qza$", full.names = TRUE, recursive = TRUE)
   rooted_tree_file <- list.files(destination_folder, pattern = "rooted-tree.*\\.qza$", full.names = TRUE, recursive = TRUE)
+
+  if (length(rooted_tree_file) == 0) {
+    rooted_tree_file <- NULL
+  }
+
   taxonomy_file <- list.files(destination_folder, pattern = "classifier.*\\.qza", full.names = TRUE, recursive = TRUE)
   metadata_file <- list.files(destination_folder, pattern = "metadata_final\\.tsv", full.names = TRUE)
 
