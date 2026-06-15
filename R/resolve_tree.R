@@ -48,40 +48,40 @@ resolve_tree = function(physeq = cleaned_physeq) {
   if (is.null(current_tree)) {
     log_message("WARNING: No phylogenetic tree found in the phyloseq object. Skipping tree resolution.", log_file)
     return(psdata)
-  }
-
-  # Check if the tree is binary
-  if (!ape::is.binary(phy_tree(psdata))) {
-    # Resolve polychotomous nodes
-    phy_tree_resolved <- ape::multi2di(phy_tree(psdata))
-    # Check if resolved
-    if (!ape::is.binary(phy_tree_resolved)) {
-      stop("Error: Unable to resolve polychotomous nodes.")
-    }
-    # Update tree
-    tree2 <- phy_tree_resolved
   } else {
-    # Use the original tree if it's already binary
-    tree2 <- phyloseq::phy_tree(psdata)
+    # Check if the tree is binary
+    if (!ape::is.binary(phy_tree(psdata))) {
+      # Resolve polychotomous nodes
+      phy_tree_resolved <- ape::multi2di(phy_tree(psdata))
+      # Check if resolved
+      if (!ape::is.binary(phy_tree_resolved)) {
+        stop("Error: Unable to resolve polychotomous nodes.")
+      }
+      # Update tree
+      tree2 <- phy_tree_resolved
+    } else {
+      # Use the original tree if it's already binary
+      tree2 <- phyloseq::phy_tree(psdata)
+    }
+
+    # Merge new tree with sample_data and otu_table
+    new_tree <- phyloseq::merge_phyloseq(
+      phyloseq::otu_table(psdata),
+      phyloseq::sample_data(psdata),
+      phyloseq::tax_table(psdata),
+      tree2)
+
+    # Add sample IDs to the sample_data
+    phyloseq::sample_data(new_tree)$sampleid <- phyloseq::sample_names(new_tree)
+
+    output_file_path = paste0(output_folder_rds_files, project_name, "_phyloseq_resolved_tree.rds")
+
+    saveRDS(new_tree, file = output_file_path)
+
+    log_message(paste("Phyloseq object saved as .rds object in", output_file_path), log_file)
+
+    return(new_tree)
+
+    log_message("Tree successfully resolved", log_file)
   }
-
-  # Merge new tree with sample_data and otu_table
-  new_tree <- phyloseq::merge_phyloseq(
-    phyloseq::otu_table(psdata),
-    phyloseq::sample_data(psdata),
-    phyloseq::tax_table(psdata),
-    tree2)
-
-  # Add sample IDs to the sample_data
-  phyloseq::sample_data(new_tree)$sampleid <- phyloseq::sample_names(new_tree)
-
-  output_file_path = paste0(output_folder_rds_files, project_name, "_phyloseq_resolved_tree.rds")
-
-  saveRDS(new_tree, file = output_file_path)
-
-  log_message(paste("Phyloseq object saved as .rds object in", output_file_path), log_file)
-
-  return(new_tree)
-
-  log_message("Tree successfully resolved", log_file)
 }
