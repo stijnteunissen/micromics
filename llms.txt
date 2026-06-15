@@ -15,6 +15,7 @@ samples.
 using *devtools*:
 
 ``` r
+
 # install.packages
 devootls::install_github("stijnteunissen/micromics")
 ```
