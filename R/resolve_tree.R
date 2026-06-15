@@ -47,7 +47,7 @@ resolve_tree = function(physeq = cleaned_physeq) {
 
   if (is.null(current_tree)) {
     log_message("WARNING: No phylogenetic tree found in the phyloseq object. Skipping tree resolution.", log_file)
-    return(physeq)
+    return(psdata)
   }
 
   # Check if the tree is binary
