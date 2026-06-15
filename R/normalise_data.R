@@ -118,9 +118,10 @@ normalise_data = function(physeq = without_mock_physeq,
   rasperGade16S_rds = readRDS(rasperGade16S_file)
 
   raspergade_df = rasperGade16S_rds$discrete %>%
-    dplyr::rename(OTU = label,
-           copy_number = x,
-           probability = probs) %>%
+    dplyr::rename(
+      OTU = label,
+      copy_number = x,
+      probability = probs) %>%
     select(OTU, copy_number, probability) %>%
     as_tibble()
 
