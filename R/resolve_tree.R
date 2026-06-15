@@ -43,12 +43,12 @@ resolve_tree = function(physeq = cleaned_physeq) {
     stop("Error: psdata is not a phyloseq object.")
   }
 
+  current_tree <- phyloseq::phy_tree(psdata, errorIfNULL = FALSE)
+
   if (is.null(current_tree)) {
     log_message("WARNING: No phylogenetic tree found in the phyloseq object. Skipping tree resolution.", log_file)
     return(physeq)
   }
-
-  current_tree <- phyloseq::phy_tree(psdata, errorIfNULL = FALSE)
 
   # Check if the tree is binary
   if (!ape::is.binary(phy_tree(psdata))) {
