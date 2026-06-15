@@ -49,21 +49,24 @@ creating_physeq_object = function(projects) {
   # Search for the required files
   table_file <- list.files(destination_folder, pattern = "table.*\\.qza$", full.names = TRUE, recursive = TRUE)
   rooted_tree_file <- list.files(destination_folder, pattern = "rooted-tree.*\\.qza$", full.names = TRUE, recursive = TRUE)
-
-  if (length(rooted_tree_file) == 0) {
-    rooted_tree_file <- NULL
-  }
-
   taxonomy_file <- list.files(destination_folder, pattern = "classifier.*\\.qza", full.names = TRUE, recursive = TRUE)
   metadata_file <- list.files(destination_folder, pattern = "metadata_final\\.tsv", full.names = TRUE)
 
   # Create the phyloseq object
-  physeq <- qza_to_phyloseq(
-    features = table_file,
-    tree = rooted_tree_file,
-    taxonomy = taxonomy_file,
-    metadata = metadata_file
-  )
+  if (length(rooted_tree_file) == 0) {
+    physeq <- qza_to_phyloseq(
+      features = table_file,
+      taxonomy = taxonomy_file,
+      metadata = metadata_file
+    )
+  } else {
+    physeq <- qza_to_phyloseq(
+      features = table_file,
+      tree = rooted_tree_file,
+      taxonomy = taxonomy_file,
+      metadata = metadata_file
+    )
+  }
 
   # Add read counts to metadata
   phyloseq::sample_data(physeq)$read_count = phyloseq::sample_sums(physeq)
