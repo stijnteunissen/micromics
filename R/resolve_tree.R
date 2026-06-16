@@ -39,9 +39,9 @@ resolve_tree = function(physeq = cleaned_physeq) {
   output_folder_csv_files = paste0(project_folder, "/output_data/csv_files/")
   output_folder_rds_files = paste0(project_folder, "/output_data/rds_files/Before_cleaning_rds_files/")
 
-  # if (!inherits(psdata, "phyloseq")) {
-  #   stop("Error: psdata is not a phyloseq object.")
-  # }
+  if (!inherits(psdata, "phyloseq")) {
+    stop("Error: psdata is not a phyloseq object.")
+  }
 
   current_tree <- phyloseq::phy_tree(psdata, errorIfNULL = FALSE)
 
