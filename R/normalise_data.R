@@ -123,7 +123,8 @@ normalise_data = function(physeq = without_mock_physeq,
       copy_number = x,
       probability = probs) %>%
     select(OTU, copy_number, probability) %>%
-    as_tibble()
+    as_tibble() %>%
+    dplyr::mutate(OTU = as.character(OTU))
 
   joined_pstibble =
     pstibble %>%
