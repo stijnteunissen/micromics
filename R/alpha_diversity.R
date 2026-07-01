@@ -223,7 +223,7 @@ alpha_diversity = function(physeq = physeq,
       fig.width <- max(14, n_samples * 0.6)
 
       figure_file_path = paste0(asv_folder_png, project_name, "_alpha_diversity_asv_level.png")
-      ggsave(filename = figure_file_path, plot = combined_plot, width = fig.width, height = 6, dpi = 600)
+      ggsave(filename = figure_file_path, plot = combined_plot, width = fig.width, height = 6, dpi = 600, limitsize = FALSE)
       log_message(paste("alpha diversity asv level saved as .png object in", figure_file_path), log_file)
 
       figure_file_path = paste0(asv_folder_pdf, project_name, "_alpha_diversity_asv_level.pdf")
@@ -276,7 +276,7 @@ alpha_diversity = function(physeq = physeq,
       fig.width_rna <- max(14, n_samples_rna * 0.6)
 
       figure_file_path = paste0(asv_folder_png, project_name, "_alpha_diversity_dna_asv_level.png")
-      ggsave(filename = figure_file_path, plot = combined_plot_dna, width = fig.width_dna, height = 6, dpi = 600)
+      ggsave(filename = figure_file_path, plot = combined_plot_dna, width = fig.width_dna, height = 6, dpi = 600, limitsize = FALSE)
       log_message(paste("alpha diversity asv level saved as .png object in", figure_file_path), log_file)
 
       figure_file_path = paste0(asv_folder_pdf, project_name, "_alpha_diversity_dna_asv_level.pdf")
@@ -284,7 +284,7 @@ alpha_diversity = function(physeq = physeq,
       log_message(paste("alpha diversity asv level saved as .pdf object in", figure_file_path), log_file)
 
       figure_file_path = paste0(asv_folder_png, project_name, "_alpha_diversity_rna_asv_level.png")
-      ggsave(filename = figure_file_path, plot = combined_plot_rna, width = fig.width_rna, height = 6, dpi = 600)
+      ggsave(filename = figure_file_path, plot = combined_plot_rna, width = fig.width_rna, height = 6, dpi = 600, limitsize = FALSE)
       log_message(paste("alpha diversity asv level saved as .png object in", figure_file_path), log_file)
 
       figure_file_path = paste0(asv_folder_pdf, project_name, "_alpha_diversity_rna_asv_level.pdf")
@@ -376,7 +376,7 @@ alpha_diversity = function(physeq = physeq,
         fig.width <- max(14, n_samples * 0.6)
 
         figure_file_path = paste0(tax_folder_png, project_name, "_alpha_diversity_", tax, "_level.png")
-        ggsave(filename = figure_file_path, plot = combined_plot, width = fig.width, height = 6, dpi = 600)
+        ggsave(filename = figure_file_path, plot = combined_plot, width = fig.width, height = 6, dpi = 600, limitsize = FALSE)
         log_message(paste("alpha diversity asv level saved as .png object in", figure_file_path), log_file)
 
         figure_file_path = paste0(tax_folder_pdf, project_name, "_alpha_diversity_", tax, "_level.pdf")
@@ -429,7 +429,7 @@ alpha_diversity = function(physeq = physeq,
         fig.width_rna <- max(14, n_samples_rna * 0.6)
 
         figure_file_path = paste0(tax_folder_png, project_name, "_alpha_diversity_dna_", tax, "_level.png")
-        ggsave(filename = figure_file_path, plot = combined_plot_dna, width = fig.width_dna, height = 6, dpi = 600)
+        ggsave(filename = figure_file_path, plot = combined_plot_dna, width = fig.width_dna, height = 6, dpi = 600, limitsize = FALSE)
         log_message(paste("alpha diversity", tax, "level saved as .png object in", figure_file_path), log_file)
 
         figure_file_path = paste0(tax_folder_pdf, project_name, "_alpha_diversity_dna_", tax, "_level.pdf")
@@ -437,7 +437,7 @@ alpha_diversity = function(physeq = physeq,
         log_message(paste("alpha diversity", tax, "level saved as .pdf object in", figure_file_path), log_file)
 
         figure_file_path = paste0(tax_folder_png, project_name, "_alpha_diversity_rna_", tax, "_level.png")
-        ggsave(filename = figure_file_path, plot = combined_plot_rna, width = fig.width_rna, height = 6, dpi = 600)
+        ggsave(filename = figure_file_path, plot = combined_plot_rna, width = fig.width_rna, height = 6, dpi = 600, limitsize = FALSE)
         log_message(paste("alpha diversity", tax, "level saved as .png object in", figure_file_path), log_file)
 
         figure_file_path = paste0(tax_folder_pdf, project_name, "_alpha_diversity_rna_", tax, "_level.pdf")
