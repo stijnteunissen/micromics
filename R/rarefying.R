@@ -106,47 +106,43 @@ rarefying = function(physeq = physeq,
     return(round(output, 0))
   }
 
-  if (is.null(norm_method)) {
-    psdata = physeq[["psdata_asv_copy_number_corrected"]]
-    log_message(paste("Message: Normalization method is NULL. Performing standard rarefaction."), log_file)
+  psdata = physeq[["psdata_asv_copy_number_corrected"]]
+  log_message(paste("Message: Normalization method is NULL. Performing standard rarefaction."), log_file)
 
-    # convert phyloseq to matrix
-    ps_matrix = as(t(otu_table(psdata)), "matrix")
+  # convert phyloseq to matrix
+  ps_matrix = as(t(otu_table(psdata)), "matrix")
 
-    # determine minimal sampling depth
-    min_sample <- min(sample_sums(psdata))
+  # determine minimal sampling depth
+  min_sample <- min(sample_sums(psdata))
 
-    # rarefaction taking mean of 100 iterations
-    set.seed(711)
-    rarefied_matrix <- avgrarefy(x = ps_matrix, rarefy_to = min_sample, iterations = iteration, seed = 711)
+  # rarefaction taking mean of 100 iterations
+  set.seed(711)
+  rarefied_matrix <- avgrarefy(x = ps_matrix, rarefy_to = min_sample, iterations = iteration, seed = 711)
 
-    rownames(rarefied_matrix) <- rownames(ps_matrix)  # samples
-    colnames(rarefied_matrix) <- colnames(ps_matrix)  # taxa
+  rownames(rarefied_matrix) <- rownames(ps_matrix)  # samples
+  colnames(rarefied_matrix) <- colnames(ps_matrix)  # taxa
 
-    # create phyloseq object with rarefied data
-    rarefied_table <- otu_table(rarefied_matrix, taxa_are_rows = FALSE)
-    psdata_rarefied <- psdata
-    otu_table(psdata_rarefied) <- rarefied_table
+  # create phyloseq object with rarefied data
+  rarefied_table <- otu_table(rarefied_matrix, taxa_are_rows = FALSE)
+  psdata_rarefied_rel <- psdata
+  otu_table(psdata_rarefied_rel) <- rarefied_table
 
-    if (copy_correction == FALSE) {
-      # save
-      assign(paste0(project_name, "_rarefied_physeq"), psdata_rarefied, envir = .GlobalEnv)
-      output_file_path = paste0(output_asv_rds_files, project_name, "_phyloseq_asv_level_without_copy_number_corrected_counts_rarefied.rds")
-      saveRDS(psdata_rarefied, file = output_file_path)
-      log_message(paste("Standard rarefied ASV-level phyloseq saved as:", output_file_path), log_file)
+  if (copy_correction == FALSE) {
+    # save
+    assign(paste0(project_name, "_rarefied_physeq"), psdata_rarefied_rel, envir = .GlobalEnv)
+    output_file_path = paste0(output_asv_rds_files, project_name, "_phyloseq_asv_level_without_copy_number_corrected_counts_rarefied.rds")
+    saveRDS(psdata_rarefied_rel, file = output_file_path)
+    log_message(paste("Standard rarefied ASV-level phyloseq saved as:", output_file_path), log_file)
 
-    } else if (copy_correction == TRUE) {
-      # save
-      assign(paste0(project_name, "_rarefied_physeq"), psdata_rarefied, envir = .GlobalEnv)
-      output_file_path = paste0(output_asv_rds_files, project_name, "_phyloseq_asv_level_copy_number_corrected_counts_rarefied.rds")
-      saveRDS(psdata_rarefied, file = output_file_path)
-      log_message(paste("Standard rarefied ASV-level phyloseq saved as:", output_file_path), log_file)
-    }
+  } else if (copy_correction == TRUE) {
+    # save
+    assign(paste0(project_name, "_rarefied_physeq"), psdata_rarefied_rel, envir = .GlobalEnv)
+    output_file_path = paste0(output_asv_rds_files, project_name, "_phyloseq_asv_level_copy_number_corrected_counts_rarefied.rds")
+    saveRDS(psdata_rarefied_rel, file = output_file_path)
+    log_message(paste("Standard rarefied ASV-level phyloseq saved as:", output_file_path), log_file)
+  }
 
-    return(list(psdata_asv_copy_number_corrected = psdata_rarefied))
-
-  } else if (!is.null(norm_method) && norm_method == "fcm") {
-    psdata = physeq[["psdata_asv_copy_number_corrected"]]
+  if (!is.null(norm_method) && norm_method == "fcm") {
     psdata_fcm = physeq[["psdata_asv_fcm_norm"]]
 
     psdata_fcm <- prune_samples(sample_sums(psdata_fcm) > 0, psdata_fcm)        # Remove samples with zero counts
@@ -211,13 +207,11 @@ rarefying = function(physeq = physeq,
     saveRDS(psdata_rarefied, file = output_file_path)
     log_message(paste("Phyloseq data fcm normalised cell concentration (cells per ml/gram sample) asv level rarefied saved as .rds object in", output_file_path), log_file)
 
-    return(list(psdata_asv_copy_number_corrected = psdata, psdata_asv_fcm_norm_rarefied = psdata_rarefied))
+    return(list(psdata_asv_copy_number_corrected = psdata_rarefied_rel, psdata_asv_fcm_norm_rarefied = psdata_rarefied))
 
   } else if (!is.null(norm_method) && norm_method == "qpcr") {
 
-    psdata_ccn = physeq[["psdata_asv_copy_number_corrected"]]
     psdata_qpcr = physeq[["psdata_asv_qpcr_norm"]]
-
 
     psdata_qpcr <- prune_samples(sample_sums(psdata_qpcr) > 0, psdata_qpcr) # Remove samples with zero counts
     psdata_qpcr <- prune_taxa(rowSums(otu_table(psdata_qpcr)) > 0, psdata_qpcr) # Remove taxa with zero counts across all samples
@@ -280,11 +274,10 @@ rarefying = function(physeq = physeq,
     saveRDS(psdata_rarefied, file = output_file_path)
     log_message(paste("phyloseq qpcr normalised cell concentration (cells per ml/gram sample) asv level rarefied saved as .rds object in", output_file_path), log_file)
 
-    return(list(psdata_asv_copy_number_corrected = psdata_ccn, psdata_asv_qpcr_norm_rarefied = psdata_rarefied))
+    return(list(psdata_asv_copy_number_corrected = psdata_rarefied_rel, psdata_asv_qpcr_norm_rarefied = psdata_rarefied))
 
   } else {
-    log_message(paste("Error: Invalid normalization method specified. Use 'fcm' or 'qpcr'."), log_file)
-    stop("Error: Invalid normalization method specified. Use 'fcm' or 'qpcr'.")
+    return(list(psdata_asv_copy_number_corrected = psdata_rarefied_rel))
   }
 
   log_message("Data is successfully rarefied.", log_file)
