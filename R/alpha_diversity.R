@@ -56,7 +56,7 @@ alpha_diversity = function(physeq = physeq,
                            taxrank = c("Phylum", "Class", "Order", "Family", "Genus"),
                            date_factor = NULL) {
 
-  log_message(paste("Step 15x: Creating alpha diversity.", paste(projects, collapse = ", ")), log_file)
+  log_message(paste("Step 15: Creating alpha diversity.", paste(projects, collapse = ", ")), log_file)
 
   base_alpha_plot = function(alpha_data, x_value, y_value, x_label, y_label) {
 
@@ -167,9 +167,9 @@ alpha_diversity = function(physeq = physeq,
     present_factors = if (length(factor_columns) > 0) factor_columns else NULL
 
     alpha_data = estimate_richness(psdata, measures = c("Observed", "Chao1", "Shannon", "Simpson"))
-    alpha_data = alpha_data %>% rownames_to_column(var = "SampleID")
+    alpha_data = alpha_data %>% rownames_to_column(var = "sampleid")
     metadata = sample_data(psdata) %>% data.frame() %>% as_tibble()
-    alpha_data_full = inner_join(metadata, alpha_data, by = "SampleID")
+    alpha_data_full = inner_join(metadata, alpha_data, by = "sampleid")
 
     if (!is.null(date_factor) && date_factor %in% present_factors) {
       alpha_data_full <- alpha_data_full %>%
@@ -210,16 +210,16 @@ alpha_diversity = function(physeq = physeq,
     na_types = unique(alpha_data_full$na_type)
 
     if (length(na_types) == 1) {
-      chao1_plot = base_alpha_plot(alpha_data_full, "SampleID", "Chao1", x_label = "Sample", y_label = "Chao1 Index") +
+      chao1_plot = base_alpha_plot(alpha_data_full, "sampleid", "Chao1", x_label = "Sample", y_label = "Chao1 Index") +
         facet_add(present_factors)
 
-      shannon_plot = base_alpha_plot(alpha_data_full, "SampleID", "Shannon", x_label = "Sample", y_label = "Shannon Index") +
+      shannon_plot = base_alpha_plot(alpha_data_full, "sampleid", "Shannon", x_label = "Sample", y_label = "Shannon Index") +
         facet_add(present_factors)
 
       combined_plot = plot_grid(chao1_plot + theme(legend.position = "none"), shannon_plot + theme(legend.position = "none"),
                                 align = "hv", labels = c("A", "B"), nrow = 1)
 
-      n_samples <- length(unique(alpha_data_full$SampleID))
+      n_samples <- length(unique(alpha_data_full$sampleid))
       fig.width <- max(14, n_samples * 0.6)
 
       figure_file_path = paste0(asv_folder_png, project_name, "_alpha_diversity_asv_level.png")
@@ -234,21 +234,21 @@ alpha_diversity = function(physeq = physeq,
       alpha_data_full_dna = alpha_data_full %>% filter(na_type == "dna")
 
       chao1_plot_dna =
-        base_alpha_plot(alpha_data_full_dna, "SampleID", "Chao1", x_label = "Sample", y_label = "Chao1 Index") +
+        base_alpha_plot(alpha_data_full_dna, "sampleid", "Chao1", x_label = "Sample", y_label = "Chao1 Index") +
         facet_add(present_factors)
 
       shannon_plot_dna =
-        base_alpha_plot(alpha_data_full_dna, "SampleID", "Shannon", x_label = "Sample", y_label = "Shannon Index") +
+        base_alpha_plot(alpha_data_full_dna, "sampleid", "Shannon", x_label = "Sample", y_label = "Shannon Index") +
         facet_add(present_factors)
 
       alpha_data_full_rna = alpha_data_full %>% filter(na_type == "rna")
 
       chao1_plot_rna =
-        base_alpha_plot(alpha_data_full_rna, "SampleID", "Chao1", x_label = "Sample", y_label = "Chao1 Index") +
+        base_alpha_plot(alpha_data_full_rna, "sampleid", "Chao1", x_label = "Sample", y_label = "Chao1 Index") +
         facet_add(present_factors)
 
       shannon_plot_rna =
-        base_alpha_plot(alpha_data_full_rna, "SampleID", "Shannon", x_label = "Sample", y_label = "Shannon Index") +
+        base_alpha_plot(alpha_data_full_rna, "sampleid", "Shannon", x_label = "Sample", y_label = "Shannon Index") +
         facet_add(present_factors)
 
       separator_line = ggdraw() +
@@ -269,10 +269,10 @@ alpha_diversity = function(physeq = physeq,
         plot_grid(rna_label, separator_line, combined_plot_rna, ncol = 1, rel_heights = c(0.1, 0.05, 1)),
         ncol = 1)
 
-      n_samples_dna <- length(unique(alpha_data_full_dna$SampleID))
+      n_samples_dna <- length(unique(alpha_data_full_dna$sampleid))
       fig.width_dna <- max(14, n_samples_dna * 0.6)
 
-      n_samples_rna <- length(unique(alpha_data_full_rna$SampleID))
+      n_samples_rna <- length(unique(alpha_data_full_rna$sampleid))
       fig.width_rna <- max(14, n_samples_rna * 0.6)
 
       figure_file_path = paste0(asv_folder_png, project_name, "_alpha_diversity_dna_asv_level.png")
@@ -320,9 +320,9 @@ alpha_diversity = function(physeq = physeq,
       present_factors = if (length(factor_columns) > 0) factor_columns else NULL
 
       alpha_data = estimate_richness(psdata, measures = c("Observed", "Chao1", "Shannon", "Simpson"))
-      alpha_data = alpha_data %>% rownames_to_column(var = "SampleID")
+      alpha_data = alpha_data %>% rownames_to_column(var = "sampleid")
       metadata = sample_data(psdata) %>% data.frame() %>% as_tibble()
-      alpha_data_full = inner_join(metadata, alpha_data, by = "SampleID")
+      alpha_data_full = inner_join(metadata, alpha_data, by = "sampleid")
 
       if (!is.null(date_factor) && date_factor %in% present_factors) {
         alpha_data_full <- alpha_data_full %>%
@@ -363,16 +363,16 @@ alpha_diversity = function(physeq = physeq,
       na_types = unique(alpha_data_full$na_type)
 
       if (length(na_types) == 1) {
-        chao1_plot = base_alpha_plot(alpha_data_full, "SampleID", "Chao1", x_label = "Sample", y_label = "Chao1 Index") +
+        chao1_plot = base_alpha_plot(alpha_data_full, "sampleid", "Chao1", x_label = "Sample", y_label = "Chao1 Index") +
           facet_add(present_factors)
 
-        shannon_plot = base_alpha_plot(alpha_data_full, "SampleID", "Shannon", x_label = "Sample", y_label = "Shannon Index") +
+        shannon_plot = base_alpha_plot(alpha_data_full, "sampleid", "Shannon", x_label = "Sample", y_label = "Shannon Index") +
           facet_add(present_factors)
 
         combined_plot = plot_grid(chao1_plot + theme(legend.position = "none"), shannon_plot + theme(legend.position = "none"),
                                   align = "hv", labels = c("A", "B"), nrow = 1)
 
-        n_samples <- length(unique(alpha_data_full$SampleID))
+        n_samples <- length(unique(alpha_data_full$sampleid))
         fig.width <- max(14, n_samples * 0.6)
 
         figure_file_path = paste0(tax_folder_png, project_name, "_alpha_diversity_", tax, "_level.png")
@@ -387,21 +387,21 @@ alpha_diversity = function(physeq = physeq,
         alpha_data_full_dna = alpha_data_full %>% filter(na_type == "dna")
 
         chao1_plot_dna =
-          base_alpha_plot(alpha_data_full_dna, "SampleID", "Chao1", x_label = "Sample", y_label = "Chao1 Index") +
+          base_alpha_plot(alpha_data_full_dna, "sampleid", "Chao1", x_label = "Sample", y_label = "Chao1 Index") +
           facet_add(present_factors)
 
         shannon_plot_dna =
-          base_alpha_plot(alpha_data_full_dna, "SampleID", "Shannon", x_label = "Sample", y_label = "Shannon Index") +
+          base_alpha_plot(alpha_data_full_dna, "sampleid", "Shannon", x_label = "Sample", y_label = "Shannon Index") +
           facet_add(present_factors)
 
         alpha_data_full_rna = alpha_data_full %>% filter(na_type == "rna")
 
         chao1_plot_rna =
-          base_alpha_plot(alpha_data_full_rna, "SampleID", "Chao1", x_label = "Sample", y_label = "Chao1 Index") +
+          base_alpha_plot(alpha_data_full_rna, "sampleid", "Chao1", x_label = "Sample", y_label = "Chao1 Index") +
           facet_add(present_factors)
 
         shannon_plot_rna =
-          base_alpha_plot(alpha_data_full_rna, "SampleID", "Shannon", x_label = "Sample", y_label = "Shannon Index") +
+          base_alpha_plot(alpha_data_full_rna, "sampleid", "Shannon", x_label = "Sample", y_label = "Shannon Index") +
           facet_add(present_factors)
 
         separator_line = ggdraw() +
@@ -422,10 +422,10 @@ alpha_diversity = function(physeq = physeq,
           plot_grid(rna_label, separator_line, combined_plot_rna, ncol = 1, rel_heights = c(0.1, 0.05, 1)),
           ncol = 1)
 
-        n_samples_dna <- length(unique(alpha_data_full_dna$SampleID))
+        n_samples_dna <- length(unique(alpha_data_full_dna$sampleid))
         fig.width_dna <- max(14, n_samples_dna * 0.6)
 
-        n_samples_rna <- length(unique(alpha_data_full_rna$SampleID))
+        n_samples_rna <- length(unique(alpha_data_full_rna$sampleid))
         fig.width_rna <- max(14, n_samples_rna * 0.6)
 
         figure_file_path = paste0(tax_folder_png, project_name, "_alpha_diversity_dna_", tax, "_level.png")
