@@ -119,7 +119,7 @@ tax_clean = function(physeq = physeq,
         )
         first_non_numeric
       },
-      TRUE ~ Genus)) %>%
+      TRUE ~ Genus))
 
   matrix <- as.matrix(tax.clean3)
   rownames(matrix) <- taxa_names(psdata)
