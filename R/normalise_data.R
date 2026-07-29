@@ -361,7 +361,7 @@ normalise_data = function(physeq = without_mock_physeq,
   #               destfile = zip_file_path, mode = "wb")
 
   # Path to database folder and zip file
-  database_folder <- "/export/microlab/users/STEU/automation_analysis/Database"
+  database_folder <- database_folder
   zip_file_path <- file.path(database_folder, "rrnDB-5.9_pantaxa_stats_NCBI.tsv.zip")
 
   # Check if the file exists
