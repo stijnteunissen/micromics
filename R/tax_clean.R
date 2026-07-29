@@ -87,23 +87,39 @@ tax_clean = function(physeq = physeq,
     mutate(Kingdom = if_else(Kingdom == "d__Bacteria", "Bacteria", Kingdom),
            Kingdom = if_else(Kingdom == "d__Archaea", "Archaea", Kingdom))
 
+  # tax.clean3 =
+  #   tax.clean2 %>%
+  #   rowwise() %>%
+  #   mutate(Genus = case_when(
+  #     grepl("\\d", Genus) ~ {
+  #       first_non_numeric <- case_when(
+  #         !grepl("\\d", Family) ~ paste0("Genus of ", Family, " (", Genus, ")"),
+  #         !grepl("\\d", Order) ~ paste0("Genus of ", Order, " (", Genus, ")"),
+  #         !grepl("\\d", Class) ~ paste0("Genus of ", Class, " (", Genus, ")"),
+  #         !grepl("\\d", Phylum) ~ paste0("Genus of ", Phylum, " (", Genus, ")"),
+  #         !grepl("\\d", Kingdom) ~ paste0("Genus of ", Kingdom, " (", Genus, ")"),
+  #         TRUE ~ NA_character_
+  #       )
+  #       first_non_numeric
+  #     },
+  #     TRUE ~ Genus)) %>%
+  #   ungroup()
+
   tax.clean3 =
     tax.clean2 %>%
     rowwise() %>%
     mutate(Genus = case_when(
-      grepl("\\d", Genus) ~ {
+      grepl("^\\d+$|^[A-Z\\d_-]+$", Genus) & !str_detect(Genus, "[A-Za-z]{4,}") ~ {
         first_non_numeric <- case_when(
           !grepl("\\d", Family) ~ paste0("Genus of ", Family, " (", Genus, ")"),
-          !grepl("\\d", Order) ~ paste0("Genus of ", Order, " (", Genus, ")"),
-          !grepl("\\d", Class) ~ paste0("Genus of ", Class, " (", Genus, ")"),
+          !grepl("\\d", Order)  ~ paste0("Genus of ", Order, " (", Genus, ")"),
+          !grepl("\\d", Class)  ~ paste0("Genus of ", Class, " (", Genus, ")"),
           !grepl("\\d", Phylum) ~ paste0("Genus of ", Phylum, " (", Genus, ")"),
-          !grepl("\\d", Kingdom) ~ paste0("Genus of ", Kingdom, " (", Genus, ")"),
-          TRUE ~ NA_character_
+          TRUE ~ paste0("Genus (", Genus, ")")
         )
         first_non_numeric
       },
       TRUE ~ Genus)) %>%
-    ungroup()
 
   matrix <- as.matrix(tax.clean3)
   rownames(matrix) <- taxa_names(psdata)
