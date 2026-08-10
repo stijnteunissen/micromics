@@ -29,7 +29,7 @@ for details.
 
 ## Citing micromics
 
-Teunissen, S., van Veelen, H. P. J., Silvius, J. (2025). *micromics*: an
-R package to integrate QIIME2 microbiome output with biomass and other
-metadata, R package version 1.0.0, GitHub.
-<https://github.com/stijnteunissen/micromics>.
+Teunissen, S., Silvius, J., van Veelen, H. P. J. (2025). micromics: an R
+package to integrate QIIME2 output and biomass quantitation for
+pseudo-quantitative microbiome analysis, R package version 1.0.0,
+GitHub. <https://github.com/stijnteunissen/micromics>.
