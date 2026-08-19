@@ -1,12 +1,32 @@
 Package: micromics
-Title: An R Package to Integrate QIIME2 Microbiome Output with Biomass and Other Metadata
+Title: An R package to integrate QIIME2 output and biomass quantitation for pseudo-quantitative microbiome analysis
 Version: 1.0.0
 Date: 2025
 Authors@R: person("Stijn", "Teunissen", email = "Stijn.Teunissen@wetsus.nl", role = c("aut", "cre"))
-Description: Provides functions to integrate microbiome data from QIIME2 with measured biomass and metadata, allowing for visualization, normalization, and filtering of taxonomic abundance tables.
+Description: micromics: an R package to integrate QIIME2 output and biomass quantitation for pseudo-quantitative microbiome analysis
 License: MIT + file LICENSE.md
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 URL: https://github.com/stijnteunissen/micromics
 BugReports: https://github.com/stijnteunissen/micromics/issues
+Imports: 
+    ape,
+    colorspace,
+    cowplot,
+    decontam,
+    ggh4x,
+    ggtext,
+    glue,
+    microbiome,
+    patchwork,
+    phyloseq,
+    qiime2R,
+    RColorBrewer,
+    scales,
+    tidyverse,
+    vegan,
+    dplyr
+Remotes: 
+    jbisanz/qiime2R,
+    kasperskytte/ampvis2
