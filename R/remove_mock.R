@@ -44,58 +44,57 @@
 #' }
 #'
 #' @export
-remove_mock = function(physeq = decontam_physeq,
-                       mock_genera = mock_genera,
-                       mock = TRUE) {
+remove_mock = function(physeq, mock_genera, mock = TRUE, project_id, base_path, log_file) {
 
-  log_message(paste("Step 8: Removing mock: Mock samples en mock ASVs are removed fropm phyloseq object.", paste(projects, collapse = ", ")), log_file)
+  log_message("Removing mock-specific ASVs", status = "start", log_file)
 
-  psdata = physeq
-  project_name = projects
+  # Define storage directory path
+  raw_rds_folder <- file.path(base_path, "raw_rds")
 
-  project_folder = paste0(base_path, project_name)
-  output_folder_rds_files = paste0(project_folder, "/output_data/rds_files/Before_cleaning_rds_files/")
-
-  if (mock == FALSE) {
-    # Filter phyloseq to remove mock samples
-    physeq_no_mock =
-      psdata %>%
-      subset_samples(., sample_or_control == "sample") %>%
-      prune_taxa(taxa_sums(.) > 0, .)
-
-    physeq_filtered = physeq_no_mock
-    message = paste0("message: mock parameter is FALSE. mock ASVs not filtered")
-    log_message(message, log_file)
-  } else if (mock == TRUE) {
-
-    # if (!is.null(extra_genera)) {
-    #   mock_genera = c(mock_genera, extra_genera)
-    # } else
-    #   mock_genera = mock_genera
-
-    physeq_mock =
-      psdata %>%
-      subset_samples(sample_or_control == "mock") %>%
-      prune_taxa(taxa_sums(.) > 0, .)
-
-    # extract mock ASV mock_genera
-    mock_ASVs =
-      physeq_mock %>%
-      subset_taxa(Genus %in% mock_genera) %>%
-      taxa_names()
-
-    # Filter phyloseq to remove mock samples
-    physeq_filtered =
-      psdata %>%
-      subset_samples(sample_or_control == "sample") %>%
-      prune_taxa(!taxa_names(.) %in% mock_ASVs, .)
+  # Validate presence of required sample data
+  if (!("sample_or_control" %in% colnames(phyloseq::sample_data(physeq)))) {
+    error_message <- paste0("Error: 'sample_or_control' column is missing from the sample data.")
+    log_message(error_message, status = "error", log_file)
+    stop(error_message, call. = FALSE)
   }
 
-  output_file_path = paste0(output_folder_rds_files, project_name, "_phyloseq_asv_level_without_mock.rds")
-  saveRDS(physeq_filtered, file = output_file_path)
-  log_message(paste("Phyloseq object without mock saved as .rds object in", output_file_path), log_file)
+  # Conditional proceessing based on mock presence
+  if (mock == FALSE) {
+    log_message("The 'mock' parameter is set to FALSE. Retaining true samples only, mock ASVs will not be filtered.", status = "info", log_file)
+
+    # Filter dataset to isolate true biological samples and drop zero abundance ASVs
+    physeq_filtered <- physeq %>%
+      phyloseq::subset_samples(sample_or_control == "sample") %>%
+      phyloseq::prune_taxa(taxa_sums(.) > 0, .)
+
+  } else {
+    log_message("Isolating mock community control profiles to identify cross-contaminating mock ASVs.", status = "info", log_file)
+
+    # Isolate mock reference profiles and drop zero abundace ASVs
+    physeq_mock <- physeq %>%
+      phyloseq::subset_samples(sample_or_control == "mock") %>%
+      phyloseq::prune_taxa(taxa_sums(.) > 0, .)
+
+    # Extract specific ASVs belonging to the mock genera
+    mock_ASVs <- physeq_mock %>%
+      phyloseq::subset_taxa(Genus %in% mock_genera) %>%
+      phyloseq::taxa_names()
+
+    log_message(glue::glue("Identified {length(mock_asvs)} unique ASVs matching the specified mock community genera."), status = "info", log_file)
+
+    # Prune mock control samples and completely strip out their corresponding ASVs from samples
+    physeq_filtered <- physeq %>%
+      phyloseq::subset_samples(sample_or_control == "sample") %>%
+      phyloseq::prune_taxa(!taxa_names(.) %in% mock_ASVs, .)
+  }
+
+  # Save results
+  output_rds_path <- file.path(raw_rds_folder, glue::glue("{project_id}_phyloseq_asv_without_mock.rds"))
+  saveRDS(physeq_filtered, file = output_rds_path)
+
+  # Log
+  log_message(glue::glue("Filtered phyloseq object stored successfully at: {output_rds_path}"), status = "info", log_file)
+  log_message("Mock sample and mock-specific ASV removal complete.", status = "success", log_file)
 
   return(physeq_filtered)
-
-  log_message("Mock ASVs successfully removed.", log_file)
 }

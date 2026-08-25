@@ -40,167 +40,153 @@
 #' }
 #'
 #' @export
-decontam =  function(physeq = resolved_tree_physeq,
-                     decon_method = c("frequency", "prevalence", "both"),
-                     blank = TRUE) {
+decontam =  function(physeq, decon_method = c("frequency", "prevalence", "both"), blank = TRUE, project_id, base_path, log_file) {
 
-  log_message(paste("Step 7: Decontam: Removing contamination.", paste(projects, collapse = ", ")), log_file)
+  log_message("Starting microbiome decontamination.", status = "start", log_file)
 
-  psdata = physeq
-  project_name = projects
+  # Match argument input choices
+  decon_method <- match.arg(decon_method)
 
-  project_folder = paste0(base_path, project_name)
-  figure_folder_pdf = paste0(project_folder, "/figures/PDF_figures/")
-  if(!dir.exists(figure_folder_pdf)) { dir.create(figure_folder_pdf) }
-  figure_folder_png = paste0(project_folder, "/figures/PNG_figures/")
-  if(!dir.exists(figure_folder_png)) { dir.create(figure_folder_png) }
-  output_folder_csv_files = paste0(project_folder, "/output_data/csv_files/")
-  output_folder_rds_files = paste0(project_folder, "/output_data/rds_files/Before_cleaning_rds_files/")
+  # Define coutput directory paths
+  figure_folder <- file.path(base_path, "figures")
+  raw_rds_folder <- file.path(base_path, "raw_rds")
 
-  contam_taxa_freq = character(0)
-  contam_taxa_prev = character(0)
+  # Initialize empty containers for tracking contaminant
+  contam_taxa_freq <- character(0)
+  contam_taxa_prev <- character(0)
 
-  if (!("sample_or_control" %in% colnames(sample_data(psdata)))) {
-    error_message = paste0("error: 'sample_or_control' column is missing from the sample data.")
-    log_message(error_message, log_file)
-    stop(error_message)
+  # Validate presence of required sample data
+  if (!("sample_or_control" %in% colnames(phyloseq::sample_data(physeq)))) {
+    error_message <- paste0("Error: 'sample_or_control' column is missing from the sample data.")
+    log_message(error_message, status = "error", log_file)
+    stop(error_message, call. = FALSE)
   }
 
-  # error if decon_method is "both" but blank is FALSE or missing
-  if (decon_method == "both" && (!blank || !"blank" %in% sample_data(psdata)$sample_or_control)) {
-    error_message = paste0("error: 'decon_method' set to 'both' but 'blank' samples are either not present or blank parameter is FALSE.")
-    log_message(error_message, log_file)
-    stop(error_message)
+  # Stop if combination (both) filtering is requested but blank is missing
+  if (decon_method == "both" && (!blank || !"blank" %in% phyloseq::sample_data(physeq)$sample_or_control)) {
+    error_message <- paste0("Error: 'decon_method' set to 'both' but 'blank' sample is either not present or blank parameter is FALSE.")
+    log_message(error_message, status = "error", log_file)
+    stop(error_message, call. = FALSE)
   }
 
-  # # error if blank is missing
-  # if (!"blank" %in% sample_data(psdata)$sample_or_control) {
-  #   error_message = paste0("error: blank sample is not present.")
-  #   log_message(error_message, log_file)
-  #   stop(error_message)
-  # }
-
-  # adjust decon_method based on blank parameter
+  # Adjust 'decon_method' based on blank parameter
   if (blank == FALSE) {
-    decon_method = "frequency"
-    message = paste0("message: 'blank' parameter is FALSE using method 'frequency'.")
-    log_message(message, log_file)
+    decon_method <- "frequency"
+    log_message("The 'blank' parameter is FALSE. Forcing decontamination method to 'frequency'.", status = "warning", log_file)
   }
 
-  # Decontaminate with frequency method
-  if (decon_method == "frequency" || decon_method == "both") {
-    contamdf.freq <- isContaminant(psdata, method = "frequency", conc = "DNA_Concentration")
-    print(paste(project_name, "- Method frequency:"))
-    if (any(contamdf.freq$contaminant)) {
-      print(table(contamdf.freq$contaminant))
-      contam_taxa_freq = rownames(contamdf.freq)[contamdf.freq$contaminant == TRUE]
+  # Execute Frequency based decontamination -------------------------------
+  if (decon_method %in% c("frequency", "both")) {
+    contam_df_freq <- decontam::isContaminant(physeq, method = "frequency", conc = "DNA_Concentration")
+
+    if (any(contam_df_freq$contaminant)) {
+      found_count <- sum(contam_df_freq$contaminant)
+      log_message(glue::glue("Frequency method identified {found_count} contaminant ASVs."), status = "info", log_file)
+      contam_taxa_freq <- rownames(contam_df_freq)[contam_df_freq$contaminant == TRUE]
     } else {
-      message = paste0("No contaminants found using frequency method.")
-      log_message(message, log_file)
+      log_message("No contaminants detected via DNA concentration frequency patterns.", status = "info", log_file)
     }
   }
 
-  # Decontaminate with prevalence method
-  if (decon_method == "prevalence" || decon_method == "both") {
-    sample_data(psdata)$is.neg = sample_data(psdata)$sample_or_control == "blank"
-    contamdf.prev = isContaminant(psdata, method = "prevalence", neg = "is.neg", threshold = 0.5)
-    print(paste(project_name, "- Method prevalence:"))
-    if (any(contamdf.prev$contaminant)) {
-      print(table(contamdf.prev$contaminant))
-      contam_taxa_prev = rownames(contamdf.prev)[contamdf.prev$contaminant == TRUE]
+  # Execute Prevalence based decontamination ------------------------------
+  if (decon_method %in% c("prevalence", "both")) {
+    phyloseq::sample_data(physeq)$is_neg <- phyloseq::sample_data(physeq)$sample_or_control == "blank"
+    contam_df_prev <- decontam::isContaminant(physeq, method = "prevalence", neg = "is_neg", threshold = 0.5)
+
+    if (any(contam_df_prev$contaminant)) {
+      found_count <- sum(contam_df_prev$contaminant)
+      log_message(glue::glue("Prevalance method identified {found_count} contaminant ASVs."), status = "info", log_file)
+      contam_taxa_prev <- rownames(contam_df_prev)[contam_df_prev$contaminant == TRUE]
     } else {
-      message = paste0("No contaminants found using prevalence method.")
-      log_message(message, log_file)
+      log_message("No contaminants detected via negative control prevalence checks.", status = "info", log_file)
     }
   }
 
-  # Combine both methods
+  # Combine filtering arrays ----------------------------------------------
   if (decon_method == "both") {
-    all_OTUs = union(rownames(contamdf.freq), rownames(contamdf.prev))
-    contamdf.both = tibble(
+    all_OTUs = union(rownames(contam_df_freq), rownames(contam_df_prev))
+
+    contam_df_both <- tibble::tibble(
       OTU = all_OTUs,
-      frequency_contaminant = contamdf.freq$contaminant[match(all_OTUs, rownames(contamdf.freq))],
-      prevalence_contaminant = contamdf.prev$contaminant[match(all_OTUs, rownames(contamdf.prev))])
-    contamdf.both = contamdf.both %>%
-      mutate(both_contaminant = frequency_contaminant | prevalence_contaminant)
-    contamdf.both_unique = contamdf.both %>%
-      distinct(OTU, .keep_all = TRUE) %>%
-      mutate(contaminant = both_contaminant)
-    contam_taxa = unique(c(contam_taxa_freq, contam_taxa_prev))
+      frequency_contaminant = contam_df_freq$contaminant[match(all_OTUs, rownames(contam_df_freq))],
+      prevalence_contaminant = contam_df_prev$contaminant[match(all_OTUs, rownames(contam_df_prev))]
+    ) %>%
+      dplyr::mutate(both_contaminant = frequency_contaminant | prevalence_contaminant)
+
+    contam_df_both_unique <- contam_df_both %>%
+      dplyr::distinct(OTU, .keep_all = TRUE) %>%
+      dplyr::mutate(contaminant = both_contaminant)
+
+    contam_taxa <- unique(c(contam_taxa_freq, contam_taxa_prev))
+
   } else if (decon_method == "frequency") {
-    contam_taxa = contam_taxa_freq
+    contam_taxa <- contam_taxa_freq
   } else if (decon_method == "prevalence") {
-    contam_taxa = contam_taxa_prev
+    contam_taxa <- contam_taxa_prev
   }
 
-  physeq_no_contam = prune_taxa(!taxa_names(psdata) %in% contam_taxa, psdata)
+  # Prune identified contaminants out of the dataset
+  physeq_no_contam <- phyloseq::prune_taxa(!phyloseq::taxa_names(physeq) %in% contam_taxa, physeq)
 
-  output_file_path = paste0(output_folder_rds_files, project_name, "_phyloseq_asv_level_decontam.rds")
-  saveRDS(physeq_no_contam, file = output_file_path)
-  log_message(paste("Decontam phyloseq object saved as .rds object in", output_file_path), log_file)
+  # Save results
+  output_rds_path <- file.path(raw_rds_folder, glue::glue("{project_id}_phyloseq_asv_decontam.rds"))
+  saveRDS(physeq_no_contam, file = output_rds_path)
+  log_message(glue::glue("Decontaminated object successfully stored at: {output_rds_path}"), status = "info", log_file)
 
-  df = as.data.frame(sample_data(psdata))
-  df$read_count = sample_sums(psdata)
-  df = df[order(df$read_count),]
-  df$Index = seq(nrow(df))
+  # Generate quality control plot -----------------------------------------
+  metadata <- as.data.frame(as(phyloseq::sample_data(physeq), "data.frame"))
+  library_df <- metadata %>%
+    dplyr::mutate(
+      read_count = phyloseq::sample_sums(physeq),
+      index = dplyr::row_number(read_count)
+    )
 
-  p1 = ggplot(df, aes(x = Index, y = read_count, color = sample_or_control)) +
+  plot_library_size <- ggplot2::ggplot(library_df, aes(x = index, y = read_count, color = sample_or_control)) +
     geom_point() +
-    xlab("Sample Index") +
-    ylab("Read Count") +
-    ggtitle(paste("Read Count Plot for", project_name))
+    labs(
+      x = "Sample Index",
+      y = "Read Count",
+      title = "Read Count Plot"
+    ) +
+    theme_minimal()
 
-  figure_file_path = paste0(figure_folder_png, project_name, "_decontam_library_size.png")
-  ggsave(filename = figure_file_path, plot = p1)
-  log_message(paste("Read Count plot saved as .png object in", figure_file_path), log_file)
+  ggplot2::ggsave(filename = file.path(figure_folder, glue::glue("{project_id}_decontam_library_size.png")), plot = plot_library_size, width = 8, height = 8)
+  ggplot2::ggsave(filename = file.path(figure_folder, glue::glue("{project_id}_decontam_library_size.pdf")), plot = plot_library_size, width = 8, height = 8)
 
-  figure_file_path = paste0(figure_folder_pdf, project_name, "_decontam_library_size.pdf")
-  ggsave(filename = figure_file_path, plot = p1)
-  log_message(paste("Read Count plot saved as .pdf object in", figure_file_path), log_file)
-
+  # Generate Prevalence Plots if blanks are present
   if (blank == TRUE) {
+    presence_absence = phyloseq::transform_sample_counts(physeq, function(Abundance) 1 * (Abundance > 0))
+    presence_absence_neg = phyloseq::prune_samples(phyloseq::sample_data(presence_absence)$sample_or_control == "blank", presence_absence)
+    presence_absence_pos = phyloseq::prune_samples(phyloseq::sample_data(presence_absence)$sample_or_control != "blank", presence_absence)
 
-    presence_absence = transform_sample_counts(psdata, function(Abundance) 1 * (Abundance > 0))
-    presence_absence_neg = prune_samples(sample_data(presence_absence)$sample_or_control == "blank", presence_absence)
-    presence_absence_pos = prune_samples(sample_data(presence_absence)$sample_or_control != "blank", presence_absence)
+    # Establish plotting target veactors dynamically
+    contaminant_logical <- switch(decon_method,
+                                  "frequency" = contam_df_freq$contaminant,
+                                  "prevalence" = contam_df_prev$contaminant,
+                                  "both" = contam_df_both_unique$contaminant)
 
-    if (decon_method == "frequency") {
-      presence_absence_df = data.frame(
-        presence_absence_pos = taxa_sums(presence_absence_pos),
-        presence_absence_neg = taxa_sums(presence_absence_neg),
-        contaminant = contamdf.freq$contaminant
-      )
-    } else if (decon_method == "prevalence") {
-      presence_absence_df = data.frame(
-        presence_absence_pos = taxa_sums(presence_absence_pos),
-        presence_absence_neg = taxa_sums(presence_absence_neg),
-        contaminant = contamdf.prev$contaminant
-      )
-    } else if (decon_method == "both") {
-      presence_absence_df = data.frame(
-        presence_absence_pos = taxa_sums(presence_absence_pos),
-        presence_absence_neg = taxa_sums(presence_absence_neg),
-        contaminant = contamdf.both_unique$contaminant
-      )
-    }
+    presence_absence_df <- data.frame(
+      presence_absence_pos = phyloseq::taxa_sums(presence_absence_pos),
+      presence_absence_neg = phyloseq::taxa_sums(presence_absence_neg),
+      contaminant = contaminant_logical
+    )
 
-    p2 = ggplot(presence_absence_df, aes(x = presence_absence_neg, y = presence_absence_pos, color = contaminant)) +
+    plot_prevalence = ggplot2::ggplot(presence_absence_df, aes(x = presence_absence_neg, y = presence_absence_pos, color = contaminant)) +
       geom_point() +
-      xlab("Prevalence (Negative Controls)") +
-      ylab("Prevalence (True Samples)") +
-      ggtitle(paste(decon_method, "Plot for", project_name))
+      labs(
+        x = "Prevalence (Negative Controls)",
+        y = "Prevalence (True Samples)",
+        title = glue::glue("{stringr::str_to_title(decon_method)} Isolation Plot: {project_id}")
+      ) +
+      theme_minimal()
 
-    figure_file_path = paste0(figure_folder_png, project_name, "_decontam_method_", decon_method, ".png")
-    ggsave(filename = figure_file_path, plot = p2)
-    log_message(paste("Plot saved as .png object in", figure_file_path), log_file)
+    # Save decontam method plot
+    ggplot2::ggsave(filename = file.path(figure_folder, glue::glue("{project_id}_decontam_method_{decon_method}.png")), plot = plot_prevalence, width = 8, height = 8)
+    ggplot2::ggsave(filename = file.path(figure_folder, glue::glue("{project_id}_decontam_method_{decon_method}.pdf")), plot = plot_prevalence, width = 8, height = 8)
 
-    figure_file_path = paste0(figure_folder_pdf, project_name, "_decontam_method_", decon_method, ".pdf")
-    ggsave(filename = figure_file_path, plot = p2)
-    log_message(paste("Plot saved as .pdf object in", figure_file_path), log_file)
-
+    log_message("Decontamination diagnostic visualizations generated and exported.", status = "info", log_file)
   }
 
+  log_message("Microbiome decontamination protocol completed successfully.", status = "success", log_file)
   return(physeq_no_contam)
-
-  log_message("Decontam successfully executed.", log_file)
 }

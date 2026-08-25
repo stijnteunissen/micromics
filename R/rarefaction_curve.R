@@ -1,89 +1,97 @@
-amp_rarecurve <- function(data, step = 100, ylim = NULL, xlim = NULL, label = FALSE, color = NULL, legend = TRUE, color.vector = NULL, legend.position = "topleft") {
-  abund = otu_table(data)
-  abund = as.data.frame(abund)
-
-  pdf(NULL)
-  capture.output({rc <- vegan::rarecurve(t(abund), step = 100, label = FALSE)})
-  dev.off()
-  max_depth <- max(sapply(rc, function(x) max(attr(x, "Subsample"))))
-
-  if (!is.null(color)) {
-    gg_color_hue <- function(n) {
-      hues = seq(15, 375, length = n + 1)
-      hcl(h = hues, l = 65, c = 100)[1:n]
-    }
-    group_vector <- sample_data(data)[, color]@.Data %>% as.data.frame()
-    names(group_vector) <- "color_variable"
-    group_vector <- as.character(group_vector$color_variable)
-    groups <- unique(group_vector)
-    n = length(groups)
-    cols = gg_color_hue(n)
-    if (!is.null(color.vector)) {
-      cols <- color.vector
-    }
-    col_vector <- rep("black", length(group_vector))
-    for (i in seq_along(group_vector)) {
-      col_vector[i] <- cols[match(group_vector[i], groups)]
-    }
-  } else {
-    col_vector = "black"
-  }
-  if (is.null(ylim) & is.null(xlim)) {
-    vegan::rarecurve(t(abund), step = step, label = label, col = col_vector, xlab = "Sequencing depth", ylab = "Total ASV")
-  }
-  if (!is.null(ylim) & !is.null(xlim)) {
-    vegan::rarecurve(t(abund), step = step, ylim = ylim, xlim = c(0, max_depth), label = label, col = col_vector, xlab = "Sequencing depth", ylab = "Total ASV")
-  }
-  if (!is.null(ylim) & is.null(xlim)) {
-    vegan::rarecurve(t(abund), step = step, ylim = ylim, label = label, col = col_vector, xlab = "Sequencing depth", ylab = "Total ASV")
-  }
-  if (is.null(ylim) & !is.null(xlim)) {
-    vegan::rarecurve(t(abund), step = step, xlim = c(0, max_depth), label = label, col = col_vector, xlab = "Sequencing depth", ylab = "Total ASV")
-  }
-  if (!is.null(color) & legend) {
-    legend(legend.position, legend = groups, fill = cols, bty = "n")
-  }
-}
-#' @title Generate and Save Rarefaction Curve
-#' @description This function creates a rarefaction curve for a given phyloseq object and
-#'              saves the plot as a PDF.
+#' Generate and Save Rarefaction Curve
 #'
-#' @inheritParams tax_clean
+#' Generates a sequencing depth rarefaction curve from a phyloseq object
+#' and exports the resulting plot as a PDF.
 #'
-#' @param color A character string specifying the column in the sample metadata to use for
-#'              coloring the samples. Default is `NULL`, which automatically sets the color
-#'              to `"sample_or_control"`.
+#' @param physeq A phyloseq object to be analyzed.
+#' @param color Character string specifying the metadata column used for coloring lines.
+#'   Defaults to \code{"sample_or_control"}.
+#' @param base_path Character string specifying the root project directory.
+#' @param project_id Character string specifying the unique project name.
+#' @param log_file Character string specifying the path to the log file.
 #'
-#' @return The rarefaction curve plot object.
-#' @details This function first checks whether the `sample_or_control` column exists in the
-#'          sample metadata. It then generates a rarefaction curve using the `amp_rarecurve`
-#'          function and saves the plot as a PDF file in the specified directory.
-#' @examples
-#' rarefaction_curve(physeq = physeq)
-#'
+#' @return None. This function is called for its side effects (saving a PDF file).
 #' @export
-rarefaction_curve <- function(physeq = resolved_tree_physeq, color = NULL) {
+rarefaction_curve <- function(physeq, color = "sample_or_control", project_id, base_path, log_file) {
 
-  log_message(paste("Step 6: Creating rarefaction curve: creating rarefaction curve before cleaning on ASV level.", paste(projects, collapse = ", ")), log_file)
+  log_message("Generating rarefaction curve plot on raw ASV levels.", status = "start", log_file)
 
-  if (!("sample_or_control" %in% colnames(sample_data(physeq)))) {
-    stop("error: 'sample_or_control' column is missing from the sample data.")
+  # Define storage directory path cleanly
+  figure_folder <- file.path(base_path, "figures")
+
+  # Validate mandatory core coloring column presence
+  if (!"sample_or_control" %in% colnames(phyloseq::sample_data(physeq))) {
+    error_message <- "Error: 'sample_or_control' column is missing from the sample metadata."
+    log_message(error_message, status = "error", log_file)
+    stop(error_message, call. = FALSE)
   }
 
-  if (is.null(color)) {
-    color = "sample_or_control"
-  } else {
-    message(paste("message: using", color, "for color in rarefaction plot."))
+  log_message(glue::glue("Using '{color}' column for line coloring in rarefaction plot."), status = "info", log_file)
+
+  # Internal helper function to plot the underlying vegan curve
+  plot_rarecurve <- function(data, step = 100, ylim_val = NULL, xlim_val = NULL, color_col = NULL) {
+    abund_table <- as.data.frame(phyloseq::otu_table(data))
+
+    if (!is.null(color_col)) {
+      # Extract metadata vector safely using S4 slot extraction conventions
+      metadata_df <- as.data.frame(phyloseq::sample_data(data))
+      group_vector <- as.character(metadata_df[[color_col]])
+      unique_groups <- unique(group_vector)
+
+      # Generate standardized color hues
+      hues <- seq(15, 375, length = length(unique_groups) + 1)
+      color_palette <- hcl(h = hues, l = 65, c = 100)[seq_along(unique_groups)]
+
+      # Map samples to their corresponding group color
+      sample_colors <- color_palette[match(group_vector, unique_groups)]
+    } else {
+      sample_colors <- "black"
+    }
+
+    # Setup flexible plot limits based on per-sample ASV maximum
+    if (is.null(xlim_val)) {
+      # Open a silent graphics device to calculate max depth per sample
+      pdf(NULL)
+      captured_curve <- vegan::rarecurve(t(abund_table), step = 100, label = FALSE)
+      dev.off()
+      xlim_val <- c(0, max(sapply(captured_curve, function(x) max(attr(x, "Subsample")))))
+    }
+
+    if (is.null(ylim_val)) {
+      # Dynamically scale y-axis to the maximum number of ASVs found within a single sample
+      pdf(NULL)
+      captured_curve <- vegan::rarecurve(t(abund_table), step = 100, label = FALSE)
+      dev.off()
+      ylim_val <- c(0, max(sapply(captured_curve, function(x) max(x))))
+    }
+
+    # Draw the standardized base graphic curve
+    vegan::rarecurve(
+      x = t(abund_table),
+      step = step,
+      xlim = xlim_val,
+      ylim = ylim_val,
+      label = FALSE,
+      col = sample_colors,
+      xlab = "Sequencing depth",
+      ylab = "Total ASV"
+    )
+
+    # Add legend if coloring variables are present
+    if (!is.null(color_col)) {
+      legend("bottomright", legend = unique_groups, fill = color_palette, bty = "n")
+    }
   }
 
-  project_name = projects
-  project_folder = paste0(base_path, project_name)
-  figure_folder_pdf = paste0(project_folder, "/figures/PDF_figures/")
-  if(!dir.exists(figure_folder_pdf)) { dir.create(figure_folder_pdf, recursive = TRUE) }
+  # Construct output destination file path
+  output_pdf_path <- file.path(figure_folder, glue::glue("{project_id}_rarefaction_curve.pdf"))
 
-  figure_path <- file.path(figure_folder_pdf, paste0(project_name, "_rarefaction_curve.pdf"))
-  cairo_pdf(file = figure_path, width = 7, height = 5)
-  amp_rarecurve(physeq, color = color, legend.position = "bottomright", xlim = c(0, max(sample_sums(physeq))))
-  dev.off()
-  log_message("Created successfully rarefaction curve.", log_file)
+  # Open graphics engine and write plot stream
+  grDevices::cairo_pdf(file = output_pdf_path, width = 7, height = 5)
+  plot_rarecurve(physeq, color_col = color, xlim_val = c(0, max(phyloseq::sample_sums(physeq))))
+  grDevices::dev.off()
+
+  # Log successful termination boundaries
+  log_message(glue::glue("Rarefaction curve PDF stored successfully at: {output_pdf_path}"), status = "info", log_file)
+  log_message("Rarefaction curve visualization complete.", status = "success", log_file)
 }

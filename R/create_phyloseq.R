@@ -37,30 +37,38 @@
 #' }
 #'
 #' @export
-creating_physeq_object = function(projects) {
+create_phyloseq = function(project_id, base_path, log_file) {
 
-  log_message(paste("Step 3: Creating phyloseq object (physeq): physeq is created using the table, rooted tree, classifier and metadata.", paste(projects, collapse = ", ")), log_file)
+  log_message("Creating raw phyloseq object from QIIME2 artifacts and metadata", status = "start", log_file)
 
-  project_name = projects
-  project_folder = paste0(base_path, project_name)
-  destination_folder = paste0(project_folder, "/input_data")
-  output_folder_rds_files = paste0(project_folder, "/output_data/rds_files/Before_cleaning_rds_files/")
+  # Define data and storage directories
+  input_folder = file.path(base_path, "input_data")
+  raw_rds_folder = file.path(base_path, "raw_rds")
 
-  # Search for the required files
-  table_file <- list.files(destination_folder, pattern = "table.*\\.qza$", full.names = TRUE, recursive = TRUE)
-  rooted_tree_file <- list.files(destination_folder, pattern = "rooted-tree.*\\.qza$", full.names = TRUE, recursive = TRUE)
-  taxonomy_file <- list.files(destination_folder, pattern = "classifier.*\\.qza", full.names = TRUE, recursive = TRUE)
-  metadata_file <- list.files(destination_folder, pattern = "metadata_final\\.tsv", full.names = TRUE)
+  # Search for the required artifat and metadata files
+  table_file <- list.files(input_folder, pattern = "table.*\\.qza$", full.names = TRUE, recursive = TRUE)
+  rooted_tree_file <- list.files(input_folder, pattern = "rooted-tree.*\\.qza$", full.names = TRUE, recursive = TRUE)
+  taxonomy_file <- list.files(input_folder, pattern = "classifier.*\\.qza", full.names = TRUE, recursive = TRUE)
+  metadata_file <- list.files(input_folder, pattern = "metadata.*\\.tsv", full.names = TRUE)
 
-  # Create the phyloseq object
+  # Validate that critical components exist before attempting import
+  if (length(table_file) == 0 || length(taxonomy_file) == 0 || length(metadata_file) == 0) {
+    error_message <- "Error: Missing table, taxonomy, or metadata in input_data."
+    log_message(error_message, status = "error", log_file)
+    stop(error_message, call. = FALSE)
+  }
+
+  # Build the phyloseq object based on tree availability
   if (length(rooted_tree_file) == 0) {
-    physeq <- qza_to_phyloseq(
+    log_message("No phylogenetic tree found. Building phyloseq without tree.", status = "info", log_file)
+    physeq <- qiime2R::qza_to_phyloseq(
       features = table_file,
       taxonomy = taxonomy_file,
       metadata = metadata_file
     )
   } else {
-    physeq <- qza_to_phyloseq(
+    log_message("Phylogenetic tree located. Building complete phyloseq object.", status = "info", log_file)
+    physeq <- qiime2R::qza_to_phyloseq(
       features = table_file,
       tree = rooted_tree_file,
       taxonomy = taxonomy_file,
@@ -68,16 +76,16 @@ creating_physeq_object = function(projects) {
     )
   }
 
-  # Add read counts to metadata
-  phyloseq::sample_data(physeq)$read_count = phyloseq::sample_sums(physeq)
+  # Add total read count per sample to the sample_data (metadata)
+  phyloseq::sample_data(physeq)$read_count <- phyloseq::sample_sums(physeq)
 
-  # save uncleaned psdata
-  output_file_path = paste0(output_folder_rds_files, project_name, "_phyloseq_uncleaned.rds")
+  # save the uncleaned phyloseq object as an RDS file
+  output_file_path = file.path(raw_rds_folder, glue::glue("{project_id}_phyloseq_uncleaned.rds"))
   saveRDS(physeq, file = output_file_path)
-  log_message(paste("Uncleaned phyloseq object saved as .rds object in", output_file_path), log_file)
+
+  # Log completion and return the object to the R session
+  log_message(glue::glue("Uncleaned phyloseq object stored successfully at: {output_file_path}"), status = "info", log_file)
+  log_message("Phyloseq object generation complete.", status = "success", log_file)
 
   return(physeq)
-
-  log_message("Phyloseq successfully created.", log_file)
-
 }

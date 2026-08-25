@@ -28,60 +28,56 @@
 #' }
 #'
 #' @export
-resolve_tree = function(physeq = cleaned_physeq) {
+resolve_tree = function(physeq, project_id, base_path, log_file) {
 
-  log_message(paste("Step 5: Resolving tree.", paste(projects, collapse = ", ")), log_file)
+  log_message("Starting phylogenetic tree validation and node resolution.", status = "start", log_file)
 
-  psdata = physeq
-  project_name = projects
+  # Define storage directory path
+  raw_rds_folder <- file.path(base_path, "raw_rds")
 
-  project_folder = paste0(base_path, projects)
-  output_folder_csv_files = paste0(project_folder, "/output_data/csv_files/")
-  output_folder_rds_files = paste0(project_folder, "/output_data/rds_files/Before_cleaning_rds_files/")
+  # Extract tree slot
+  current_tree <- phyloseq::phy_tree(physeq, errorIfNULL = FALSE)
 
-  if (!inherits(psdata, "phyloseq")) {
-    stop("Error: psdata is not a phyloseq object.")
-  }
-
-  current_tree <- phyloseq::phy_tree(psdata, errorIfNULL = FALSE)
-
+  # Skip tree resolution if slot is empty
   if (is.null(current_tree)) {
-    log_message("WARNING: No phylogenetic tree found in the phyloseq object. Skipping tree resolution.", log_file)
-    return(psdata)
+    log_message("No phylogenetic tree found in the phyloseq object. Skipping tree resolution.", status = "info", log_file)
+    return(physeq)
   } else {
     # Check if the tree is binary
-    if (!ape::is.binary(phy_tree(psdata))) {
+    if (!ape::is.binary(current_tree)) {
       # Resolve polychotomous nodes
-      phy_tree_resolved <- ape::multi2di(phy_tree(psdata))
+      phy_tree_resolved <- ape::multi2di(current_tree)
+
       # Check if resolved
       if (!ape::is.binary(phy_tree_resolved)) {
-        stop("Error: Unable to resolve polychotomous nodes.")
+        error_message <- "Error: Unable to resolve polychotomous tree nodes."
+        log_message(error_message, status = "error", log_file)
+        stop(error_message, call. = FALSE)
       }
-      # Update tree
-      tree2 <- phy_tree_resolved
+      binary_tree <- phy_tree_resolved
     } else {
-      # Use the original tree if it's already binary
-      tree2 <- phyloseq::phy_tree(psdata)
+      log_message("Phylogenetic tree is already binary. No resolution needed.", status = "info", log_file)
+      binary_tree <- current_tree
     }
+    # Reconstruct phyloseq object with the updated binary tree
+    phyloseq_tree_resolved <- phyloseq::merge_phyloseq(
+      phyloseq::otu_table(physeq),
+      phyloseq::sample_data(physeq),
+      phyloseq::tax_table(physeq),
+      binary_tree
+    )
 
-    # Merge new tree with sample_data and otu_table
-    new_tree <- phyloseq::merge_phyloseq(
-      phyloseq::otu_table(psdata),
-      phyloseq::sample_data(psdata),
-      phyloseq::tax_table(psdata),
-      tree2)
+    # Add sampleIDs
+    phyloseq::sample_data(phyloseq_tree_resolved)$sample_id <- phyloseq::sample_names(phyloseq_tree_resolved)
 
-    # Add sample IDs to the sample_data
-    phyloseq::sample_data(new_tree)$sampleid <- phyloseq::sample_names(new_tree)
+    # Save the resolved object
+    output_file_path = file.path(raw_rds_folder, glue::glue("{project_id}_phyloseq_tree_resolved.rds"))
+    saveRDS(phyloseq_tree_resolved, file = output_file_path)
 
-    output_file_path = paste0(output_folder_rds_files, project_name, "_phyloseq_resolved_tree.rds")
+    # Log successful completion boundary
+    log_message(glue::glue("Phyloseq object with resolved tree saved at: {output_file_path}"), status = "info", log_file)
+    log_message("Phylogenetic tree resolution complete.", status = "success", log_file)
 
-    saveRDS(new_tree, file = output_file_path)
-
-    log_message(paste("Phyloseq object saved as .rds object in", output_file_path), log_file)
-
-    return(new_tree)
-
-    log_message("Tree successfully resolved", log_file)
+    return(phyloseq_tree_resolved)
   }
 }

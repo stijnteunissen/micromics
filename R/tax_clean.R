@@ -50,87 +50,70 @@
 #' }
 #'
 #' @export
-tax_clean = function(physeq = physeq,
-                     tax_filter = TRUE) {
+tax_clean = function(physeq, tax_filter = TRUE, project_id, base_path, log_file) {
 
-  log_message(paste("Step 4: Tax clean: phyloseq are cleaned.", paste(projects, collapse = ", ")), log_file)
+  log_message("Starting taxonomy table cleaning", status = "start", log_file)
 
-  psdata = physeq
-  project_name = projects
+  # Define storage directory path
+  raw_rds_folder <- file.path(base_path, "raw_rds")
 
-  project_folder = paste0(base_path, projects)
-  output_folder_csv_files = paste0(project_folder, "/output_data/csv_files/")
-  output_folder_rds_files = paste0(project_folder, "/output_data/rds_files/Before_cleaning_rds_files/")
+  # Track initial ASV counts
+  ntaxa_in <- phyloseq::ntaxa(physeq)
 
-  # ASV count start
-  psdata_in = psdata
+  # Extract taxonomy table into a clean data frame
+  tax_table_clean <- data.frame(phyloseq::tax_table(physeq))
 
-  # specify NA taxon name tags to last known taxon names
-  tax.clean <- data.frame(phyloseq::tax_table(psdata))
-
-  tax.clean2 =
-    tax.clean %>%
-    mutate_if(is.factor, as.character) %>%
-    mutate(across(everything(),
-                  ~ str_replace_all(.x,  "Incertae_Sedis|Ambiguous_taxa|metagenome|uncultured archeaon|uncultured bacterium|uncultured prokaryote|uncultured soil bacterium|uncultured rumen bacterium|uncultured compost bacterium|uncultured organism|^uncultured|uncultured$",
-                                    replacement = NA_character_
-                  ))) %>%
-    replace(is.na(.), NA_character_) %>%
-    mutate(Phylum = if_else(is.na(Phylum), paste0("Phylum of ", Kingdom), Phylum),
-           Class = if_else(is.na(Class), paste0("Class of ", Phylum), Class),
-           Order = if_else(is.na(Order), paste0("Order of ", Class), Order),
-           Family = if_else(is.na(Family), paste0("Family of ", Order), Family),
-           Genus = if_else(is.na(Genus), paste0("Genus of ", Family), Genus),
-           Species = if_else(is.na(Species), paste0("Species of ", Genus), Species)
+  # Replace ambiguous strings with explicit NA values and roll forward taxonomy names
+  tax_table_clean2 <- tax_table_clean %>%
+    dplyr::mutate(dplyr::across(where(is.factor), as.character)) %>%
+    dplyr::mutate(dplyr::across(dplyr::everything(), ~ stringr::str_replace_all(
+      .x,
+      "Incertae_Sedis|Ambiguous_taxa|metagenome|uncultured archeaon|uncultured bacterium|uncultured prokaryote|uncultured soil bacterium|uncultured rumen bacterium|uncultured compost bacterium|uncultured organism|^uncultured|uncultured$",
+      NA_character_
+    ))) %>%
+    dplyr::mutate(
+      Phylum  = dplyr::if_else(is.na(Phylum), paste0("Phylum of ", Kingdom), Phylum),
+      Class   = dplyr::if_else(is.na(Class), paste0("Class of ", Phylum), Class),
+      Order   = dplyr::if_else(is.na(Order), paste0("Order of ", Class), Order),
+      Family  = dplyr::if_else(is.na(Family), paste0("Family of ", Order), Family),
+      Genus   = dplyr::if_else(is.na(Genus), paste0("Genus of ", Family), Genus),
+      Species = dplyr::if_else(is.na(Species), paste0("Species of ", Genus), Species)
     ) %>%
-    mutate(across(.cols = Kingdom:Species, .fns = ~if_else(str_detect(.,'\\bof\\b.*\\bof\\b'), paste0(word(., 1)," ", word(., 2)," ", word(., -1)), .))) %>%
-    mutate(Kingdom = if_else(Kingdom == "d__Bacteria", "Bacteria", Kingdom),
-           Kingdom = if_else(Kingdom == "d__Archaea", "Archaea", Kingdom))
+    dplyr::mutate(dplyr::across(
+      .cols = Kingdom:Species,
+      .fns = ~ dplyr::if_else(stringr::str_detect(., "\\bof\\b.*\\bof\\b"), paste(stringr::word(., 1), stringr::word(., 2), stringr::word(., -1)), .)
+    )) %>%
+    dplyr::mutate(
+      Kingdom = dplyr::if_else(Kingdom == "d__Bacteria", "Bacteria", Kingdom),
+      Kingdom = dplyr::if_else(Kingdom == "d__Archaea", "Archaea", Kingdom)
+    )
 
-  # tax.clean3 =
-  #   tax.clean2 %>%
-  #   rowwise() %>%
-  #   mutate(Genus = case_when(
-  #     grepl("\\d", Genus) ~ {
-  #       first_non_numeric <- case_when(
-  #         !grepl("\\d", Family) ~ paste0("Genus of ", Family, " (", Genus, ")"),
-  #         !grepl("\\d", Order) ~ paste0("Genus of ", Order, " (", Genus, ")"),
-  #         !grepl("\\d", Class) ~ paste0("Genus of ", Class, " (", Genus, ")"),
-  #         !grepl("\\d", Phylum) ~ paste0("Genus of ", Phylum, " (", Genus, ")"),
-  #         !grepl("\\d", Kingdom) ~ paste0("Genus of ", Kingdom, " (", Genus, ")"),
-  #         TRUE ~ NA_character_
-  #       )
-  #       first_non_numeric
-  #     },
-  #     TRUE ~ Genus)) %>%
-  #   ungroup()
-
-  tax.clean3 =
-    tax.clean2 %>%
-    rowwise() %>%
-    mutate(Genus = case_when(
-      grepl("^\\d+$|^[A-Z\\d_-]+$", Genus) & !str_detect(Genus, "[A-Za-z]{4,}") ~ {
-        first_non_numeric <- case_when(
+  # Handle numeric/placeholder Genus annotations conditionally
+  tax_table_clean3 <- tax_table_clean2 %>%
+    dplyr::rowwise() %>%
+    dplyr::mutate(Genus = dplyr::case_when(
+      grepl("^\\d+$|^[A-Z\\d_-]+$", Genus) & !stringr::str_detect(Genus, "[A-Za-z]{4,}") ~ {
+        dplyr::case_when(
           !grepl("\\d", Family) ~ paste0("Genus of ", Family, " (", Genus, ")"),
           !grepl("\\d", Order)  ~ paste0("Genus of ", Order, " (", Genus, ")"),
           !grepl("\\d", Class)  ~ paste0("Genus of ", Class, " (", Genus, ")"),
           !grepl("\\d", Phylum) ~ paste0("Genus of ", Phylum, " (", Genus, ")"),
-          TRUE ~ paste0("Genus (", Genus, ")")
+          TRUE                  ~ paste0("Genus (", Genus, ")")
         )
-        first_non_numeric
       },
-      TRUE ~ Genus))
+      TRUE ~ Genus
+    )) %>%
+    dplyr::ungroup()
 
-  matrix <- as.matrix(tax.clean3)
-  rownames(matrix) <- taxa_names(psdata)
-  # put cleaned tax_table into phyloseq object
-  phyloseq::tax_table(psdata) <- phyloseq::tax_table(matrix)
+  # Reconvert table back into a matrix format and overwrite taxonomy slot
+  tax_matrix <- as.matrix(tax_table_clean3)
+  rownames(tax_matrix) <- phyloseq::taxa_names(physeq)
+  phyloseq::tax_table(physeq) <- phyloseq::tax_table(tax_matrix)
 
-  # apply taxa filter if tax_filter is TRUE
-  # remove unwanted taxa such as Mitochondria, Chloroplasts, Unclassified Kingdom, Eukaryota, etc.
-  if (tax_filter == TRUE) {
-    psdata <-
-      psdata %>% subset_taxa(
+  # Apply taxonomic filters to remove off-target host or unassigned reads
+  if (tax_filter) {
+    physeq <- physeq %>%
+      phyloseq::subset_taxa(
         Class != "Chloroplast" &
           Order != "Chloroplast" &
           Family != "Mitochondria" &
@@ -138,21 +121,21 @@ tax_clean = function(physeq = physeq,
           Kingdom != "Unassigned" &
           Phylum != "Phylum of d__Bacteria" &
           Phylum != "Phylum of d__Archaea" &
-          Phylum != "Phylum of Bacteria")
+          Phylum != "Phylum of Bacteria"
+      )
   }
 
-  # count ASVs after cleaning
-  psdata_out = psdata
+  # Calculate the absolute number of filtered ASVs
+  removed_asv_count <- ntaxa_in - phyloseq::ntaxa(physeq)
 
-  # difference
-  removed_ASV_count = ntaxa(psdata_in) - ntaxa(psdata_out)
+  # Save the clean taxonomy object
+  output_file_path <- file.path(raw_rds_folder, glue::glue("{project_id}_phyloseq_cleaned.rds"))
+  saveRDS(physeq, file = output_file_path)
 
-  #save psdata after cleaning as RDS object
-  output_file_path = paste0(output_folder_rds_files, project_name, "_phyloseq_cleaned.rds")
-  saveRDS(psdata, file = output_file_path)
-  log_message(paste("taxonomy table cleaned: ",  removed_ASV_count, " ASVs removed.  Phyloseq object saved as .rds object in", output_file_path), log_file)
+  # Log messages
+  log_message(glue::glue("Taxonomy table cleaned: {removed_asv_count} ASVs removed."), status = "info", log_file)
+  log_message(glue::glue("Cleaned phyloseq object stored at: {output_file_path}"), status = "info", log_file)
+  log_message("Taxonomy table standardization complete.", status = "success", log_file)
 
-  return(psdata)
-
-  log_message("Successfully Tax cleaned.", log_file)
+  return(physeq)
 }
