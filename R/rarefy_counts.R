@@ -1,4 +1,4 @@
-#' Rarefying Phyloseq Data
+#' Rarefy counts
 #'
 #' This function performs rarefaction on a normalized `phyloseq` object.
 #' Rarefaction is based on the biomass of each sample to identify the minimum
@@ -43,57 +43,51 @@
 #'
 #' @examples
 #' # Rarefy using FCM normalization
-#' rarefied_physeq <- rarefying(physeq = normalised_physeq, norm_method = "fcm")
+#' rarefied_physeq <- rarefy_counts(physeq = normalised_physeq, norm_method = "fcm")
 #'
 #' # Rarefy using qPCR normalization
-#' rarefied_physeq <- rarefying(physeq = normalised_physeq, norm_method = "qpcr")
+#' rarefied_physeq <- rarefy_counts(physeq = normalised_physeq, norm_method = "qpcr")
 #'
 #' @note Ensure that the `phyloseq` object is properly normalized before applying this function.
 #' Missing or invalid `rarefy_to` values will result in warnings and skipped samples.
 #'
 #' @export
-rarefying = function(physeq, norm_method = NULL, copy_correction = TRUE, iteration = 100, project_id, base_path, log_file) {
+rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, iteration = 100, project_id, base_path, log_file) {
 
   log_message("Starting rarefying data", status = "start", log_file)
 
   # Define directory paths
-  input_folder <- file.path(base_path, "input_data")
-  raw_rds_folder <- file.path(base_path, "raw_rds")
   clean_rds_folder <- file.path(base_path, "clean_rds")
-  figure_folder <- file.path(base_path, "figures")
+
+  # Ensure 'vegan' is installed on the master node; install if missing
+  if (!requireNamespace("vegan", quietly = TRUE)) {
+    install.packages("vegan", repos = "https://cloud.r-project.org")
+  }
+
+  # Determine number of workers
+  ncores <- parallel::detectCores()
+  nworkers <- max(1, ncores - 2)
+  cl <- parallel::makeCluster(nworkers)
+
+  # Prepare all workers once at the beginning
+  parallel::clusterEvalQ(cl, {
+    if (!requireNamespace("vegan", quietly = TRUE)) {
+      install.packages("vegan", repos = "https://cloud.r-project.org", quiet = TRUE)
+    }
+    library(vegan)
+  })
 
   # Internal function to calculate averaged rarefactions
-  avgrarefy <- function(x, rarefy_to, iterations = iteration, seed = 711) {
+  avgrarefy <- function(cl_object, x, rarefy_to, iterations, seed = 711) {
     set.seed(seed)
 
-    # Ensure 'vegan' is installed on the master node; install if missing
-    if (!requireNamespace("vegan", quietly = TRUE)) {
-      install.packages("vegan", repos = "https://cloud.r-project.org")
-    }
-
-    # Determine number of workers
-    ncores <- parallel::detectCores()
-    nworkers <- max(1, ncores - 2)
-    cl <- parallel::makeCluster(nworkers)
-
-    # On each worker: load 'vegan' (assumes now installed on master,
-    # so it should be available on worker as well)
-    clusterEvalQ(cl, {
-      if (!requireNamespace("vegan", quietly = TRUE)) {
-        install.packages("vegan", repos = "https://cloud.r-project.org", quiet = TRUE)
-      }
-      library(vegan)
-    })
-
     # Export data and target depth to workers
-    clusterExport(cl, varlist = c("x", "rarefy_to"), envir = environment())
+    parallel::clusterExport(cl_object, varlist = c("x", "rarefy_to"), envir = environment())
 
     # Perform parallel rarefactions
-    tablist <- parLapply(cl, seq_len(iterations), function(i) {
-      suppressWarnings(rrarefy(x, sample = rarefy_to))
+    tablist <- parallel::parLapply(cl_object, seq_len(iterations), function(i) {
+      suppressWarnings(vegan::rrarefy(x, sample = rarefy_to))
     })
-
-    stopCluster(cl)
 
     # Average the results
     afunc  <- array(unlist(tablist), c(dim(tablist[[1]]), iterations))
@@ -118,7 +112,7 @@ rarefying = function(physeq, norm_method = NULL, copy_correction = TRUE, iterati
   min_sample <- min(phyloseq::sample_sums(physeq_rmp))
 
   # rarefaction taking mean of n iterations
-  rarefied_matrix <- avgrarefy(x = otu_matrix, rarefy_to = min_sample, iterations = iteration, seed = 711)
+  rarefied_matrix <- avgrarefy(cl_object = cl, x = otu_matrix, rarefy_to = min_sample, iterations = iteration, seed = 711)
 
   rownames(rarefied_matrix) <- rownames(otu_matrix)  # samples
   colnames(rarefied_matrix) <- colnames(otu_matrix)  # taxa
@@ -176,21 +170,20 @@ rarefying = function(physeq, norm_method = NULL, copy_correction = TRUE, iterati
     # Caclusate target dephts per sample
     rarefy_to <- round(cell_count_table * minimum_sampling_depth, digits = 0) # number of reads to rarefy for each sample
 
-    phyloseq_matrix <- t(otu_matrix)
-
     # rarefy each sample based on the calculated rarefying targets (rarfy_to)
     rarefied_matrix <- matrix(
-      nrow = nrow(phyloseq_matrix),
-      ncol = ncol(phyloseq_matrix),
-      dimnames = list(rownames(phyloseq_matrix), colnames(phyloseq_matrix)))
+      nrow = nrow(otu_matrix),
+      ncol = ncol(otu_matrix),
+      dimnames = list(rownames(otu_matrix), colnames(otu_matrix))
+    )
 
-    for (i in seq_len(ncol(phyloseq_matrix))) {
-      sample_name <- colnames(phyloseq_matrix)[i]
-      sample_counts <- phyloseq_matrix[, sample_name, drop = FALSE]
+    for (i in seq_len(nrow(otu_matrix))) {
+      sample_name <- rownames(otu_matrix)[i]
+      sample_counts <- otu_matrix[sample_name, , drop = FALSE]
 
       if (!is.na(rarefy_to[i]) && rarefy_to[i] > 0) {
-        rarefied_sample <- avgrarefy(x = sample_counts, rarefy_to = rarefy_to[i], iterations = iteration, seed = 711)
-        rarefied_matrix[, sample_name] <- as.numeric(rarefied_sample)
+        rarefied_sample <- avgrarefy(cl_object = cl, x = sample_counts, rarefy_to = rarefy_to[i], iterations = iteration, seed = 711)
+        rarefied_matrix[sample_name, ] <- as.numeric(rarefied_sample)
       }
     }
 
@@ -225,4 +218,6 @@ rarefying = function(physeq, norm_method = NULL, copy_correction = TRUE, iterati
   } else {
     return(list(physeq_rmp_rarefied = physeq_rmp_rarefied))
   }
+  # Stop the global running cluster safely
+  parallel::stopCluster(cl)
 }

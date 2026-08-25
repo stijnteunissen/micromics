@@ -4,7 +4,7 @@
 \alias{tax_clean}
 \title{Clean Taxonomy Table in Phyloseq Object}
 \usage{
-tax_clean(physeq = physeq, tax_filter = TRUE)
+tax_clean(physeq, tax_filter = TRUE, project_id, base_path, log_file)
 }
 \arguments{
 \item{physeq}{A \code{phyloseq} object containing the microbiome data.

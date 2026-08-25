@@ -4,7 +4,7 @@
 \alias{remove_mock}
 \title{Remove Mock Features from a Phyloseq Object}
 \usage{
-remove_mock(physeq = decontam_physeq, mock_genera = mock_genera, mock = TRUE)
+remove_mock(physeq, mock_genera, mock = TRUE, project_id, base_path, log_file)
 }
 \arguments{
 \item{physeq}{A \code{phyloseq} object containing the microbiome data.

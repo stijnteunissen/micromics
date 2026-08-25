@@ -5,9 +5,12 @@
 \title{Decontaminate a Phyloseq Object Using Specified Methods}
 \usage{
 decontam(
-  physeq = resolved_tree_physeq,
+  physeq,
   decon_method = c("frequency", "prevalence", "both"),
-  blank = TRUE
+  blank = TRUE,
+  project_id,
+  base_path,
+  log_file
 )
 }
 \arguments{

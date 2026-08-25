@@ -4,7 +4,7 @@
 \alias{resolve_tree}
 \title{Resolve Multichotomies in Phyloseq Object's Tree}
 \usage{
-resolve_tree(physeq = cleaned_physeq)
+resolve_tree(physeq, project_id, base_path, log_file)
 }
 \arguments{
 \item{physeq}{A \code{phyloseq} object containing the microbiome data.

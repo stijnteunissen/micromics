@@ -4,29 +4,30 @@
 \alias{rarefaction_curve}
 \title{Generate and Save Rarefaction Curve}
 \usage{
-rarefaction_curve(physeq = resolved_tree_physeq, color = NULL)
+rarefaction_curve(
+  physeq,
+  color = "sample_or_control",
+  project_id,
+  base_path,
+  log_file
+)
 }
 \arguments{
-\item{physeq}{A \code{phyloseq} object containing the microbiome data.
-This is the input object that the function processes.}
+\item{physeq}{A phyloseq object to be analyzed.}
 
-\item{color}{A character string specifying the column in the sample metadata to use for
-coloring the samples. Default is \code{NULL}, which automatically sets the color
-to \code{"sample_or_control"}.}
+\item{color}{Character string specifying the metadata column used for coloring lines.
+Defaults to \code{"sample_or_control"}.}
+
+\item{project_id}{Character string specifying the unique project name.}
+
+\item{base_path}{Character string specifying the root project directory.}
+
+\item{log_file}{Character string specifying the path to the log file.}
 }
 \value{
-The rarefaction curve plot object.
+None. This function is called for its side effects (saving a PDF file).
 }
 \description{
-This function creates a rarefaction curve for a given phyloseq object and
-saves the plot as a PDF.
-}
-\details{
-This function first checks whether the \code{sample_or_control} column exists in the
-sample metadata. It then generates a rarefaction curve using the \code{amp_rarecurve}
-function and saves the plot as a PDF file in the specified directory.
-}
-\examples{
-rarefaction_curve(physeq = physeq)
-
+Generates a sequencing depth rarefaction curve from a phyloseq object
+and exports the resulting plot as a PDF.
 }

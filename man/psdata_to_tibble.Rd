@@ -10,19 +10,6 @@ psdata_to_tibble(
   taxrank = c("Phylum", "Class", "Order", "Family", "Genus")
 )
 }
-\arguments{
-\item{physeq}{A \code{phyloseq} object containing the microbiome data.
-This is the input object that the function processes.}
-
-\item{norm_method}{A character string specifying the normalization method. Acceptable values are:
-\itemize{
-\item \code{NULL}: Use this option if no FCM or qPCR data is available, or if you wish to retain only relative abundances.
-\item \code{"fcm"}: Use this option if the data have been normalized using flow cytometry (FCM).
-\item \code{"qpcr"}: Use this option if the data have been normalized using quantitative PCR (qPCR).
-}}
-
-\item{taxrank}{A character vector indicating the taxonomic levels at which to group the data.}
-}
 \value{
 The function saves multiple \code{phyloseq}-derived tibbles as RDS files and returns a list of tibbles:
 \itemize{
