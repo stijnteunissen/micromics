@@ -188,11 +188,9 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
     }
 
     # transpose
-    if (!phyloseq::taxa_are_rows(rarefied_matrix)) {
-      rarefied_matrix <- t(rarefied_matrix)
-    }
-    colnames(rarefied_matrix) <- phyloseq::taxa_names(physeq_qmp)
-    rownames(rarefied_matrix) <- phyloseq::sample_names(physeq_qmp)
+    rarefied_matrix_t <- t(rarefied_matrix)
+    colnames(rarefied_matrix_t) <- phyloseq::sample_names(physeq_qmp)
+    rownames(rarefied_matrix_t) <- phyloseq::taxa_names(physeq_qmp)
 
     # Extract scale factor
     scale_factor_df <- data.frame(phyloseq::sample_data(physeq_qmp))
@@ -202,12 +200,12 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
       sample_id <- scale_factor_df$SampleID[i]
       scale_factor <- scale_factor_df$scale_factor[i]
       if (!is.na(scale_factor) && scale_factor != 1) {
-        rarefied_matrix[sample_id, ] <- rarefied_matrix[sample_id, ] * scale_factor
+        rarefied_matrix_t[sample_id, ] <- rarefied_matrix_t[sample_id, ] * scale_factor
       }
     }
 
     # Reconstruct biomass normalised phyloseq object
-    otu_rescaled <- phyloseq::otu_table(rarefied_matrix, taxa_are_rows = FALSE)
+    otu_rescaled <- phyloseq::otu_table(rarefied_matrix_t, taxa_are_rows = TRUE)
     physeq_qmp_rarefied <- physeq_qmp
     phyloseq::otu_table(physeq_qmp_rarefied) <- otu_rescaled
 
