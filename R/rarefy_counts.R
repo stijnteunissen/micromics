@@ -205,7 +205,7 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
     }
 
     # Reconstruct biomass normalised phyloseq object
-    otu_rescaled <- phyloseq::otu_table(rarefied_matrix_t, taxa_are_rows = TRUE)
+    otu_rescaled <- phyloseq::otu_table(rarefied_matrix_t, taxa_are_rows = FALSE)
     physeq_qmp_rarefied <- physeq_qmp
     phyloseq::otu_table(physeq_qmp_rarefied) <- otu_rescaled
 
