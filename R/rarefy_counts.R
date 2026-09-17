@@ -69,6 +69,9 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
   nworkers <- max(1, ncores - 2)
   cl <- parallel::makeCluster(nworkers)
 
+  # Stop the global running cluster safely after function stops
+  on.exit(parallel::stopCluster(cl))
+
   # Prepare all workers once at the beginning
   parallel::clusterEvalQ(cl, {
     if (!requireNamespace("vegan", quietly = TRUE)) {
@@ -141,9 +144,9 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
 
     physeq_qmp <- physeq[["physeq_biomass_normalised"]]
 
-    # Clean empty profiles form the phyloseq object
-    physeq_qmp <- phyloseq::prune_samples(phyloseq::sample_sums(physeq_qmp) > 0, physeq_qmp)        # Remove samples with zero counts
-    physeq_qmp <- phyloseq::prune_taxa(rowSums(phyloseq::otu_table(physeq_qmp)) > 0, physeq_qmp)  # Remove taxa with zero counts across all samples
+    # # Clean empty profiles form the phyloseq object
+    # physeq_qmp <- phyloseq::prune_samples(phyloseq::sample_sums(physeq_qmp) > 0, physeq_qmp) # Remove samples with zero counts
+    # physeq_qmp <- phyloseq::prune_taxa(rowSums(phyloseq::otu_table(physeq_qmp)) > 0, physeq_qmp) # Remove taxa with zero counts across all samples
 
     # Convert phyloseq sample data to data frame
     sample_data <- data.frame(phyloseq::sample_data(physeq_qmp))
@@ -187,10 +190,9 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
       }
     }
 
-    # transpose
     rarefied_matrix_t <- t(rarefied_matrix)
-    colnames(rarefied_matrix_t) <- phyloseq::sample_names(physeq_qmp)
-    rownames(rarefied_matrix_t) <- phyloseq::taxa_names(physeq_qmp)
+    colnames(rarefied_matrix_t) <- phyloseq::sample_names(physeq_qmp) # samples
+    rownames(rarefied_matrix_t) <- phyloseq::taxa_names(physeq_qmp) # taxa
 
     # Extract scale factor
     scale_factor_df <- data.frame(phyloseq::sample_data(physeq_qmp))
@@ -200,12 +202,12 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
       sample_id <- scale_factor_df$SampleID[i]
       scale_factor <- scale_factor_df$scale_factor[i]
       if (!is.na(scale_factor) && scale_factor != 1) {
-        rarefied_matrix_t[sample_id, ] <- rarefied_matrix_t[sample_id, ] * scale_factor
+        rarefied_matrix_t[, sample_id] <- rarefied_matrix_t[, sample_id] * scale_factor
       }
     }
 
     # Reconstruct biomass normalised phyloseq object
-    otu_rescaled <- phyloseq::otu_table(rarefied_matrix_t, taxa_are_rows = FALSE)
+    otu_rescaled <- phyloseq::otu_table(rarefied_matrix_t, taxa_are_rows = TRUE)
     physeq_qmp_rarefied <- physeq_qmp
     phyloseq::otu_table(physeq_qmp_rarefied) <- otu_rescaled
 
@@ -216,6 +218,4 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
   } else {
     return(list(physeq_rmp_rarefied = physeq_rmp_rarefied))
   }
-  # Stop the global running cluster safely
-  parallel::stopCluster(cl)
 }

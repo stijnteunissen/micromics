@@ -5,20 +5,13 @@
 \title{Create Barplots for Relative and Absolute Abundance}
 \usage{
 barplot(
-  physeq = rarefied_genus_psmelt,
+  physeq,
   ntaxa = NULL,
   norm_method = NULL,
-  sample_matrix = NULL,
-  group_by_factor = NULL,
-  taxrank = c("Phylum", "Class", "Order", "Family", "Genus"),
-  date_factor = NULL,
-  SampleID_xas = FALSE
+  taxrank = c("Phylum", "Class", "Order", "Family", "Genus")
 )
 }
 \arguments{
-\item{physeq}{A \code{phyloseq} object containing the microbiome data.
-This is the input object that the function processes.}
-
 \item{ntaxa}{An integer specifying the maximum number of taxa to display in the barplot. Default is 23.}
 
 \item{norm_method}{A string indicating the normalization method used for absolute abundance
@@ -28,8 +21,6 @@ data. Options are \code{"fcm"} (flow cytometry) or \code{"qpcr"} (quantitative P
 \item{sample_matrix}{An optional matrix specifying the sample structure or metadata.}
 
 \item{group_by_factor}{with this option you can separtate de barplot for factors}
-
-\item{taxrank}{A character vector indicating the taxonomic levels at which to group the data.}
 }
 \value{
 The function generates and saves barplots as PDF files in the project’s \verb{figures/} folder.

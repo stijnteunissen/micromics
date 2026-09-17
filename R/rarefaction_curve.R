@@ -52,6 +52,7 @@ rarefaction_curve <- function(physeq, color = "sample_or_control", project_id, b
     if (is.null(xlim_val)) {
       # Open a silent graphics device to calculate max depth per sample
       pdf(NULL)
+      on.exit(if (dev.cur() > 1) dev.off(), add = TRUE)
       captured_curve <- vegan::rarecurve(t(abund_table), step = 100, label = FALSE)
       dev.off()
       xlim_val <- c(0, max(sapply(captured_curve, function(x) max(attr(x, "Subsample")))))
@@ -60,6 +61,7 @@ rarefaction_curve <- function(physeq, color = "sample_or_control", project_id, b
     if (is.null(ylim_val)) {
       # Dynamically scale y-axis to the maximum number of ASVs found within a single sample
       pdf(NULL)
+      on.exit(if (dev.cur() > 1) dev.off(), add = TRUE)
       captured_curve <- vegan::rarecurve(t(abund_table), step = 100, label = FALSE)
       dev.off()
       ylim_val <- c(0, max(sapply(captured_curve, function(x) max(x))))

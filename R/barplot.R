@@ -37,20 +37,17 @@
 #' )
 #'
 #' @export
-barplot = function(physeq = rarefied_genus_psmelt,
+barplot = function(physeq,
                    ntaxa = NULL,
                    norm_method = NULL,
-                   sample_matrix = NULL,
-                   group_by_factor = NULL,
-                   taxrank = c("Phylum", "Class", "Order", "Family", "Genus"),
-                   date_factor = NULL,
-                   SampleID_xas = FALSE) {
+                   taxrank = c("Phylum", "Class", "Order", "Family", "Genus")) {
 
   log_message(paste("Step 13: Creating barplot.", paste(projects, collapse = ", ")), log_file)
 
   # Internal function for creating basic barplots with a dynamic taxonomic column
   base_barplot = function(plot_data, x_value, y_value, colorset, tax_column,
                           x_label = "Sample", y_label = "Cell equivalents (Cells/ml) sample") {
+
     p = ggplot(plot_data, aes(x = !!sym(x_value),
                               y = !!sym(y_value),
                               fill = !!sym(tax_column))) +
@@ -64,19 +61,9 @@ barplot = function(physeq = rarefied_genus_psmelt,
             legend.position = "bottom",
             strip.background = element_rect(colour = "white"),
             strip.text = element_text(face = "bold"),
-            ggh4x.facet.nestline = element_line(colour = "black"))
+            ggh4x.facet.nestline = element_line(colour = "black")) +
+      guides(fill = guide_legend(nrow = 8))
 
-    if (ntaxa > 23) {
-      p = p + guides(fill = guide_legend(nrow = 14))
-    } else {
-      p = p + guides(fill = guide_legend(nrow = 8))
-    }
-
-    if (!is.null(present_factors) && !isTRUE(SampleID_xas)) {
-      p = p + theme(axis.text.x = element_blank())
-    } else {
-      p = p + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0))
-    }
     return(p)
   }
 
@@ -124,10 +111,6 @@ barplot = function(physeq = rarefied_genus_psmelt,
     "#2980b9", "#e67e22"
   ))
   colorset <- unique(c(dark2_colors, paired_colors, set_colors, set1_colors, spectral_colors, additional_palette))
-
-  if (is.null(ntaxa)) {
-    ntaxa = 23
-  }
 
   # Iterate over the desired taxonomic levels
   for (tax in taxrank) {
