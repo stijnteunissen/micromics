@@ -51,402 +51,85 @@
 #' }
 #'
 #' @export
-alpha_diversity = function(physeq = physeq,
-                           norm_method = NULL,
-                           taxrank = c("Phylum", "Class", "Order", "Family", "Genus"),
-                           date_factor = NULL) {
+alpha_diversity = function(physeq, norm_method, taxrank, facet_vars, plot_width, project_id, base_path, log_file) {
 
-  log_message(paste("Step 15: Creating alpha diversity.", paste(projects, collapse = ", ")), log_file)
+  base_alpha_plot = function(alpha_data, x_value, y_value, x_label, y_label, facet_vars) {
 
-  base_alpha_plot = function(alpha_data, x_value, y_value, x_label, y_label) {
+    p = ggplot(alpha_data, aes(x = !!sym(x_value), y = !!sym(y_value))) +
+      geom_point(color = "black", size = 3, alpha = 0.8) +
+      #geom_col(fill = "steelblue", color = "steelblue", show.legend = FALSE) +
+      theme_classic() +
+      labs(x = x_label, y = y_label) +
+      theme(
+        legend.position = "none",
+        legend.text = element_markdown(),
+        axis.ticks.x = element_blank(),
+        axis.text.x = element_text(face = "bold", angle = 90, vjust = 0.5, hjust = 0),
+        strip.placement = "outside",
+        strip.text = element_text(face = "bold"),
+        strip.background = element_blank(),
+        ggh4x.facet.nestline = element_line(colour = "black")
+      ) +
+      scale_y_continuous(expand = expansion(mult = c(0.05, 0.05))) +  # Correct placement outside theme with 5%
+      expand_limits(y = c(min(alpha_data[[y_value]]) - 1, max(alpha_data[[y_value]]) + 1))  # Correct placement outside theme
 
-    if (!is.null(date_factor)) {
-      alpha_data = alpha_data %>%
-        mutate(!!date_factor := as.Date(.data[[date_factor]], format = "%d/%m/%Y")) %>%
-        arrange(.data[[date_factor]])
-
-      if (is.null(present_factors) || length(present_factors) == 0) {
-        alpha_data <- alpha_data %>% mutate(grouping_factor = "all")
-      } else {
-        alpha_data <- alpha_data %>%
-          mutate(grouping_factor = do.call(paste, c(across(all_of(present_factors)), sep = "_")))
-      }
-
-      plot = ggplot(alpha_data, aes(x = !!sym(x_value), y = !!sym(y_value), group = grouping_factor)) +
-        #geom_jitter(aes(color = .data[[date_factor]]), size = 2, width = 0.2, show.legend = FALSE) +
-        #scale_color_date(low = "lightblue", high = "darkgreen") +
-        geom_col(fill = "steelblue", color = "steelblue", show.legend = FALSE) +
-        theme_classic() +
-        labs(x = x_label, y = y_label) +
-        theme(
-          legend.position = "bottom",
-          legend.text = element_markdown(),
-          axis.ticks.x = element_blank(),
-          strip.placement = "outside",
-          strip.text = element_text(face = "bold"),
-          #strip.text = element_text(face = "bold", angle = 90, vjust = 0.5, hjust = 0),
-          strip.background = element_blank(),
-          ggh4x.facet.nestline = element_line(colour = "black")
-        ) +
-        scale_y_continuous(expand = expansion(mult = c(0.05, 0.05))) +  # Correct placement outside theme with 5%
-        expand_limits(y = c(min(alpha_data[[y_value]]) - 1, max(alpha_data[[y_value]]) + 1))  # Correct placement outside theme
-
-    } else {
-      if (is.null(present_factors) || length(present_factors) == 0) {
-        alpha_data <- alpha_data %>% mutate(grouping_factor = "all")
-      } else {
-        alpha_data <- alpha_data %>%
-          mutate(grouping_factor = do.call(paste, c(across(all_of(present_factors)), sep = "_")))
-      }
-
-      plot = ggplot(alpha_data, aes(x = !!sym(x_value), y = !!sym(y_value), group = grouping_factor)) +
-        #geom_jitter(aes(color = grouping_factor), size = 2, width = 0.2, show.legend = FALSE) +
-        geom_col(fill = "steelblue", color = "steelblue", show.legend = FALSE) +
-        #scale_color_manual(values = colorset) +
-        theme_classic() +
-        labs(x = x_label, y = y_label) +
-        theme(
-          legend.position = "bottom",
-          legend.text = element_markdown(),
-          axis.ticks.x = element_blank(),
-          strip.placement = "outside",
-          strip.text = element_text(face = "bold"),
-          #strip.text = element_text(angle = 90, vjust = 0.5, hjust = 0),
-          strip.background = element_blank(),
-          ggh4x.facet.nestline = element_line(colour = "black")) +
-        scale_y_continuous(expand = c(0, 0))
+    if (!is.null(facet_vars)) {
+      p <- p +
+        facet_nested(
+          cols = vars(!!!syms(facet_vars)),
+          scales = "free_x",
+          space = "free_x",
+          nest_line = element_line(linetype = 1, color = "black", linewidth = 0.6),
+          strip = strip_nested(size = "variable")
+        )
     }
-    if (!is.null(present_factors)) {
-      plot = plot + theme(axis.text.x = element_blank())
-    } else {
-      plot = plot + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 0))
-    }
-    return(plot)
+    return(p)
   }
 
-  facet_add = function(present_factors) {
-    if (!is.null(present_factors) && length(present_factors) > 0) {
-      return(facet_nested(cols = vars(!!!syms(present_factors)), scales = "free", space = "free", nest_line = element_line(linetype = 1)))
+  # Set up directory paths
+  figures_folder <- file.path(base_path, "03_figures")
+  export_folder <- file.path(base_path, "02_exports")
+
+  alpha_div_folder <- file.path(figures_folder, "alpha_diversity")
+  if(!dir.exists(alpha_div_folder)) { dir.create(alpha_div_folder, recursive = TRUE) }
+
+  alpha_div_table_folder <- file.path(export_folder, "alpha_diversity")
+  if(!dir.exists(alpha_div_table_folder)) { dir.create(alpha_div_table_folder, recursive = TRUE) }
+
+  # ASV and taxa
+  for (tax in taxrank) {
+    physeq_rmp <- physeq$physeq_rmp_rarefied
+
+    if (tax != "ASV") {
+      physeq_rmp_glom <- phyloseq::tax_glom(physeq_rmp, taxrank = tax)
     } else {
-      return(NULL)
+      physeq_rmp_glom <- physeq_rmp
     }
+
+    alpha_div = phyloseq::estimate_richness(physeq_rmp_glom, measures = c("Observed", "Chao1", "Shannon", "Simpson"))
+    alpha_div_df = alpha_div %>% tibble::rownames_to_column(var = "SampleID")
+    metadata = phyloseq::sample_data(physeq_rmp_glom) %>%
+      data.frame() %>%
+      tibble::rownames_to_column(var = "SampleID") %>%
+      dplyr::as_tibble()
+    alpha_div_df_meta = inner_join(metadata, alpha_div_df, by = "SampleID")
+
+    alpha_div_df_meta_export <- alpha_div_df_meta %>%
+      dplyr::mutate(
+        Observed = round(Observed, 2),
+        Chao1 = round(Chao1, 2),
+        Shannon = round(Shannon, 2),
+        Simpson = round(Simpson, 2)) %>%
+      select(SampleID, read_count, Observed, Chao1, Shannon, Simpson)
+
+    readr::write_csv(alpha_div_df_meta_export, file.path(alpha_div_table_folder, glue::glue("alpha_diversity_data_{tax}.csv")))
+
+    Chao1_plot <- base_alpha_plot(alpha_div_df_meta, "SampleID", "Chao1", x_label = "Sample", y_label = "Choa1 Index", facet_vars)
+    Shannon_plot <- base_alpha_plot(alpha_div_df_meta, "SampleID", "Shannon", x_label = "Sample", y_label = "Shannon Index", facet_vars)
+
+    combined_plot <- cowplot::plot_grid(Chao1_plot, Shannon_plot, align = "v", labels = c("A", "B"), ncol = 1)
+
+    ggsave(filename = file.path(alpha_div_folder, glue::glue("alpha_diversity_rmp_{tax}.png")), plot = combined_plot, width = plot_width, height = 10, dpi = 600)
+    ggsave(filename = file.path(alpha_div_folder, glue::glue("alpha_diversity_rmp_{tax}.pdf")), plot = combined_plot, width = plot_width, height = 10)
   }
-
-  project_name = projects
-  project_folder = paste0(base_path, project_name)
-  figure_folder_pdf = paste0(project_folder, "/figures/PDF_figures/")
-  if(!dir.exists(figure_folder_pdf)) { dir.create(figure_folder_pdf, recursive = TRUE) }
-  figure_folder_png = paste0(project_folder, "/figures/PNG_figures/")
-  if(!dir.exists(figure_folder_png)) { dir.create(figure_folder_png, recursive = TRUE) }
-  output_folder_csv_files = paste0(project_folder, "/output_data/csv_files/")
-  if(!dir.exists(output_folder_csv_files)) { dir.create(output_folder_csv_files, recursive = TRUE) }
-
-  if (tolower(taxrank[1]) == "asv") {
-    log_message("Processing ASV-level alpha diversity", log_file)
-
-    if (is.null(norm_method)) {
-      psdata = physeq[["psdata_asv_copy_number_corrected"]]
-    } else if (norm_method == "fcm") {
-      psdata = physeq[["psdata_asv_fcm_norm_rarefied"]]
-    } else if (norm_method == "qpcr") {
-      psdata = physeq[["psdata_asv_qpcr_norm_rarefied"]]
-    }
-
-    alpha_div_folder_png = paste0(figure_folder_png, "Alpha_diversity/")
-    if(!dir.exists(alpha_div_folder_png)){dir.create(alpha_div_folder_png)}
-    asv_folder_png = paste0(alpha_div_folder_png, "ASV/")
-    if(!dir.exists(asv_folder_png)){dir.create(asv_folder_png)}
-
-    alpha_div_folder_pdf = paste0(figure_folder_pdf, "Alpha_diversity/")
-    if(!dir.exists(alpha_div_folder_pdf)){dir.create(alpha_div_folder_pdf)}
-    asv_folder_pdf = paste0(alpha_div_folder_pdf, "ASV/")
-    if(!dir.exists(asv_folder_pdf)){dir.create(asv_folder_pdf)}
-
-    variable_columns = intersect(present_variable_factors, colnames(sample_data(psdata)))
-    factor_columns = unique(c(variable_columns))
-    present_factors = if (length(factor_columns) > 0) factor_columns else NULL
-
-    alpha_data = estimate_richness(psdata, measures = c("Observed", "Chao1", "Shannon", "Simpson"))
-    alpha_data = alpha_data %>% rownames_to_column(var = "sampleid")
-    metadata = sample_data(psdata) %>% data.frame() %>% as_tibble()
-    alpha_data_full = inner_join(metadata, alpha_data, by = "sampleid")
-
-    if (!is.null(date_factor) && date_factor %in% present_factors) {
-      alpha_data_full <- alpha_data_full %>%
-        mutate(!!sym(date_factor) := as.Date(!!sym(date_factor), format = "%d/%m/%Y")) %>%
-        arrange(!!sym(date_factor))
-    }
-
-    # # adding dummy data to the dataset.
-    # dummy_sample_names <- sprintf("DUMMY_%03d", 1:12)
-    # dummy_row <- tibble(
-    #   sampleid = dummy_sample_names,
-    #   timepoint = rep(1, 12),
-    #   Chao1 = 0,
-    #   Shannon = 0,
-    #   Observed = 0,
-    #   Simpson = 0,
-    #   na_type = "dna",
-    #   soil_type = rep(c("L1", "L5", "L7"), each = 4),
-    #   treatment = rep(c("Non-Pesticide", "Pesticide", "Pesticide", "Pesticide"), times = 3),
-    #   replica   = rep(c(4, 1, 2, 3), times = 3)
-    # )
-    # alpha_data_full <- bind_rows(alpha_data_full, dummy_row)
-
-    alpha_div_csv_folder = paste0(output_folder_csv_files, "Alpha_diversity/")
-    if(!dir.exists(alpha_div_csv_folder)){dir.create(alpha_div_csv_folder)}
-    asv_csv_folder = paste0(alpha_div_csv_folder, "ASV/")
-    if(!dir.exists(asv_csv_folder)){dir.create(asv_csv_folder)}
-
-    alpha_data_full_csv = alpha_data_full %>% mutate(Observed = round(Observed, 2),
-                                                     Chao1 = round(Chao1, 2),
-                                                     Shannon = round(Shannon, 2),
-                                                     Simpson = round(Simpson, 2))
-
-    output_file_path = paste0(asv_csv_folder, project_name, "_alpha_diversity_asv_level.csv")
-    write.csv(alpha_data_full_csv, file = output_file_path, row.names = FALSE)
-    log_message(paste("Alpha diversity asv level saved as .csv object in", output_file_path), log_file)
-
-    na_types = unique(alpha_data_full$na_type)
-
-    if (length(na_types) == 1) {
-      chao1_plot = base_alpha_plot(alpha_data_full, "sampleid", "Chao1", x_label = "Sample", y_label = "Chao1 Index") +
-        facet_add(present_factors)
-
-      shannon_plot = base_alpha_plot(alpha_data_full, "sampleid", "Shannon", x_label = "Sample", y_label = "Shannon Index") +
-        facet_add(present_factors)
-
-      combined_plot = plot_grid(chao1_plot + theme(legend.position = "none"), shannon_plot + theme(legend.position = "none"),
-                                align = "hv", labels = c("A", "B"), nrow = 1)
-
-      n_samples <- length(unique(alpha_data_full$sampleid))
-      fig.width <- max(14, n_samples * 0.6)
-
-      figure_file_path = paste0(asv_folder_png, project_name, "_alpha_diversity_asv_level.png")
-      ggsave(filename = figure_file_path, plot = combined_plot, width = fig.width, height = 6, dpi = 600, limitsize = FALSE)
-      log_message(paste("alpha diversity asv level saved as .png object in", figure_file_path), log_file)
-
-      figure_file_path = paste0(asv_folder_pdf, project_name, "_alpha_diversity_asv_level.pdf")
-      ggsave(filename = figure_file_path, plot = combined_plot, width = fig.width, height = 6)
-      log_message(paste("alpha diversity asv level saved as .pdf object in", figure_file_path), log_file)
-
-    } else if (length(na_types) == 2) {
-      alpha_data_full_dna = alpha_data_full %>% filter(na_type == "dna")
-
-      chao1_plot_dna =
-        base_alpha_plot(alpha_data_full_dna, "sampleid", "Chao1", x_label = "Sample", y_label = "Chao1 Index") +
-        facet_add(present_factors)
-
-      shannon_plot_dna =
-        base_alpha_plot(alpha_data_full_dna, "sampleid", "Shannon", x_label = "Sample", y_label = "Shannon Index") +
-        facet_add(present_factors)
-
-      alpha_data_full_rna = alpha_data_full %>% filter(na_type == "rna")
-
-      chao1_plot_rna =
-        base_alpha_plot(alpha_data_full_rna, "sampleid", "Chao1", x_label = "Sample", y_label = "Chao1 Index") +
-        facet_add(present_factors)
-
-      shannon_plot_rna =
-        base_alpha_plot(alpha_data_full_rna, "sampleid", "Shannon", x_label = "Sample", y_label = "Shannon Index") +
-        facet_add(present_factors)
-
-      separator_line = ggdraw() +
-        draw_line(x = c(0.25, 0.75), y = c(0.5, 0.5), size = 0.5, color = "black") +
-        theme_void()
-
-      dna_label = ggdraw() + draw_label("DNA", fontface = "bold", size = 14, hjust = 0.5)
-      rna_label = ggdraw() + draw_label("RNA", fontface = "bold", size = 14, hjust = 0.5)
-
-      combined_plot_dna = plot_grid(chao1_plot_dna, shannon_plot_dna,
-                                    ncol = 2, labels = c("A", "B"))
-
-      combined_plot_rna = plot_grid(chao1_plot_rna, shannon_plot_rna,
-                                    ncol = 2, labels = c("C", "D"))
-
-      combined_plot = plot_grid(
-        plot_grid(dna_label, separator_line, combined_plot_dna, ncol = 1, rel_heights = c(0.1, 0.05, 1)),
-        plot_grid(rna_label, separator_line, combined_plot_rna, ncol = 1, rel_heights = c(0.1, 0.05, 1)),
-        ncol = 1)
-
-      n_samples_dna <- length(unique(alpha_data_full_dna$sampleid))
-      fig.width_dna <- max(14, n_samples_dna * 0.6)
-
-      n_samples_rna <- length(unique(alpha_data_full_rna$sampleid))
-      fig.width_rna <- max(14, n_samples_rna * 0.6)
-
-      figure_file_path = paste0(asv_folder_png, project_name, "_alpha_diversity_dna_asv_level.png")
-      ggsave(filename = figure_file_path, plot = combined_plot_dna, width = fig.width_dna, height = 6, dpi = 600, limitsize = FALSE)
-      log_message(paste("alpha diversity asv level saved as .png object in", figure_file_path), log_file)
-
-      figure_file_path = paste0(asv_folder_pdf, project_name, "_alpha_diversity_dna_asv_level.pdf")
-      ggsave(filename = figure_file_path, plot = combined_plot_dna, width = fig.width_dna, height = 6)
-      log_message(paste("alpha diversity asv level saved as .pdf object in", figure_file_path), log_file)
-
-      figure_file_path = paste0(asv_folder_png, project_name, "_alpha_diversity_rna_asv_level.png")
-      ggsave(filename = figure_file_path, plot = combined_plot_rna, width = fig.width_rna, height = 6, dpi = 600, limitsize = FALSE)
-      log_message(paste("alpha diversity asv level saved as .png object in", figure_file_path), log_file)
-
-      figure_file_path = paste0(asv_folder_pdf, project_name, "_alpha_diversity_rna_asv_level.pdf")
-      ggsave(filename = figure_file_path, plot = combined_plot_rna, width = fig.width_rna, height = 6)
-      log_message(paste("alpha diversity asv level saved as .pdf object in", figure_file_path), log_file)
-    }
-
-  } else {
-
-    for (tax in taxrank) {
-      log_message(paste("Processing taxonomic level:", tax), log_file)
-
-      if (is.null(norm_method)) {
-        psdata = physeq[[paste0("psdata_copy_number_corrected_", tax)]]
-      } else if (norm_method == "fcm") {
-        psdata = physeq[[paste0("psdata_fcm_norm_rarefied_", tax)]]
-      } else if (norm_method == "qpcr") {
-        psdata = physeq[[paste0("psdata_qpcr_norm_rarefied_", tax)]]
-      }
-
-      alpha_div_folder_png = paste0(figure_folder_png, "Alpha_diversity/")
-      if(!dir.exists(alpha_div_folder_png)){dir.create(alpha_div_folder_png)}
-      tax_folder_png = paste0(alpha_div_folder_png, tax, "/")
-      if(!dir.exists(tax_folder_png)){dir.create(tax_folder_png)}
-
-      alpha_div_folder_pdf = paste0(figure_folder_pdf, "Alpha_diversity/")
-      if(!dir.exists(alpha_div_folder_pdf)){dir.create(alpha_div_folder_pdf)}
-      tax_folder_pdf = paste0(alpha_div_folder_pdf, tax, "/")
-      if(!dir.exists(tax_folder_pdf)){dir.create(tax_folder_pdf)}
-
-      variable_columns = intersect(present_variable_factors, colnames(sample_data(psdata)))
-      factor_columns = unique(c(variable_columns))
-      present_factors = if (length(factor_columns) > 0) factor_columns else NULL
-
-      alpha_data = estimate_richness(psdata, measures = c("Observed", "Chao1", "Shannon", "Simpson"))
-      alpha_data = alpha_data %>% rownames_to_column(var = "sampleid")
-      metadata = sample_data(psdata) %>% data.frame() %>% as_tibble()
-      alpha_data_full = inner_join(metadata, alpha_data, by = "sampleid")
-
-      if (!is.null(date_factor) && date_factor %in% present_factors) {
-        alpha_data_full <- alpha_data_full %>%
-          mutate(!!sym(date_factor) := as.Date(!!sym(date_factor), format = "%d/%m/%Y")) %>%
-          arrange(!!sym(date_factor))
-      }
-
-      # # adding dummy data to the dataset.
-      # dummy_sample_names <- sprintf("DUMMY_%03d", 1:12)
-      # dummy_row <- tibble(
-      #   sampleid = dummy_sample_names,
-      #   timepoint = rep(1, 12),
-      #   Chao1 = 0,
-      #   Shannon = 0,
-      #   Observed = 0,
-      #   Simpson = 0,
-      #   na_type = "dna",
-      #   soil_type = rep(c("L1", "L5", "L7"), each = 4),
-      #   treatment = rep(c("Non-Pesticide", "Pesticide", "Pesticide", "Pesticide"), times = 3),
-      #   replica   = rep(c(4, 1, 2, 3), times = 3)
-      # )
-      # alpha_data_full <- bind_rows(alpha_data_full, dummy_row)
-
-      alpha_div_csv_folder = paste0(output_folder_csv_files, "Alpha_diversity/")
-      if(!dir.exists(alpha_div_csv_folder)){dir.create(alpha_div_csv_folder)}
-      tax_csv_folder = paste0(alpha_div_csv_folder, tax, "/")
-      if(!dir.exists(tax_csv_folder)){dir.create(tax_csv_folder)}
-
-      alpha_data_full_csv = alpha_data_full %>% mutate(Observed = round(Observed, 2),
-                                                       Chao1 = round(Chao1, 2),
-                                                       Shannon = round(Shannon, 2),
-                                                       Simpson = round(Simpson, 2))
-
-      output_file_path = paste0(tax_csv_folder, project_name, "_alpha_diversity_", tax, "_level.csv")
-      write.csv(alpha_data_full_csv, file = output_file_path, row.names = FALSE)
-      log_message(paste("Alpha diversity", tax, "level saved as .csv object in", output_file_path), log_file)
-
-      na_types = unique(alpha_data_full$na_type)
-
-      if (length(na_types) == 1) {
-        chao1_plot = base_alpha_plot(alpha_data_full, "sampleid", "Chao1", x_label = "Sample", y_label = "Chao1 Index") +
-          facet_add(present_factors)
-
-        shannon_plot = base_alpha_plot(alpha_data_full, "sampleid", "Shannon", x_label = "Sample", y_label = "Shannon Index") +
-          facet_add(present_factors)
-
-        combined_plot = plot_grid(chao1_plot + theme(legend.position = "none"), shannon_plot + theme(legend.position = "none"),
-                                  align = "hv", labels = c("A", "B"), nrow = 1)
-
-        n_samples <- length(unique(alpha_data_full$sampleid))
-        fig.width <- max(14, n_samples * 0.6)
-
-        figure_file_path = paste0(tax_folder_png, project_name, "_alpha_diversity_", tax, "_level.png")
-        ggsave(filename = figure_file_path, plot = combined_plot, width = fig.width, height = 6, dpi = 600, limitsize = FALSE)
-        log_message(paste("alpha diversity asv level saved as .png object in", figure_file_path), log_file)
-
-        figure_file_path = paste0(tax_folder_pdf, project_name, "_alpha_diversity_", tax, "_level.pdf")
-        ggsave(filename = figure_file_path, plot = combined_plot, width = fig.width, height = 6)
-        log_message(paste("alpha diversity asv level saved as .pdf object in", figure_file_path), log_file)
-
-      } else if (length(na_types) == 2) {
-        alpha_data_full_dna = alpha_data_full %>% filter(na_type == "dna")
-
-        chao1_plot_dna =
-          base_alpha_plot(alpha_data_full_dna, "sampleid", "Chao1", x_label = "Sample", y_label = "Chao1 Index") +
-          facet_add(present_factors)
-
-        shannon_plot_dna =
-          base_alpha_plot(alpha_data_full_dna, "sampleid", "Shannon", x_label = "Sample", y_label = "Shannon Index") +
-          facet_add(present_factors)
-
-        alpha_data_full_rna = alpha_data_full %>% filter(na_type == "rna")
-
-        chao1_plot_rna =
-          base_alpha_plot(alpha_data_full_rna, "sampleid", "Chao1", x_label = "Sample", y_label = "Chao1 Index") +
-          facet_add(present_factors)
-
-        shannon_plot_rna =
-          base_alpha_plot(alpha_data_full_rna, "sampleid", "Shannon", x_label = "Sample", y_label = "Shannon Index") +
-          facet_add(present_factors)
-
-        separator_line = ggdraw() +
-          draw_line(x = c(0.25, 0.75), y = c(0.5, 0.5), size = 0.5, color = "black") +
-          theme_void()
-
-        dna_label = ggdraw() + draw_label("DNA", fontface = "bold", size = 14, hjust = 0.5)
-        rna_label = ggdraw() + draw_label("RNA", fontface = "bold", size = 14, hjust = 0.5)
-
-        combined_plot_dna = plot_grid(chao1_plot_dna, shannon_plot_dna,
-                                      ncol = 2, labels = c("A", "B"))
-
-        combined_plot_rna = plot_grid(chao1_plot_rna, shannon_plot_rna,
-                                      ncol = 2, labels = c("C", "D"))
-
-        combined_plot = plot_grid(
-          plot_grid(dna_label, separator_line, combined_plot_dna, ncol = 1, rel_heights = c(0.1, 0.05, 1)),
-          plot_grid(rna_label, separator_line, combined_plot_rna, ncol = 1, rel_heights = c(0.1, 0.05, 1)),
-          ncol = 1)
-
-        n_samples_dna <- length(unique(alpha_data_full_dna$sampleid))
-        fig.width_dna <- max(14, n_samples_dna * 0.6)
-
-        n_samples_rna <- length(unique(alpha_data_full_rna$sampleid))
-        fig.width_rna <- max(14, n_samples_rna * 0.6)
-
-        figure_file_path = paste0(tax_folder_png, project_name, "_alpha_diversity_dna_", tax, "_level.png")
-        ggsave(filename = figure_file_path, plot = combined_plot_dna, width = fig.width_dna, height = 6, dpi = 600, limitsize = FALSE)
-        log_message(paste("alpha diversity", tax, "level saved as .png object in", figure_file_path), log_file)
-
-        figure_file_path = paste0(tax_folder_pdf, project_name, "_alpha_diversity_dna_", tax, "_level.pdf")
-        ggsave(filename = figure_file_path, plot = combined_plot_dna, width = fig.width_dna, height = 6)
-        log_message(paste("alpha diversity", tax, "level saved as .pdf object in", figure_file_path), log_file)
-
-        figure_file_path = paste0(tax_folder_png, project_name, "_alpha_diversity_rna_", tax, "_level.png")
-        ggsave(filename = figure_file_path, plot = combined_plot_rna, width = fig.width_rna, height = 6, dpi = 600, limitsize = FALSE)
-        log_message(paste("alpha diversity", tax, "level saved as .png object in", figure_file_path), log_file)
-
-        figure_file_path = paste0(tax_folder_pdf, project_name, "_alpha_diversity_rna_", tax, "_level.pdf")
-        ggsave(filename = figure_file_path, plot = combined_plot_rna, width = fig.width_rna, height = 6)
-        log_message(paste("alpha diversity", tax, "level saved as .pdf object in", figure_file_path), log_file)
-      }
-    }
-  }
-  return(combined_plot)
-
-  log_message("Alpha diversity successfully plotted.", log_file)
 }

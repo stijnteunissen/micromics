@@ -3,7 +3,6 @@
 #' This function aggregates ASV data at specified taxonomic levels (e.g., Phylum, Class, Order, Family, or Genus)
 #' using the \code{tax_glom} function from the \pkg{phyloseq} package.
 #'
-#' @inheritParams rarefying
 #'
 #' @param taxrank A character vector indicating the taxonomic levels at which to group the data.
 #'
@@ -30,7 +29,7 @@ physeq_to_taxa_tibbles = function(physeq, norm_method = NULL, copy_correction = 
   log_message("Starting taxonomic agglomeration and conversion to tibble", status = "start", log_file)
 
   # Define output directory path
-  clean_rds_folder <- file.path(base_path, "clean_rds")
+  clean_rds_folder <- file.path(base_path, "01_r_objects/clean")
 
   results = list()
 

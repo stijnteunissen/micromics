@@ -55,7 +55,7 @@ tax_clean = function(physeq, tax_filter = TRUE, project_id, base_path, log_file)
   log_message("Starting taxonomy table cleaning", status = "start", log_file)
 
   # Define storage directory path
-  raw_rds_folder <- file.path(base_path, "raw_rds")
+  raw_rds_folder = file.path(base_path, "01_r_objects/raw")
 
   # Track initial ASV counts
   ntaxa_in <- phyloseq::ntaxa(physeq)

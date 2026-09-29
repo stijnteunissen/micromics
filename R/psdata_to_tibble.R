@@ -3,8 +3,6 @@
 #' This function transforms a `phyloseq` object into a tibble for each specified taxonomic level
 #' using the \code{psmelt} function from the \pkg{phyloseq} package.
 #'
-#' @inheritParams group_tax
-#'
 #' @details
 #' The primary task of this function is to convert a `phyloseq` object into a tibble at each specified
 #' taxonomic level using the \code{psmelt} function.

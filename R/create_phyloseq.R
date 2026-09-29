@@ -4,7 +4,6 @@
 #' feature tables, taxonomic assignments, phylogenetic tree, and unified
 #' metadata into a single `phyloseq` object for downstream analysis.
 #'
-#' @inheritParams create_folders
 #'
 #' @details
 #' This function performs the following steps:
@@ -42,14 +41,14 @@ create_phyloseq = function(project_id, base_path, log_file) {
   log_message("Creating raw phyloseq object from QIIME2 artifacts and metadata", status = "start", log_file)
 
   # Define data and storage directories
-  input_folder = file.path(base_path, "input_data")
-  raw_rds_folder = file.path(base_path, "raw_rds")
+  qiime2_folder <- file.path(base_path, "qiime2_output")
+  raw_rds_folder = file.path(base_path, "01_r_objects/raw")
 
   # Search for the required artifat and metadata files
-  table_file <- list.files(input_folder, pattern = "table.*\\.qza$", full.names = TRUE, recursive = TRUE)
-  rooted_tree_file <- list.files(input_folder, pattern = "rooted-tree.*\\.qza$", full.names = TRUE, recursive = TRUE)
-  taxonomy_file <- list.files(input_folder, pattern = "classifier.*\\.qza", full.names = TRUE, recursive = TRUE)
-  metadata_file <- list.files(input_folder, pattern = "metadata.*\\.tsv", full.names = TRUE)
+  table_file <- list.files(qiime2_folder, pattern = "table.*\\.qza$", full.names = TRUE, recursive = TRUE)
+  rooted_tree_file <- list.files(qiime2_folder, pattern = "rooted-tree.*\\.qza$", full.names = TRUE, recursive = TRUE)
+  taxonomy_file <- list.files(qiime2_folder, pattern = "classifier.*\\.qza", full.names = TRUE, recursive = TRUE)
+  metadata_file <- list.files(qiime2_folder, pattern = "metadata_prepared.*\\.tsv", full.names = TRUE)
 
   # Validate that critical components exist before attempting import
   if (length(table_file) == 0 || length(taxonomy_file) == 0 || length(metadata_file) == 0) {

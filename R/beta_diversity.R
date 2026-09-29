@@ -67,492 +67,109 @@
 #' }
 #'
 #' @export
-beta_diversity <- function(physeq = physeq,
-                           taxrank = c("Phylum", "Class", "Order", "Family", "Genus"),
-                           norm_method = NULL,
-                           ordination_method = "PCoA",
-                           color_factor = NULL,
-                           color_continuous = TRUE,
-                           shape_factor = NULL,
-                           size_factor = NULL,
-                           alpha_factor = NULL,
-                           fill_factor = NULL) {
-
-  log_message(paste("Step 16: Creating beta diversity.", paste(projects, collapse = ", ")), log_file)
-
-  # Set up project and folder paths
-  project_name <- projects
-  project_folder <- paste0(base_path, project_name)
-  figure_folder_pdf = paste0(project_folder, "/figures/PDF_figures/")
-  if(!dir.exists(figure_folder_pdf)) { dir.create(figure_folder_pdf, recursive = TRUE) }
-  figure_folder_png = paste0(project_folder, "/figures/PNG_figures/")
-  if(!dir.exists(figure_folder_png)) { dir.create(figure_folder_png, recursive = TRUE) }
-  output_folder_csv_files <- paste0(project_folder, "/output_data/csv_files/")
-  if(!dir.exists(output_folder_csv_files)) { dir.create(output_folder_csv_files, recursive = TRUE) }
+beta_diversity <- function(physeq, taxrank, norm_method, ordination_method,
+                           color_var, shape_var, size_var, alpha_var, facet_var,
+                           project_id, base_path, log_file) {
 
   # Function for creating the base beta-diversity plot
-  base_beta_plot <- function(psdata, ordination_method, distance_method, title,
-                             color_factor, shape_factor, size_factor, alpha_factor) {
+  base_beta_plot <- function(physeq, ordination_method, distance_method, title,
+                             color_var, shape_var, size_var, alpha_var, facet_var) {
+
     # Perform the ordination
-    ordination_res <- ordinate(psdata, method = ordination_method, distance = distance_method)
-    base_plot <- plot_ordination(psdata, ordination = ordination_res, axes = c(1, 2))
+    ordination_res <- ordinate(physeq, method = ordination_method, distance = distance_method)
 
-    # Remove any existing point layers to add our own
-    if (length(base_plot$layers) > 0) {
-      base_plot$layers <- base_plot$layers[!sapply(base_plot$layers, function(x) inherits(x$geom, "GeomPoint"))]
-    }
+    # Build a dynamic mapping list to force phyloseq to load ALL required metadata columns
+    mapping_list <- list()
+    if (!is.null(color_var)) mapping_list$color <- color_var
+    if (!is.null(shape_var)) mapping_list$shape <- shape_var
+    if (!is.null(size_var))  mapping_list$size  <- size_var
+    if (!is.null(alpha_var)) mapping_list$alpha <- alpha_var
+    if (!is.null(facet_var)) mapping_list$facet <- facet_var
 
-    # Build the aesthetic mapping list
-    aes_params <- list()
-    if (!is.null(color_factor)) aes_params$color <- sym(color_factor)
-    if (!is.null(shape_factor)) aes_params$shape <- sym(shape_factor)
-    if (!is.null(size_factor))  aes_params$size  <- sym(size_factor)
-    if (!is.null(alpha_factor)) aes_params$alpha <- sym(alpha_factor)
-    if (!is.null(fill_factor)) aes_params$fill <- sym(fill_factor)
+    base_plot <- plot_ordination(physeq, ordination = ordination_res, axes = c(1, 2))
+    base_plot$mapping <- utils::modifyList(base_plot$mapping, ggplot2::aes(!!!lapply(mapping_list, ggplot2::sym)))
+
+    # Safely clear default phyloseq point layers to prevent doubling
+    base_plot$layers <- list()
 
     # Add points with the specified aesthetics
-    base_plot <- base_plot + geom_point(mapping = do.call(aes, aes_params), stroke = 1)
-
-    # Apply color scales based on whether the color factor is continuous or discrete
-    if (!is.null(color_factor)) {
-      if (color_continuous == TRUE) {
-        base_plot <- base_plot + scale_color_continuous(low = "lightblue", high = "darkgreen")
-      } else if (color_continuous == FALSE) {
-        base_plot <- base_plot + scale_color_manual(values = colorset)
-      }
-    }
-    if (!is.null(shape_factor)) {
-      base_plot <- base_plot + scale_shape_manual(values = shapeset) +
-        guides(shape = guide_legend(override.aes = list(fill = "black")))
-    }
-    if (!is.null(size_factor)) {
-      base_plot <- base_plot + scale_size_manual(values = sizeset)
-    }
-    if (!is.null(fill_factor)) {
-      fixed_fill_colors <- c("grey80", "black")
-
-      base_plot <- base_plot + scale_fill_manual(
-        values = setNames(fixed_fill_colors, levels(sample_data(psdata)[[fill_factor]])))
-
-      base_plot <- base_plot + guides(
-        fill = guide_legend(override.aes = list(shape = 21)))
-    }
-    if (!is.null(alpha_factor)) {
-      base_plot <- base_plot + scale_alpha_continuous(range = c(0.3, 1))  # Set transparency for alpha
-    }
-
-    # Add title and labels; adjust theme and axis settings
     base_plot <- base_plot +
+      geom_point(stroke = 1, size = if (is.null(size_var)) 3 else NULL) +
       ggtitle(title) +
-      labs(color = color_factor, shape = shape_factor, size = size_factor, alpha = alpha_factor) +
-      theme(panel.background = element_rect(fill = "transparent"),
-            panel.grid = element_line(colour = "grey90"),
-            strip.text = element_text(face = "bold"),
-            panel.border = element_rect(colour = "black", fill = NA, linewidth = 0.3),
-            axis.line.y = element_line(color = "black", linewidth = 0.3),
-            axis.line.x = element_line(color = "black", linewidth = 0.3)) +
+      labs(color = color_var, shape = shape_var, size = size_var, alpha = alpha_var) +
+      theme_classic() +
+      theme(
+        panel.background = element_rect(fill = "transparent"),
+        panel.grid = element_line(colour = "grey90"),
+        strip.text = element_text(face = "bold"),
+        panel.border = element_rect(colour = "black", fill = NA, linewidth = 0.3),
+        axis.line.y = element_line(color = "black", linewidth = 0.3),
+        axis.line.x = element_line(color = "black", linewidth = 0.3)) +
       scale_y_continuous(expand = expansion(mult = c(0.05, 0.05)))  # 5% expansion for y-axis
+
+    if (!is.null(facet_var)) {
+      base_plot <- base_plot + facet_wrap(vars(!!sym(facet_var)))
+    }
 
     return(base_plot)
   }
 
-  # Create the main beta-diversity folder
-  beta_div_folder_png <- paste0(figure_folder_png, "Beta_diversity/")
-  if (!dir.exists(beta_div_folder_png)){dir.create(beta_div_folder_png)}
+  # Set up project and folder paths
+  figures_folder <- file.path(base_path, "03_figures")
 
-  beta_div_folder_pdf <- paste0(figure_folder_pdf, "Beta_diversity/")
-  if (!dir.exists(beta_div_folder_pdf)){dir.create(beta_div_folder_pdf)}
+  beta_div_folder <- file.path(figures_folder, "beta_diversity")
+  if(!dir.exists(beta_div_folder)) { dir.create(beta_div_folder, recursive = TRUE) }
 
-  if (tolower(taxrank[1]) == "asv") {
-    log_message("Processing ASV-level beta diversity", log_file)
+  for (tax in taxrank) {
+    physeq_rmp <- physeq$physeq_rmp_rarefied
 
-    if (is.null(norm_method)) {
-      psdata_relative <- physeq[["psdata_asv_copy_number_corrected"]]
-    } else if (norm_method == "fcm") {
-      psdata_relative <- physeq[["psdata_asv_copy_number_corrected"]]
-      psdata_absolute <- physeq[["psdata_asv_fcm_norm_rarefied"]]
-    } else if (norm_method == "qpcr") {
-      psdata_relative <- physeq[["psdata_asv_copy_number_corrected"]]
-      psdata_absolute <- physeq[["psdata_asv_qpcr_norm_rarefied"]]
+    if (tax != "ASV") {
+      physeq_rmp_glom <- phyloseq::tax_glom(physeq_rmp, taxrank = tax)
+    } else {
+      physeq_rmp_glom <- physeq_rmp
     }
 
-    # Create the ASV folder under beta-diversity
-    asv_folder_png <- paste0(beta_div_folder_png, "ASV/")
-    if (!dir.exists(asv_folder_png)){dir.create(asv_folder_png)}
+    # Check if a phylogenetic tree is present in the object
+    has_tree <- !is.null(phyloseq::phy_tree(physeq_rmp_glom, errorIfNULL = FALSE))
 
-    asv_folder_pdf <- paste0(beta_div_folder_pdf, "ASV/")
-    if (!dir.exists(asv_folder_pdf)){dir.create(asv_folder_pdf)}
+    # Create beta-diversity plots
+    plot_Jac <- base_beta_plot(physeq_rmp_glom, ordination_method, "jaccard", "Jaccard\n(binary presence)",
+                               color_var, shape_var, size_var, alpha_var, facet_var)
+    plot_BC <- base_beta_plot(physeq_rmp_glom, ordination_method, "bray", "Bray-Curtis\n(presence + abundance)",
+                              color_var, shape_var, size_var, alpha_var, facet_var)
 
-    # Transform counts to relative abundance (percentage)
-    psdata_relative <- transform_sample_counts(psdata_relative, function(x) x / sum(x) * 100)
+    # Extract shared legend safely before stripping panel themes
+    shared_legend <- cowplot::get_legend(plot_Jac + ggplot2::theme(legend.position = "right"))
 
-    # Convert specified variables to factors for absolute data (if available)
-    if (!is.null(norm_method)) {
-      if (!is.null(color_factor))
-        sample_data(psdata_absolute)[[color_factor]] <- as.factor(sample_data(psdata_absolute)[[color_factor]])
-      if (!is.null(shape_factor))
-        sample_data(psdata_absolute)[[shape_factor]] <- as.factor(sample_data(psdata_absolute)[[shape_factor]])
-      if (!is.null(size_factor))
-        sample_data(psdata_absolute)[[size_factor]] <- as.factor(sample_data(psdata_absolute)[[size_factor]])
-      if (!is.null(alpha_factor))
-        sample_data(psdata_absolute)[[alpha_factor]] <- as.factor(sample_data(psdata_absolute)[[alpha_factor]])
+    # Strip legends from standard panels
+    plot_Jac <- plot_Jac + ggplot2::theme(legend.position = "none")
+    plot_BC  <- plot_BC  + ggplot2::theme(legend.position = "none")
+
+    # Conditionally generate UniFrac plots only if a tree exists
+    if (has_tree) {
+      log_message(paste("Phylogenetic tree detected. Generating UniFrac plots for", tax), log_file)
+
+      plot_uu <- base_beta_plot(physeq_rmp_glom, ordination_method, "uunifrac", "Unweighted UniFrac\n(lineage presence)",
+                                color_var, shape_var, size_var, alpha_var, facet_var) + ggplot2::theme(legend.position = "none")
+      plot_wu <- base_beta_plot(physeq_rmp_glom, ordination_method, "wunifrac", "Weighted UniFrac\n(lineage abundance)",
+                                color_var, shape_var, size_var, alpha_var, facet_var) + ggplot2::theme(legend.position = "none")
+
+      # Assemble 4-panel grid layout
+      combined_panels <- cowplot::plot_grid(plot_Jac, plot_BC, plot_uu, plot_wu, ncol = 2, labels = c("A", "B", "C", "D"))
+      plot_ncol <- 2
+    } else {
+      log_message(paste("No phylogenetic tree detected. Skipping UniFrac plots for", tax), log_file)
+
+      # Assemble 2-panel grid layout (only Jaccard and Bray-Curtis side-by-side)
+      combined_panels <- cowplot::plot_grid(plot_Jac, plot_BC, ncol = 2, labels = c("A", "B"))
+      plot_ncol <- 1
     }
 
-    # Define color, shape, and size sets based on psdata_relative
-    if (!is.null(color_factor)) {
-      sample_data(psdata_relative)[[color_factor]] <- as.factor(sample_data(psdata_relative)[[color_factor]])
-      unique_colors <- levels(sample_data(psdata_relative)[[color_factor]])
-      n_colors <- length(unique_colors)
-      if (color_continuous == FALSE) {
-        colorset <<- scales::hue_pal()(n_colors)
-      }
-    }
-    if (!is.null(shape_factor)) {
-      sample_data(psdata_relative)[[shape_factor]] <- as.factor(sample_data(psdata_relative)[[shape_factor]])
-      n_shapes <- length(unique(sample_data(psdata_relative)[[shape_factor]]))
-      if (!is.null(fill_factor)) {
-        shapeset <<- 21:(20 + n_shapes)
-      } else {
-        shapeset <<- seq_len(n_shapes)
-      }
-    }
-    if (!is.null(size_factor)) {
-      sample_data(psdata_relative)[[size_factor]] <- as.factor(sample_data(psdata_relative)[[size_factor]])
-      n_sizes <- length(unique(sample_data(psdata_relative)[[size_factor]]))
-      sizeset <<- seq(2, 2 + 1.2 * (n_sizes - 1), by = 1.2)
-    }
-    if (!is.null(alpha_factor)) {
-      sample_data(psdata_relative)[[alpha_factor]] <- as.factor(sample_data(psdata_relative)[[alpha_factor]])
-      alphaset <<- scale_alpha_continuous(range = c(0.3, 1))
-    }
+    # Assemble final grid visualization with the shared legend
+    final_grid_plot <- cowplot::plot_grid(combined_panels, shared_legend, ncol = 2, rel_widths = c(3, 0.6))
 
-    na_types <- unique(sample_data(psdata_relative)$na_type)
+    ggsave(filename = file.path(beta_div_folder, glue::glue("beta_diversity_rmp_{tax}.png")), plot = final_grid_plot, width = 12, height = 10, dpi = 600)
+    ggsave(filename = file.path(beta_div_folder, glue::glue("beta_diversity_rmp_{tax}.pdf")), plot = final_grid_plot, width = 12, height = 10)
 
-    if (length(na_types) == 1) {
-      # Create beta-diversity plots for a single na_type
-      plot_Jac <- base_beta_plot(psdata_relative, ordination_method, "jaccard", "Jaccard\n(binary presence only)",
-                                 color_factor, shape_factor, size_factor, alpha_factor) +
-        theme(legend.position = "none")
-      plot_BC <- base_beta_plot(psdata_relative, ordination_method, "bray", "Bray-Curtis\n(presence + abundance)",
-                                color_factor, shape_factor, size_factor, alpha_factor) +
-        theme(legend.position = "none")
-      plot_uu <- base_beta_plot(psdata_relative, ordination_method, "uunifrac", "Unweighted UniFrac\n(lineage presence only)",
-                                color_factor, shape_factor, size_factor, alpha_factor) +
-        theme(legend.position = "none")
-      plot_wu <- base_beta_plot(psdata_relative, ordination_method, "wunifrac", "Weighted UniFrac\n(lineage presence and abundance)",
-                                color_factor, shape_factor, size_factor, alpha_factor) +
-        theme(legend.position = "none")
-
-      legend <- get_legend(plot_Jac + theme(legend.position = "right"))
-      combined_plot_relative <- cowplot::plot_grid(plot_Jac, plot_BC, plot_uu, plot_wu,
-                                                   ncol = 2, labels = c("A", "B", "C", "D"))
-      combined_plot_relative <- cowplot::plot_grid(combined_plot_relative, legend, ncol = 2,
-                                                   rel_widths = c(3, 0.8))
-
-      # Save the relative beta diversity plot (using the provided 'level' in the filename)
-      figure_file_path <- paste0(asv_folder_png, project_name, "_beta_diversity_relative_", ordination_method, "_asv_level.png")
-      ggsave(filename = figure_file_path, plot = combined_plot_relative, width = 10, height = 5, dpi = 600)
-      log_message(paste("Relative beta diversity plot saved:", figure_file_path), log_file)
-
-      figure_file_path <- paste0(asv_folder_pdf, project_name, "_beta_diversity_relative_", ordination_method, "_asv_level.pdf")
-      ggsave(filename = figure_file_path, plot = combined_plot_relative, width = 10, height = 5)
-      log_message(paste("Relative beta diversity plot saved:", figure_file_path), log_file)
-
-      # Generate and save absolute beta diversity plots if norm_method is provided
-      if (!is.null(norm_method)) {
-        plot_man <- base_beta_plot(psdata_absolute, ordination_method, "manhattan", "Manhattan\n(PCoA)",
-                                   color_factor, shape_factor, size_factor, alpha_factor) +
-          theme(legend.position = "right")
-
-        figure_file_path <- paste0(asv_folder_png, project_name, "_beta_diversity_absolute_", ordination_method, "_asv_level.png")
-        ggsave(filename = figure_file_path, plot = plot_man, width = 10, height = 5, dpi = 600)
-        log_message(paste("Absolute beta diversity plot saved:", figure_file_path), log_file)
-
-        figure_file_path <- paste0(asv_folder_pdf, project_name, "_beta_diversity_absolute_", ordination_method, "_asv_level.pdf")
-        ggsave(filename = figure_file_path, plot = plot_man, width = 10, height = 5)
-        log_message(paste("Absolute beta diversity plot saved:", figure_file_path), log_file)
-      }
-      return(combined_plot_relative)
-    } else if (length(na_types) == 2) {
-      # Process DNA and RNA separately
-      psdata_relative_dna <- subset_samples(psdata_relative, na_type == "dna")
-      plot_Jac_dna <- base_beta_plot(psdata_relative_dna, ordination_method, "jaccard", "Jaccard\n(binary presence only)",
-                                     color_factor, shape_factor, size_factor, alpha_factor) +
-        theme(legend.position = "none")
-      plot_BC_dna <- base_beta_plot(psdata_relative_dna, ordination_method, "bray", "Bray-Curtis\n(presence + abundance)",
-                                    color_factor, shape_factor, size_factor, alpha_factor) +
-        theme(legend.position = "none")
-      plot_uu_dna <- base_beta_plot(psdata_relative_dna, ordination_method, "uunifrac", "Unweighted UniFrac\n(lineage presence only)",
-                                    color_factor, shape_factor, size_factor, alpha_factor) +
-        theme(legend.position = "none")
-      plot_wu_dna <- base_beta_plot(psdata_relative_dna, ordination_method, "wunifrac", "Weighted UniFrac\n(lineage presence and abundance)",
-                                    color_factor, shape_factor, size_factor, alpha_factor) +
-        theme(legend.position = "none")
-
-      legend_dna <- get_legend(plot_Jac_dna + theme(legend.position = "right"))
-      combined_plot_relative_dna <- cowplot::plot_grid(plot_Jac_dna, plot_BC_dna, plot_uu_dna, plot_wu_dna,
-                                                       ncol = 2, labels = c("A", "B", "C", "D"))
-      combined_plot_relative_dna <- cowplot::plot_grid(combined_plot_relative_dna, legend_dna, ncol = 2,
-                                                       rel_widths = c(3, 0.8))
-
-      figure_file_path <- paste0(asv_folder_png, project_name, "_beta_diversity_relative_", ordination_method, "_asv_level_dna.png")
-      ggsave(filename = figure_file_path, plot = combined_plot_relative_dna, width = 10, height = 5, dpi = 600)
-      log_message(paste("Relative beta diversity DNA plot saved:", figure_file_path), log_file)
-
-      figure_file_path <- paste0(asv_folder_pdf, project_name, "_beta_diversity_relative_", ordination_method, "_asv_level_dna.pdf")
-      ggsave(filename = figure_file_path, plot = combined_plot_relative_dna, width = 10, height = 5)
-      log_message(paste("Relative beta diversity DNA plot saved:", figure_file_path), log_file)
-
-      if (!is.null(norm_method)) {
-        psdata_absolute_dna <- subset_samples(psdata_absolute, na_type == "dna")
-        plot_man_dna <- base_beta_plot(psdata_absolute_dna, ordination_method, "manhattan", "Manhattan\n(PCoA)",
-                                       color_factor, shape_factor, size_factor, alpha_factor) +
-          theme(legend.position = "right")
-
-        figure_file_path <- paste0(asv_folder_png, project_name, "_beta_diversity_absolute_", ordination_method, "_asv_level_dna.png")
-        ggsave(filename = figure_file_path, plot = plot_man_dna, width = 10, height = 5, dpi = 600)
-        log_message(paste("Absolute beta diversity DNA plot saved:", figure_file_path), log_file)
-
-        figure_file_path <- paste0(asv_folder_pdf, project_name, "_beta_diversity_absolute_", ordination_method, "_asv_level_dna.pdf")
-        ggsave(filename = figure_file_path, plot = plot_man_dna, width = 10, height = 5)
-        log_message(paste("Absolute beta diversity DNA plot saved:", figure_file_path), log_file)
-      }
-
-      psdata_relative_rna <- subset_samples(psdata_relative, na_type == "rna")
-      plot_Jac_rna <- base_beta_plot(psdata_relative_rna, ordination_method, "jaccard", "Jaccard\n(binary presence only)",
-                                     color_factor, shape_factor, size_factor, alpha_factor) +
-        theme(legend.position = "none")
-      plot_BC_rna <- base_beta_plot(psdata_relative_rna, ordination_method, "bray", "Bray-Curtis\n(presence + abundance)",
-                                    color_factor, shape_factor, size_factor, alpha_factor) +
-        theme(legend.position = "none")
-      plot_uu_rna <- base_beta_plot(psdata_relative_rna, ordination_method, "uunifrac", "Unweighted UniFrac\n(lineage presence only)",
-                                    color_factor, shape_factor, size_factor, alpha_factor) +
-        theme(legend.position = "none")
-      plot_wu_rna <- base_beta_plot(psdata_relative_rna, ordination_method, "wunifrac", "Weighted UniFrac\n(lineage presence and abundance)",
-                                    color_factor, shape_factor, size_factor, alpha_factor) +
-        theme(legend.position = "none")
-
-      legend_rna <- get_legend(plot_Jac_rna + theme(legend.position = "right"))
-      combined_plot_relative_rna <- cowplot::plot_grid(plot_Jac_rna, plot_BC_rna, plot_uu_rna, plot_wu_rna,
-                                                       ncol = 2, labels = c("A", "B", "C", "D"))
-      combined_plot_relative_rna <- cowplot::plot_grid(combined_plot_relative_rna, legend_rna, ncol = 2,
-                                                       rel_widths = c(3, 0.8))
-
-      figure_file_path <- paste0(asv_folder_png, project_name, "_beta_diversity_relative_", ordination_method, "_asv_level_rna.png")
-      ggsave(filename = figure_file_path, plot = combined_plot_relative_rna, width = 10, height = 5, dpi = 600)
-      log_message(paste("Relative beta diversity RNA plot saved:", figure_file_path), log_file)
-
-      figure_file_path <- paste0(asv_folder_pdf, project_name, "_beta_diversity_relative_", ordination_method, "_asv_level_rna.pdf")
-      ggsave(filename = figure_file_path, plot = combined_plot_relative_rna, width = 10, height = 5)
-      log_message(paste("Relative beta diversity RNA plot saved:", figure_file_path), log_file)
-
-      if (!is.null(norm_method)) {
-        psdata_absolute_rna <- subset_samples(psdata_absolute, na_type == "rna")
-        plot_man_rna <- base_beta_plot(psdata_absolute_rna, ordination_method, "manhattan", "Manhattan\n(PCoA)",
-                                       color_factor, shape_factor, size_factor, alpha_factor) +
-          theme(legend.position = "right")
-
-        figure_file_path <- paste0(asv_folder_png, project_name, "_beta_diversity_absolute_", ordination_method, "_asv_level_rna.png")
-        ggsave(filename = figure_file_path, plot = plot_man_rna, width = 10, height = 5, dpi = 600)
-        log_message(paste("Absolute beta diversity RNA plot saved:", figure_file_path), log_file)
-
-        figure_file_path <- paste0(asv_folder_pdf, project_name, "_beta_diversity_absolute_", ordination_method, "_asv_level_rna.pdf")
-        ggsave(filename = figure_file_path, plot = plot_man_rna, width = 10, height = 5)
-        log_message(paste("Absolute beta diversity RNA plot saved:", figure_file_path), log_file)
-      }
-    }
-  } else {
-    for (tax in taxrank) {
-      log_message(paste("Processing taxonomic level:", tax), log_file)
-
-      if (is.null(norm_method)) {
-        psdata_relative <- physeq[[paste0("psdata_copy_number_corrected_", tax)]]
-        psdata_absolute <- NULL
-      } else if (norm_method == "fcm") {
-        psdata_relative <- physeq[[paste0("psdata_copy_number_corrected_", tax)]]
-        psdata_absolute <- physeq[[paste0("psdata_fcm_norm_rarefied_", tax)]]
-      } else if (norm_method == "qpcr") {
-        psdata_relative <- physeq[[paste0("psdata_copy_number_corrected_", tax)]]
-        psdata_absolute <- physeq[[paste0("psdata_qpcr_norm_rarefied_", tax)]]
-      }
-
-      tax_folder_png <- paste0(beta_div_folder_png, tax, "/")
-      if (!dir.exists(tax_folder_png)) {dir.create(tax_folder_png)}
-
-      tax_folder_pdf <- paste0(beta_div_folder_pdf, tax, "/")
-      if (!dir.exists(tax_folder_pdf)) {dir.create(tax_folder_pdf)}
-
-      psdata_relative <- transform_sample_counts(psdata_relative, function(x) x / sum(x) * 100)
-
-      if (!is.null(norm_method)) {
-        if (!is.null(color_factor))
-          sample_data(psdata_absolute)[[color_factor]] <- as.factor(sample_data(psdata_absolute)[[color_factor]])
-        if (!is.null(shape_factor))
-          sample_data(psdata_absolute)[[shape_factor]] <- as.factor(sample_data(psdata_absolute)[[shape_factor]])
-        if (!is.null(size_factor))
-          sample_data(psdata_absolute)[[size_factor]] <- as.factor(sample_data(psdata_absolute)[[size_factor]])
-        if (!is.null(alpha_factor))
-          sample_data(psdata_absolute)[[alpha_factor]] <- as.factor(sample_data(psdata_absolute)[[alpha_factor]])
-      }
-
-      if (!is.null(color_factor)) {
-        sample_data(psdata_relative)[[color_factor]] <- as.factor(sample_data(psdata_relative)[[color_factor]])
-        unique_colors <- levels(sample_data(psdata_relative)[[color_factor]])
-        n_colors <- length(unique_colors)
-        if (color_continuous == FALSE) {
-          colorset <<- scales::hue_pal()(n_colors)
-        }
-      }
-      if (!is.null(shape_factor)) {
-        sample_data(psdata_relative)[[shape_factor]] <- as.factor(sample_data(psdata_relative)[[shape_factor]])
-        n_shapes <- length(unique(sample_data(psdata_relative)[[shape_factor]]))
-        if (!is.null(fill_factor)) {
-          shapeset <<- 21:(20 + n_shapes)
-        } else {
-          shapeset <<- seq_len(n_shapes)
-        }
-      }
-      if (!is.null(size_factor)) {
-        sample_data(psdata_relative)[[size_factor]] <- as.factor(sample_data(psdata_relative)[[size_factor]])
-        n_sizes <- length(unique(sample_data(psdata_relative)[[size_factor]]))
-        sizeset <<- seq(2, 2 + 1.2 * (n_sizes - 1), by = 1.2)
-      }
-      if (!is.null(alpha_factor)) {
-        sample_data(psdata_relative)[[alpha_factor]] <- as.factor(sample_data(psdata_relative)[[alpha_factor]])
-        alphaset <<- scale_alpha_continuous(range = c(0.3, 1))
-      }
-
-      na_types <- unique(sample_data(psdata_relative)$na_type)
-
-      if (length(na_types) == 1) {
-        plot_Jac <- base_beta_plot(psdata_relative, ordination_method, "jaccard", "Jaccard\n(binary presence only)",
-                                   color_factor, shape_factor, size_factor, alpha_factor) +
-          theme(legend.position = "none")
-        plot_BC <- base_beta_plot(psdata_relative, ordination_method, "bray", "Bray-Curtis\n(presence + abundance)",
-                                  color_factor, shape_factor, size_factor, alpha_factor) +
-          theme(legend.position = "none")
-        plot_uu <- base_beta_plot(psdata_relative, ordination_method, "uunifrac", "Unweighted UniFrac\n(lineage presence only)",
-                                  color_factor, shape_factor, size_factor, alpha_factor) +
-          theme(legend.position = "none")
-        plot_wu <- base_beta_plot(psdata_relative, ordination_method, "wunifrac", "Weighted UniFrac\n(lineage presence and abundance)",
-                                  color_factor, shape_factor, size_factor, alpha_factor) +
-          theme(legend.position = "none")
-
-        legend <- get_legend(plot_Jac + theme(legend.position = "right"))
-        combined_plot_relative <- cowplot::plot_grid(plot_Jac, plot_BC, plot_uu, plot_wu,
-                                                     ncol = 2, labels = c("A", "B", "C", "D"))
-        combined_plot_relative <- cowplot::plot_grid(combined_plot_relative, legend, ncol = 2,
-                                                     rel_widths = c(3, 0.8))
-
-        figure_file_path <- paste0(tax_folder_png, project_name, "_beta_diversity_relative_", ordination_method, "_", tax, "_level.png")
-        ggsave(filename = figure_file_path, plot = combined_plot_relative, width = 10, height = 5, dpi = 600)
-        log_message(paste("Relative beta diversity plot saved:", figure_file_path), log_file)
-
-        figure_file_path <- paste0(tax_folder_pdf, project_name, "_beta_diversity_relative_", ordination_method, "_", tax, "_level.pdf")
-        ggsave(filename = figure_file_path, plot = combined_plot_relative, width = 10, height = 5)
-        log_message(paste("Relative beta diversity plot saved:", figure_file_path), log_file)
-
-        if (!is.null(norm_method)) {
-          plot_man <- base_beta_plot(psdata_absolute, ordination_method, "manhattan", "Manhattan\n(PCoA)",
-                                     color_factor, shape_factor, size_factor, alpha_factor) +
-            theme(legend.position = "right")
-
-          figure_file_path <- paste0(tax_folder_png, project_name, "_beta_diversity_absolute_", ordination_method, "_", tax, "_level.png")
-          ggsave(filename = figure_file_path, plot = plot_man, width = 10, height = 5, dpi = 600)
-          log_message(paste("Absolute beta diversity plot saved:", figure_file_path), log_file)
-
-          figure_file_path <- paste0(tax_folder_pdf, project_name, "_beta_diversity_absolute_", ordination_method, "_", tax, "_level.pdf")
-          ggsave(filename = figure_file_path, plot = plot_man, width = 10, height = 5)
-          log_message(paste("Absolute beta diversity plot saved:", figure_file_path), log_file)
-        }
-      } else if (length(na_types) == 2) {
-        psdata_relative_dna <- subset_samples(psdata_relative, na_type == "dna")
-        plot_Jac_dna <- base_beta_plot(psdata_relative_dna, ordination_method, "jaccard", "Jaccard\n(binary presence only)",
-                                       color_factor, shape_factor, size_factor, alpha_factor) +
-          theme(legend.position = "none")
-        plot_BC_dna <- base_beta_plot(psdata_relative_dna, ordination_method, "bray", "Bray-Curtis\n(presence + abundance)",
-                                      color_factor, shape_factor, size_factor, alpha_factor) +
-          theme(legend.position = "none")
-        plot_uu_dna <- base_beta_plot(psdata_relative_dna, ordination_method, "uunifrac", "Unweighted UniFrac\n(lineage presence only)",
-                                      color_factor, shape_factor, size_factor, alpha_factor) +
-          theme(legend.position = "none")
-        plot_wu_dna <- base_beta_plot(psdata_relative_dna, ordination_method, "wunifrac", "Weighted UniFrac\n(lineage presence and abundance)",
-                                      color_factor, shape_factor, size_factor, alpha_factor) +
-          theme(legend.position = "none")
-
-        legend_dna <- get_legend(plot_Jac_dna + theme(legend.position = "right"))
-        combined_plot_relative_dna <- cowplot::plot_grid(plot_Jac_dna, plot_BC_dna, plot_uu_dna, plot_wu_dna,
-                                                         ncol = 2, labels = c("A", "B", "C", "D"))
-        combined_plot_relative_dna <- cowplot::plot_grid(combined_plot_relative_dna, legend_dna, ncol = 2,
-                                                         rel_widths = c(3, 0.8))
-
-        figure_file_path <- paste0(tax_folder_png, project_name, "_beta_diversity_relative_", ordination_method, "_", tax, "_level_dna.png")
-        ggsave(filename = figure_file_path, plot = combined_plot_relative_dna, width = 10, height = 5, dpi = 600)
-        log_message(paste("Relative beta diversity DNA plot saved:", figure_file_path), log_file)
-
-        figure_file_path <- paste0(tax_folder_pdf, project_name, "_beta_diversity_relative_", ordination_method, "_", tax, "_level_dna.pdf")
-        ggsave(filename = figure_file_path, plot = combined_plot_relative_dna, width = 10, height = 5)
-        log_message(paste("Relative beta diversity DNA plot saved:", figure_file_path), log_file)
-
-        if (!is.null(norm_method)) {
-          psdata_absolute_dna <- subset_samples(psdata_absolute, na_type == "dna")
-          plot_man_dna <- base_beta_plot(psdata_absolute_dna, ordination_method, "manhattan", "Manhattan\n(PCoA)",
-                                         color_factor, shape_factor, size_factor, alpha_factor) +
-            theme(legend.position = "right")
-
-          figure_file_path <- paste0(tax_folder_png, project_name, "_beta_diversity_absolute_", ordination_method, "_", tax, "_level_dna.png")
-          ggsave(filename = figure_file_path, plot = plot_man_dna, width = 10, height = 5, dpi = 600)
-          log_message(paste("Absolute beta diversity DNA plot saved:", figure_file_path), log_file)
-
-          figure_file_path <- paste0(tax_folder_pdf, project_name, "_beta_diversity_absolute_", ordination_method, "_", tax, "_level_dna.pdf")
-          ggsave(filename = figure_file_path, plot = plot_man_dna, width = 10, height = 5)
-          log_message(paste("Absolute beta diversity DNA plot saved:", figure_file_path), log_file)
-        }
-
-        psdata_relative_rna <- subset_samples(psdata_relative, na_type == "rna")
-        plot_Jac_rna <- base_beta_plot(psdata_relative_rna, ordination_method, "jaccard", "Jaccard\n(binary presence only)",
-                                       color_factor, shape_factor, size_factor, alpha_factor) +
-          theme(legend.position = "none")
-        plot_BC_rna <- base_beta_plot(psdata_relative_rna, ordination_method, "bray", "Bray-Curtis\n(presence + abundance)",
-                                      color_factor, shape_factor, size_factor, alpha_factor) +
-          theme(legend.position = "none")
-        plot_uu_rna <- base_beta_plot(psdata_relative_rna, ordination_method, "uunifrac", "Unweighted UniFrac\n(lineage presence only)",
-                                      color_factor, shape_factor, size_factor, alpha_factor) +
-          theme(legend.position = "none")
-        plot_wu_rna <- base_beta_plot(psdata_relative_rna, ordination_method, "wunifrac", "Weighted UniFrac\n(lineage presence and abundance)",
-                                      color_factor, shape_factor, size_factor, alpha_factor) +
-          theme(legend.position = "none")
-
-        legend_rna <- get_legend(plot_Jac_rna + theme(legend.position = "right"))
-        combined_plot_relative_rna <- cowplot::plot_grid(plot_Jac_rna, plot_BC_rna, plot_uu_rna, plot_wu_rna,
-                                                         ncol = 2, labels = c("A", "B", "C", "D"))
-        combined_plot_relative_rna <- cowplot::plot_grid(combined_plot_relative_rna, legend_rna, ncol = 2,
-                                                         rel_widths = c(3, 0.8))
-
-        figure_file_path <- paste0(tax_folder_png, project_name, "_beta_diversity_relative_", ordination_method, "_", tax, "_level_rna.png")
-        ggsave(filename = figure_file_path, plot = combined_plot_relative_rna, width = 10, height = 5, dpi = 600)
-        log_message(paste("Relative beta diversity RNA plot saved:", figure_file_path), log_file)
-
-        figure_file_path <- paste0(tax_folder_pdf, project_name, "_beta_diversity_relative_", ordination_method, "_", tax, "_level_rna.pdf")
-        ggsave(filename = figure_file_path, plot = combined_plot_relative_rna, width = 10, height = 5)
-        log_message(paste("Relative beta diversity RNA plot saved:", figure_file_path), log_file)
-
-        if (!is.null(norm_method)) {
-          psdata_absolute_rna <- subset_samples(psdata_absolute, na_type == "rna")
-          plot_man_rna <- base_beta_plot(psdata_absolute_rna, ordination_method, "manhattan", "Manhattan\n(PCoA)",
-                                         color_factor, shape_factor, size_factor, alpha_factor) +
-            theme(legend.position = "right")
-
-          figure_file_path <- paste0(tax_folder_png, project_name, "_beta_diversity_absolute_", ordination_method, "_", tax, "_level_rna.png")
-          ggsave(filename = figure_file_path, plot = plot_man_rna, width = 10, height = 5, dpi = 600)
-          log_message(paste("Absolute beta diversity RNA plot saved:", figure_file_path), log_file)
-
-          figure_file_path <- paste0(tax_folder_pdf, project_name, "_beta_diversity_absolute_", ordination_method, "_", tax, "_level_rna.pdf")
-          ggsave(filename = figure_file_path, plot = plot_man_rna, width = 10, height = 5)
-          log_message(paste("Absolute beta diversity RNA plot saved:", figure_file_path), log_file)
-        }
-      }
-    } # end for loop
   }
-  log_message("Beta diversity successfully plotted.", log_file)
 }

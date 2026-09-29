@@ -5,18 +5,23 @@
 \title{Create Barplots for Relative and Absolute Abundance}
 \usage{
 barplot(
-  physeq,
-  ntaxa = NULL,
-  norm_method = NULL,
-  taxrank = c("Phylum", "Class", "Order", "Family", "Genus")
+  psdata,
+  norm_method,
+  taxrank,
+  ntaxa = 23,
+  facet_vars,
+  plot_width,
+  project_id,
+  base_path,
+  log_file
 )
 }
 \arguments{
-\item{ntaxa}{An integer specifying the maximum number of taxa to display in the barplot. Default is 23.}
-
 \item{norm_method}{A string indicating the normalization method used for absolute abundance
 data. Options are \code{"fcm"} (flow cytometry) or \code{"qpcr"} (quantitative PCR).
 (relative abundance only).}
+
+\item{ntaxa}{An integer specifying the maximum number of taxa to display in the barplot. Default is 23.}
 
 \item{sample_matrix}{An optional matrix specifying the sample structure or metadata.}
 

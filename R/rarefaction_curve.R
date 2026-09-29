@@ -17,7 +17,7 @@ rarefaction_curve <- function(physeq, color = "sample_or_control", project_id, b
   log_message("Generating rarefaction curve plot on raw ASV levels.", status = "start", log_file)
 
   # Define storage directory path cleanly
-  figure_folder <- file.path(base_path, "figures")
+  figure_folder <- file.path(base_path, "03_figures")
 
   # Validate mandatory core coloring column presence
   if (!"sample_or_control" %in% colnames(phyloseq::sample_data(physeq))) {
@@ -52,7 +52,6 @@ rarefaction_curve <- function(physeq, color = "sample_or_control", project_id, b
     if (is.null(xlim_val)) {
       # Open a silent graphics device to calculate max depth per sample
       pdf(NULL)
-      on.exit(if (dev.cur() > 1) dev.off(), add = TRUE)
       captured_curve <- vegan::rarecurve(t(abund_table), step = 100, label = FALSE)
       dev.off()
       xlim_val <- c(0, max(sapply(captured_curve, function(x) max(attr(x, "Subsample")))))
@@ -61,7 +60,6 @@ rarefaction_curve <- function(physeq, color = "sample_or_control", project_id, b
     if (is.null(ylim_val)) {
       # Dynamically scale y-axis to the maximum number of ASVs found within a single sample
       pdf(NULL)
-      on.exit(if (dev.cur() > 1) dev.off(), add = TRUE)
       captured_curve <- vegan::rarecurve(t(abund_table), step = 100, label = FALSE)
       dev.off()
       ylim_val <- c(0, max(sapply(captured_curve, function(x) max(x))))
@@ -90,6 +88,7 @@ rarefaction_curve <- function(physeq, color = "sample_or_control", project_id, b
 
   # Open graphics engine and write plot stream
   grDevices::cairo_pdf(file = output_pdf_path, width = 7, height = 5)
+  on.exit(if (dev.cur() > 1) grDevices::dev.off(), add = TRUE)
   plot_rarecurve(physeq, color_col = color, xlim_val = c(0, max(phyloseq::sample_sums(physeq))))
   grDevices::dev.off()
 

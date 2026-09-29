@@ -1,4 +1,4 @@
-#' Decontaminate a Phyloseq Object Using Specified Methods
+c#' Decontaminate a Phyloseq Object Using Specified Methods
 #'
 #' This function removes contamination from a phyloseq object using the
 #' [`decontam`](https://benjjneb.github.io/decontam/vignettes/decontam_intro.html) package.
@@ -48,8 +48,8 @@ decontam =  function(physeq, decon_method = c("frequency", "prevalence", "both")
   decon_method <- match.arg(decon_method)
 
   # Define coutput directory paths
-  figure_folder <- file.path(base_path, "figures")
-  raw_rds_folder <- file.path(base_path, "raw_rds")
+  figure_folder <- file.path(base_path, "03_figures")
+  raw_rds_folder = file.path(base_path, "01_r_objects/raw")
 
   # Initialize empty containers for tracking contaminant
   contam_taxa_freq <- character(0)

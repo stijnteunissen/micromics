@@ -49,7 +49,7 @@ remove_mock = function(physeq, mock_genera, mock = TRUE, project_id, base_path, 
   log_message("Removing mock-specific ASVs", status = "start", log_file)
 
   # Define storage directory path
-  raw_rds_folder <- file.path(base_path, "raw_rds")
+  raw_rds_folder = file.path(base_path, "01_r_objects/raw")
 
   # Validate presence of required sample data
   if (!("sample_or_control" %in% colnames(phyloseq::sample_data(physeq)))) {

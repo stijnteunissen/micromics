@@ -5,10 +5,14 @@
 \title{Generate Alpha Diversity Plots}
 \usage{
 alpha_diversity(
-  physeq = physeq,
-  norm_method = NULL,
-  taxrank = c("Phylum", "Class", "Order", "Family", "Genus"),
-  date_factor = NULL
+  physeq,
+  norm_method,
+  taxrank,
+  facet_vars,
+  plot_width,
+  project_id,
+  base_path,
+  log_file
 )
 }
 \arguments{

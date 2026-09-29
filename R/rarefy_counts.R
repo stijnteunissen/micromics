@@ -57,7 +57,7 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
   log_message("Starting rarefying data", status = "start", log_file)
 
   # Define directory paths
-  clean_rds_folder <- file.path(base_path, "clean_rds")
+  clean_rds_folder <- file.path(base_path, "01_r_objects/clean")
 
   # Ensure 'vegan' is installed on the master node; install if missing
   if (!requireNamespace("vegan", quietly = TRUE)) {

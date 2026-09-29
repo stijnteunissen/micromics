@@ -33,7 +33,7 @@ resolve_tree = function(physeq, project_id, base_path, log_file) {
   log_message("Starting phylogenetic tree validation and node resolution.", status = "start", log_file)
 
   # Define storage directory path
-  raw_rds_folder <- file.path(base_path, "raw_rds")
+  raw_rds_folder = file.path(base_path, "01_r_objects/raw")
 
   # Extract tree slot
   current_tree <- phyloseq::phy_tree(physeq, errorIfNULL = FALSE)

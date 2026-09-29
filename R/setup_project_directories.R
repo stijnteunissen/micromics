@@ -63,16 +63,17 @@ setup_project_directories <- function(project_id, base_path, log_file = log_file
   log_message(glue::glue("Initialzing project structure for: {project_id}"), status = "start", log_file)
 
   # Create the required directories if they don't exist
-  if(!dir.exists(file.path(base_path, "input_data"))){dir.create(file.path(base_path, "input_data"))}
-  if(!dir.exists(file.path(base_path, "csv_exports"))){dir.create(file.path(base_path, "csv_exports"))}
-  if(!dir.exists(file.path(base_path, "raw_rds"))){dir.create(file.path(base_path, "raw_rds"))}
-  if(!dir.exists(file.path(base_path, "clean_rds"))){dir.create(file.path(base_path, "clean_rds"))}
-  if(!dir.exists(file.path(base_path, "messages"))){dir.create(file.path(base_path, "messages"))}
-  if(!dir.exists(file.path(base_path, "figures"))){dir.create(file.path(base_path, "figures"))}
+  # if(!dir.exists(file.path(base_path, "input_data"))){dir.create(file.path(base_path, "input_data"))}
+  if(!dir.exists(file.path(base_path, "01_r_objects"))){dir.create(file.path(base_path, "01_r_objects"))}
+  if(!dir.exists(file.path(base_path, "01_r_objects/raw"))){dir.create(file.path(base_path, "01_r_objects/raw"))}
+  if(!dir.exists(file.path(base_path, "01_r_objects/clean"))){dir.create(file.path(base_path, "01_r_objects/clean"))}
+
+  if(!dir.exists(file.path(base_path, "02_exports"))){dir.create(file.path(base_path, "02_exports"))}
+  if(!dir.exists(file.path(base_path, "03_figures"))){dir.create(file.path(base_path, "03_figures"))}
+  if(!dir.exists(file.path(base_path, "04_additional"))){dir.create(file.path(base_path, "04_additional"))}
 
   # Define source and destination paths
   qiime2_folder <- file.path(base_path, "qiime2_output")
-  input_folder <- file.path(base_path, "input_data")
 
   project_files <- list.files(qiime2_folder, full.names = TRUE)
 
@@ -94,16 +95,6 @@ setup_project_directories <- function(project_id, base_path, log_file = log_file
       log_message(warning_message, status = "warning", log_file)
     }
   }
-
-  # Copy the relevant files
-  copy_patterns <- paste(
-    "table.*\\.qza$", "rooted-tree.*\\.qza$", "classifier.*\\.qza$",
-    "qPCR.*\\.(tsv|txt|csv)$", "fcm.*\\.(tsv|txt|csv)$", "prediction.*\\.RDS$",
-    sep = "|")
-
-  # Filter and copy the target files
-  files_to_copy <- list.files(qiime2_folder, pattern = copy_patterns, full.names = TRUE)
-  file.copy(files_to_copy, input_folder, overwrite = TRUE)
 
   # Log successful completion
   log_message("Folder structure successfully created.", status = "success", log_file)

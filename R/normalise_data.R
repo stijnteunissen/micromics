@@ -91,9 +91,9 @@ normalise_data = function(physeq, norm_method = NULL, copy_correction = TRUE, pr
   log_message("Starting copy number correction and biomass normalisation", status = "start", log_file)
 
   # Define output directory paths
-  input_folder <- file.path(base_path, "input_data")
-  raw_rds_folder <- file.path(base_path, "raw_rds")
-  figure_folder <- file.path(base_path, "figures")
+  input_folder <- file.path(base_path, "qiime2_output")
+  raw_rds_folder = file.path(base_path, "01_r_objects/raw")
+  figure_folder <- file.path(base_path, "03_figures")
 
   # Initialize placeholders for the final outputs
   physeq_copy_corrected <- NULL

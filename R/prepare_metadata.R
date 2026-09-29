@@ -4,8 +4,6 @@
 #' QIIME metadata, experimental sample metadata, and qPCR or FCM data, to create a unified
 #' metadata file for downstream analyses.
 #'
-#' @inheritParams create_folders
-#'
 #' @details
 #' The function ensures that the metadata is unified and correctly formatted for further analysis by:
 #' \itemize{
@@ -44,7 +42,6 @@ prepare_metadata <- function(project_id, base_path, norm_method = NULL, log_file
   log_message("Preparing metadata with combining biomass measurements (fcm or qpcr) with sample data.", status = "start", log_file)
 
   # Define data directories
-  input_folder <- file.path(base_path, "input_data")
   qiime2_folder <- file.path(base_path, "qiime2_output")
 
   # Locate and validate metadata
@@ -140,7 +137,7 @@ prepare_metadata <- function(project_id, base_path, norm_method = NULL, log_file
   }
 
   # Save the updated metadata
-  output_file <- file.path(input_folder, glue::glue("{project_id}_prepared_metadata.tsv"))
+  output_file <- file.path(qiime2_folder, glue::glue("{project_id}_metadata_prepared.tsv"))
   readr::write_delim(metadata, file = output_file, delim = "\t")
   log_message("Metadata preparation completed successfully.", status = "success", log_file)
 }
