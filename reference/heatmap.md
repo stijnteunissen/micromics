@@ -11,21 +11,23 @@ sample metadata if available and saved as a PDF.
 
 ``` r
 heatmap(
-  physeq = rarefied_genus_psmelt,
-  ntaxa = NULL,
-  norm_method = NULL,
-  taxrank = c("Phylum", "Class", "Order", "Family", "Genus"),
-  date_factor = NULL,
-  SampleID_xas = FALSE
+  psdata,
+  taxrank,
+  ntaxa = 23,
+  facet_vars,
+  plot_width,
+  project_id,
+  base_path,
+  log_file
 )
 ```
 
 ## Arguments
 
-- physeq:
+- taxrank:
 
-  A phyloseq object containing normalized genus-level data. The default
-  is `rarefied_genus_psmelt`.
+  A character string indicating the taxonomic rank to use for grouping
+  taxa. The default is `"Genus"`.
 
 - ntaxa:
 
@@ -33,17 +35,17 @@ heatmap(
   individually. Taxa below the threshold are grouped into "Other". If
   `NULL`, `ntaxa` is set to 23.
 
+- physeq:
+
+  A phyloseq object containing normalized genus-level data. The default
+  is `rarefied_genus_psmelt`.
+
 - norm_method:
 
   A character string specifying the normalization method. If `NULL`, the
   function uses the provided `physeq` directly. If set to `"fcm"` or
   `"qpcr"`, the function extracts the corresponding
   `psmelt_copy_number_corrected_` data based on the taxonomic rank.
-
-- taxrank:
-
-  A character string indicating the taxonomic rank to use for grouping
-  taxa. The default is `"Genus"`.
 
 ## Value
 

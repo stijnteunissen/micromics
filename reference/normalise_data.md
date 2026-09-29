@@ -10,9 +10,12 @@ normalization.
 
 ``` r
 normalise_data(
-  physeq = without_mock_physeq,
+  physeq,
   norm_method = NULL,
-  copy_correction = TRUE
+  copy_correction = TRUE,
+  project_id,
+  base_path,
+  log_file
 )
 ```
 

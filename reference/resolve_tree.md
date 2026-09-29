@@ -10,7 +10,7 @@ RDS file.
 ## Usage
 
 ``` r
-resolve_tree(physeq = cleaned_physeq)
+resolve_tree(physeq, project_id, base_path, log_file)
 ```
 
 ## Arguments
@@ -33,7 +33,8 @@ This function performs the following steps:
 
 - Checks if the `phyloseq` object contains a binary phylogenetic tree.
 
-- Resolves polychotomous nodes (if present) using `ape::multi2di()`.
+- Resolves polychotomous nodes (if present) using
+  [`ape::multi2di()`](https://rdrr.io/pkg/ape/man/multi2di.html).
 
 - Ensures that the tree is binary after resolution; raises an error if
   unresolved.

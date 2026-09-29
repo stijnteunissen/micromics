@@ -13,16 +13,18 @@ normalization method is provided.
 
 ``` r
 beta_diversity(
-  physeq = physeq,
-  taxrank = c("Phylum", "Class", "Order", "Family", "Genus"),
-  norm_method = NULL,
-  ordination_method = "PCoA",
-  color_factor = NULL,
-  color_continuous = TRUE,
-  shape_factor = NULL,
-  size_factor = NULL,
-  alpha_factor = NULL,
-  fill_factor = NULL
+  physeq,
+  taxrank,
+  norm_method,
+  ordination_method,
+  color_var,
+  shape_var,
+  size_var,
+  alpha_var,
+  facet_var,
+  project_id,
+  base_path,
+  log_file
 )
 ```
 

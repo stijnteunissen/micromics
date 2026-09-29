@@ -10,34 +10,30 @@ RDS files.
 
 ``` r
 barplot(
-  physeq = rarefied_genus_psmelt,
-  ntaxa = NULL,
-  norm_method = NULL,
-  sample_matrix = NULL,
-  group_by_factor = NULL,
-  taxrank = c("Phylum", "Class", "Order", "Family", "Genus"),
-  date_factor = NULL,
-  SampleID_xas = FALSE
+  psdata,
+  norm_method,
+  taxrank,
+  ntaxa = 23,
+  facet_vars,
+  plot_width,
+  project_id,
+  base_path,
+  log_file
 )
 ```
 
 ## Arguments
-
-- physeq:
-
-  A `phyloseq` object containing the microbiome data. This is the input
-  object that the function processes.
-
-- ntaxa:
-
-  An integer specifying the maximum number of taxa to display in the
-  barplot. Default is 23.
 
 - norm_method:
 
   A string indicating the normalization method used for absolute
   abundance data. Options are `"fcm"` (flow cytometry) or `"qpcr"`
   (quantitative PCR). (relative abundance only).
+
+- ntaxa:
+
+  An integer specifying the maximum number of taxa to display in the
+  barplot. Default is 23.
 
 - sample_matrix:
 
@@ -46,11 +42,6 @@ barplot(
 - group_by_factor:
 
   with this option you can separtate de barplot for factors
-
-- taxrank:
-
-  A character vector indicating the taxonomic levels at which to group
-  the data.
 
 ## Value
 
@@ -85,5 +76,5 @@ barplot(
   norm_method = "fcm",
   sample_matrix = sample_metadata
 )
-#> Error in barplot(physeq = rarefied_genus_psmelt, ntaxa = 20, colorset = my_colors,     norm_method = "fcm", sample_matrix = sample_metadata): unused argument (colorset = my_colors)
+#> Error in barplot(physeq = rarefied_genus_psmelt, ntaxa = 20, colorset = my_colors,     norm_method = "fcm", sample_matrix = sample_metadata): unused arguments (physeq = rarefied_genus_psmelt, colorset = my_colors, sample_matrix = sample_metadata)
 ```

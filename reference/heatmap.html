@@ -17,7 +17,7 @@ as a PDF.'></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">micromics</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,12 +54,14 @@ as a PDF.</p>
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">heatmap</span><span class="op">(</span></span>
-<span>  physeq <span class="op">=</span> <span class="va">rarefied_genus_psmelt</span>,</span>
-<span>  ntaxa <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  norm_method <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  taxrank <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Phylum"</span>, <span class="st">"Class"</span>, <span class="st">"Order"</span>, <span class="st">"Family"</span>, <span class="st">"Genus"</span><span class="op">)</span>,</span>
-<span>  date_factor <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  SampleID_xas <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  <span class="va">psdata</span>,</span>
+<span>  <span class="va">taxrank</span>,</span>
+<span>  ntaxa <span class="op">=</span> <span class="fl">23</span>,</span>
+<span>  <span class="va">facet_vars</span>,</span>
+<span>  <span class="va">plot_width</span>,</span>
+<span>  <span class="va">project_id</span>,</span>
+<span>  <span class="va">base_path</span>,</span>
+<span>  <span class="va">log_file</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -67,20 +69,20 @@ as a PDF.</p>
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
 
 
-<dl><dt id="arg-physeq">physeq<a class="anchor" aria-label="anchor" href="#arg-physeq"></a></dt>
-<dd><p>A phyloseq object containing normalized genus-level data. The default is <code>rarefied_genus_psmelt</code>.</p></dd>
+<dl><dt id="arg-taxrank">taxrank<a class="anchor" aria-label="anchor" href="#arg-taxrank"></a></dt>
+<dd><p>A character string indicating the taxonomic rank to use for grouping taxa. The default is <code>"Genus"</code>.</p></dd>
 
 
 <dt id="arg-ntaxa">ntaxa<a class="anchor" aria-label="anchor" href="#arg-ntaxa"></a></dt>
 <dd><p>An integer specifying the maximum number of taxa to display individually. Taxa below the threshold are grouped into "Other". If <code>NULL</code>, <code>ntaxa</code> is set to 23.</p></dd>
 
 
+<dt id="arg-physeq">physeq<a class="anchor" aria-label="anchor" href="#arg-physeq"></a></dt>
+<dd><p>A phyloseq object containing normalized genus-level data. The default is <code>rarefied_genus_psmelt</code>.</p></dd>
+
+
 <dt id="arg-norm-method">norm_method<a class="anchor" aria-label="anchor" href="#arg-norm-method"></a></dt>
 <dd><p>A character string specifying the normalization method. If <code>NULL</code>, the function uses the provided <code>physeq</code> directly. If set to <code>"fcm"</code> or <code>"qpcr"</code>, the function extracts the corresponding <code>psmelt_copy_number_corrected_</code> data based on the taxonomic rank.</p></dd>
-
-
-<dt id="arg-taxrank">taxrank<a class="anchor" aria-label="anchor" href="#arg-taxrank"></a></dt>
-<dd><p>A character string indicating the taxonomic rank to use for grouping taxa. The default is <code>"Genus"</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

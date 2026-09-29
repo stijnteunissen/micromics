@@ -10,7 +10,7 @@ by setting the `mock` parameter.
 ## Usage
 
 ``` r
-remove_mock(physeq = decontam_physeq, mock_genera = mock_genera, mock = TRUE)
+remove_mock(physeq, mock_genera, mock = TRUE, project_id, base_path, log_file)
 ```
 
 ## Arguments

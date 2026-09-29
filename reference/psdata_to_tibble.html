@@ -9,7 +9,7 @@ using the psmelt function from the phyloseq package."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">micromics</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,26 +48,6 @@ using the <code>psmelt</code> function from the <span class="pkg">phyloseq</span
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
-    <div class="section level2">
-    <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-
-
-<dl><dt id="arg-physeq">physeq<a class="anchor" aria-label="anchor" href="#arg-physeq"></a></dt>
-<dd><p>A <code>phyloseq</code> object containing the microbiome data.
-This is the input object that the function processes.</p></dd>
-
-
-<dt id="arg-norm-method">norm_method<a class="anchor" aria-label="anchor" href="#arg-norm-method"></a></dt>
-<dd><p>A character string specifying the normalization method. Acceptable values are:</p><ul><li><p><code>NULL</code>: Use this option if no FCM or qPCR data is available, or if you wish to retain only relative abundances.</p></li>
-<li><p><code>"fcm"</code>: Use this option if the data have been normalized using flow cytometry (FCM).</p></li>
-<li><p><code>"qpcr"</code>: Use this option if the data have been normalized using quantitative PCR (qPCR).</p></li>
-</ul></dd>
-
-
-<dt id="arg-taxrank">taxrank<a class="anchor" aria-label="anchor" href="#arg-taxrank"></a></dt>
-<dd><p>A character vector indicating the taxonomic levels at which to group the data.</p></dd>
-
-</dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>The function saves multiple <code>phyloseq</code>-derived tibbles as RDS files and returns a list of tibbles:</p><ul><li><p><strong>If <code>norm_method</code> is <code>NULL</code>:</strong>

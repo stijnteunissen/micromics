@@ -14,32 +14,6 @@ psdata_to_tibble(
 )
 ```
 
-## Arguments
-
-- physeq:
-
-  A `phyloseq` object containing the microbiome data. This is the input
-  object that the function processes.
-
-- norm_method:
-
-  A character string specifying the normalization method. Acceptable
-  values are:
-
-  - `NULL`: Use this option if no FCM or qPCR data is available, or if
-    you wish to retain only relative abundances.
-
-  - `"fcm"`: Use this option if the data have been normalized using flow
-    cytometry (FCM).
-
-  - `"qpcr"`: Use this option if the data have been normalized using
-    quantitative PCR (qPCR).
-
-- taxrank:
-
-  A character vector indicating the taxonomic levels at which to group
-  the data.
-
 ## Value
 
 The function saves multiple `phyloseq`-derived tibbles as RDS files and

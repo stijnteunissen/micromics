@@ -11,9 +11,12 @@ the frequency method can be performed.
 
 ``` r
 decontam(
-  physeq = resolved_tree_physeq,
+  physeq,
   decon_method = c("frequency", "prevalence", "both"),
-  blank = TRUE
+  blank = TRUE,
+  project_id,
+  base_path,
+  log_file
 )
 ```
 

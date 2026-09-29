@@ -1,41 +1,43 @@
 # Generate and Save Rarefaction Curve
 
-This function creates a rarefaction curve for a given phyloseq object
-and saves the plot as a PDF.
+Generates a sequencing depth rarefaction curve from a phyloseq object
+and exports the resulting plot as a PDF.
 
 ## Usage
 
 ``` r
-rarefaction_curve(physeq = resolved_tree_physeq, color = NULL)
+rarefaction_curve(
+  physeq,
+  color = "sample_or_control",
+  project_id,
+  base_path,
+  log_file
+)
 ```
 
 ## Arguments
 
 - physeq:
 
-  A `phyloseq` object containing the microbiome data. This is the input
-  object that the function processes.
+  A phyloseq object to be analyzed.
 
 - color:
 
-  A character string specifying the column in the sample metadata to use
-  for coloring the samples. Default is `NULL`, which automatically sets
-  the color to `"sample_or_control"`.
+  Character string specifying the metadata column used for coloring
+  lines. Defaults to `"sample_or_control"`.
+
+- project_id:
+
+  Character string specifying the unique project name.
+
+- base_path:
+
+  Character string specifying the root project directory.
+
+- log_file:
+
+  Character string specifying the path to the log file.
 
 ## Value
 
-The rarefaction curve plot object.
-
-## Details
-
-This function first checks whether the `sample_or_control` column exists
-in the sample metadata. It then generates a rarefaction curve using the
-`amp_rarecurve` function and saves the plot as a PDF file in the
-specified directory.
-
-## Examples
-
-``` r
-rarefaction_curve(physeq = physeq)
-#> Error in log_message(paste("Step 6: Creating rarefaction curve: creating rarefaction curve before cleaning on ASV level.",     paste(projects, collapse = ", ")), log_file): could not find function "log_message"
-```
+None. This function is called for its side effects (saving a PDF file).

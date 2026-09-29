@@ -12,7 +12,7 @@ without merging unclassified taxa from diverse ancestry.
 ## Usage
 
 ``` r
-tax_clean(physeq = physeq, tax_filter = TRUE)
+tax_clean(physeq, tax_filter = TRUE, project_id, base_path, log_file)
 ```
 
 ## Arguments
