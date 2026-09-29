@@ -79,7 +79,7 @@ prepare_metadata <- function(project_id, base_path, norm_method = NULL, log_file
   missing_col <- required_col[!required_col %in% colnames(metadata)]
 
   if (length(missing_col) > 0) {
-    error_message <- glue::glue("Error: Metadata is missing required columns: {paste(missing_col, collapse = `, `)}")
+    error_message <- glue::glue("Error: Metadata is missing required columns: {paste(missing_col, collapse = ', ')}")
     log_message(error_message, status = "error", log_file)
     stop(error_message, call. = FALSE)
   }
