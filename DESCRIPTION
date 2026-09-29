@@ -1,6 +1,6 @@
 Package: micromics
 Title: An R package to integrate QIIME2 output and biomass quantitation for pseudo-quantitative microbiome analysis
-Version: 1.0.0
+Version: 2.0.0
 Date: 2025
 Authors@R: person("Stijn", "Teunissen", email = "Stijn.Teunissen@wetsus.nl", role = c("aut", "cre"))
 Description: micromics: an R package to integrate QIIME2 output and biomass quantitation for pseudo-quantitative microbiome analysis
