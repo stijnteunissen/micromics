@@ -276,6 +276,7 @@ RCLR_transformation <- function(physeq, taxrank, facet_var, color_var, shape_var
         if (!is.null(facet_var)) {
           p <- p + facet_wrap(vars(!!sym(facet_var)))
         }
+        return(p)
       }
 
       pc_time_folder <- file.path(rclr_folder, "PC_Time")
