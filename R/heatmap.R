@@ -46,7 +46,7 @@ heatmap = function(psdata, taxrank, ntaxa = 23, facet_vars, plot_width, project_
   # Define internal heatmap function
   base_heatmap = function(plot_data, x_value, abund_value, legend_name, x_label = "Sample", tax_column, facet_vars) {
 
-    # Initialize ggplot heatmap with dynamci taxonomic column
+    # Initialize ggplot heatmap with dynamic taxonomic column
     p <- ggplot(plot_data, aes(x = Sample,
                                y = !!sym(tax_column))) +
       geom_tile(aes(fill = !!sym(abund_value)), color = NA) +
@@ -66,7 +66,7 @@ heatmap = function(psdata, taxrank, ntaxa = 23, facet_vars, plot_width, project_
                     color = ifelse(!!sym(abund_value) > 50, "#D3D3D3", "black")),
                 size = 3)
 
-    # Add nested facets condittionally if vairables are provided
+    # Add nested facets conditionally if variables are provided
     if (!is.null(facet_vars)) {
       p <- p +
         facet_nested(
@@ -136,6 +136,10 @@ heatmap = function(psdata, taxrank, ntaxa = 23, facet_vars, plot_width, project_
     } else {
       plot_data_rmp_cleaned <- plot_data_rmp
     }
+
+    plot_data_rmp_cleaned <- plot_data_rmp_cleaned %>%
+      dplyr::group_by(across(any_of(c("Sample", tax, facet_vars)))) %>%
+      dplyr::summarise(rel_abund = sum(rel_abund), .groups = "drop")
 
     # Extract final character order of features excluding other category
     tax_order <- plot_data_rmp_cleaned %>%
