@@ -19,7 +19,6 @@ RCLR_transformation <- function(physeq, taxrank, facet_var, color_var, shape_var
   for (tax in taxrank) {
     physeq_rmp <- physeq$physeq_rmp_rarefied
 
-
     # Agglomerate taxa if not at ASV level
     if (tax != "ASV") {
       physeq_rmp_glom <- phyloseq::tax_glom(physeq_rmp, taxrank = tax)
