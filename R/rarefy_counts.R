@@ -186,13 +186,13 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
 
       if (!is.na(rarefy_to[i]) && rarefy_to[i] > 0) {
         rarefied_sample <- avgrarefy(cl_object = cl, x = sample_counts, rarefy_to = rarefy_to[i], iterations = iteration, seed = 711)
-        rarefied_matrix[sample_name, colnames(rarefied_sample)] <- rarefied_sample[1, ]
+        rarefied_matrix[sample_name, ] <- as.numeric(rarefied_sample)
       }
     }
 
     rarefied_matrix_t <- t(rarefied_matrix)
-    colnames(rarefied_matrix_t) <- rownames(otu_matrix) # samples
-    rownames(rarefied_matrix_t) <- colnames(otu_matrix) # taxa
+    colnames(rarefied_matrix_t) <- phyloseq::sample_names(physeq_qmp) # samples
+    rownames(rarefied_matrix_t) <- phyloseq::taxa_names(physeq_qmp) # taxa
 
     # Extract scale factor
     scale_factor_df <- data.frame(phyloseq::sample_data(physeq_qmp))
