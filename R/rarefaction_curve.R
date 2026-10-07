@@ -30,7 +30,6 @@ rarefaction_curve <- function(physeq, color = "sample_or_control", project_id, b
 
   # Internal helper function to plot the underlying vegan curve
   plot_rarecurve <- function(data, step = 100, ylim_val = NULL, xlim_val = NULL, color_col = NULL) {
-    abund_table <- as.data.frame(phyloseq::otu_table(data))
     otu_tab <- phyloseq::otu_table(data)
 
     if (phyloseq::taxa_are_rows(otu_tab)) {
