@@ -31,6 +31,13 @@ rarefaction_curve <- function(physeq, color = "sample_or_control", project_id, b
   # Internal helper function to plot the underlying vegan curve
   plot_rarecurve <- function(data, step = 100, ylim_val = NULL, xlim_val = NULL, color_col = NULL) {
     abund_table <- as.data.frame(phyloseq::otu_table(data))
+    otu_tab <- phyloseq::otu_table(data)
+
+    if (phyloseq::taxa_are_rows(otu_tab)) {
+      otu_matrix <- t(as(otu_tab, "matrix"))
+    } else {
+      otu_matrix <- as(otu_tab, "matrix")
+    }
 
     if (!is.null(color_col)) {
       # Extract metadata vector safely using S4 slot extraction conventions
@@ -52,7 +59,7 @@ rarefaction_curve <- function(physeq, color = "sample_or_control", project_id, b
     if (is.null(xlim_val)) {
       # Open a silent graphics device to calculate max depth per sample
       pdf(NULL)
-      captured_curve <- vegan::rarecurve(t(abund_table), step = 100, label = FALSE)
+      captured_curve <- vegan::rarecurve(otu_matrix, step = 100, label = FALSE)
       dev.off()
       xlim_val <- c(0, max(sapply(captured_curve, function(x) max(attr(x, "Subsample")))))
     }
@@ -60,14 +67,14 @@ rarefaction_curve <- function(physeq, color = "sample_or_control", project_id, b
     if (is.null(ylim_val)) {
       # Dynamically scale y-axis to the maximum number of ASVs found within a single sample
       pdf(NULL)
-      captured_curve <- vegan::rarecurve(t(abund_table), step = 100, label = FALSE)
+      captured_curve <- vegan::rarecurve(otu_matrix, step = 100, label = FALSE)
       dev.off()
       ylim_val <- c(0, max(sapply(captured_curve, function(x) max(x))))
     }
 
     # Draw the standardized base graphic curve
     vegan::rarecurve(
-      x = t(abund_table),
+      x = otu_matrix,
       step = step,
       xlim = xlim_val,
       ylim = ylim_val,
