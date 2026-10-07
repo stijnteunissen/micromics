@@ -191,8 +191,8 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
     }
 
     rarefied_matrix_t <- t(rarefied_matrix)
-    colnames(rarefied_matrix_t) <- rownames(physeq_qmp) # samples
-    rownames(rarefied_matrix_t) <- taxa_names(physeq_qmp) # taxa
+    colnames(rarefied_matrix_t) <- rownames(otu_matrix) # samples
+    rownames(rarefied_matrix_t) <- colnames(otu_matrix) # taxa
 
     # Extract scale factor
     scale_factor_df <- data.frame(phyloseq::sample_data(physeq_qmp))
