@@ -63,6 +63,16 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
   if (!requireNamespace("vegan", quietly = TRUE)) {
     install.packages("vegan", repos = "https://cloud.r-project.org")
   }
+  if (!requireNamespace("devtools", quietly = TRUE)) {
+    install.packages("devtools:", repos = "https://cloud.r-project.org")
+  }
+  library(devtools)
+  if (!requireNamespace("phyloseq", quietly = TRUE)) {
+    devtools::install_github("joey711/phyloseq")
+  }
+
+  library(vegan)
+  library(phyloseq)
 
   # Determine number of workers
   ncores <- parallel::detectCores()
@@ -78,6 +88,7 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
       install.packages("vegan", repos = "https://cloud.r-project.org", quiet = TRUE)
     }
     library(vegan)
+    library(phyloseq)
   })
 
   # Internal function to calculate averaged rarefactions
