@@ -74,38 +74,56 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
   library(vegan)
   library(phyloseq)
 
-  # Determine number of workers
-  ncores <- parallel::detectCores()
-  nworkers <- max(1, ncores - 2)
-  cl <- parallel::makeCluster(nworkers)
+  # # Determine number of workers
+  # ncores <- parallel::detectCores()
+  # nworkers <- max(1, ncores - 2)
+  # cl <- parallel::makeCluster(nworkers)
+  #
+  # # Stop the global running cluster safely after function stops
+  # on.exit(parallel::stopCluster(cl))
+  #
+  # # Prepare all workers once at the beginning
+  # parallel::clusterEvalQ(cl, {
+  #   if (!requireNamespace("vegan", quietly = TRUE)) {
+  #     install.packages("vegan", repos = "https://cloud.r-project.org", quiet = TRUE)
+  #   }
+  #   library(vegan)
+  #   library(phyloseq)
+  # })
+#
+#   # Internal function to calculate averaged rarefactions
+#   avgrarefy <- function(cl_object, x, rarefy_to, iterations, seed = 711) {
+#     set.seed(seed)
+#
+#     # Export data and target depth to workers
+#     parallel::clusterExport(cl_object, varlist = c("x", "rarefy_to"), envir = environment())
+#
+#     # Perform parallel rarefactions
+#     tablist <- parallel::parLapply(cl_object, seq_len(iterations), function(i) {
+#       suppressWarnings(vegan::rrarefy(x, sample = rarefy_to))
+#     })
+#
+#     # Average the results
+#     afunc  <- array(unlist(tablist), c(dim(tablist[[1]]), iterations))
+#     output <- apply(afunc, 1:2, mean)
+#     dimnames(output) <- dimnames(x)
+#     return(round(output, 0))
+#   }
 
-  # Stop the global running cluster safely after function stops
-  on.exit(parallel::stopCluster(cl))
-
-  # Prepare all workers once at the beginning
-  parallel::clusterEvalQ(cl, {
-    if (!requireNamespace("vegan", quietly = TRUE)) {
-      install.packages("vegan", repos = "https://cloud.r-project.org", quiet = TRUE)
-    }
-    library(vegan)
-    library(phyloseq)
-  })
-
-  # Internal function to calculate averaged rarefactions
-  avgrarefy <- function(cl_object, x, rarefy_to, iterations, seed = 711) {
+  # Internal function to calculate averaged rarefactions (Sequential version)
+  avgrarefy <- function(x, rarefy_to, iterations, seed = 711) {
     set.seed(seed)
 
-    # Export data and target depth to workers
-    parallel::clusterExport(cl_object, varlist = c("x", "rarefy_to"), envir = environment())
-
-    # Perform parallel rarefactions
-    tablist <- parallel::parLapply(cl_object, seq_len(iterations), function(i) {
+    # Voer rarefactions sequentieel uit met een normale lapply
+    tablist <- lapply(seq_len(iterations), function(i) {
       suppressWarnings(vegan::rrarefy(x, sample = rarefy_to))
     })
 
     # Average the results
     afunc  <- array(unlist(tablist), c(dim(tablist[[1]]), iterations))
     output <- apply(afunc, 1:2, mean)
+
+    # Behoud gegarandeerd de exact originele dimensienamen
     dimnames(output) <- dimnames(x)
     return(round(output, 0))
   }
