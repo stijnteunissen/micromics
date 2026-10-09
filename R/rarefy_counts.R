@@ -106,6 +106,7 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
     # Average the results
     afunc  <- array(unlist(tablist), c(dim(tablist[[1]]), iterations))
     output <- apply(afunc, 1:2, mean)
+    dimnames(output) <- dimnames(x)
     return(round(output, 0))
   }
 
@@ -116,11 +117,13 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
   physeq_rmp <- if (is.list(physeq)) physeq[["physeq_copy_corrected"]] else physeq
 
   # Convert phyloseq otu table to matrix format
-  otu_matrix = as(phyloseq::otu_table(physeq_rmp), "matrix")
+  otu <- phyloseq::otu_table(physeq_rmp)
 
-  if (phyloseq::taxa_are_rows(physeq_rmp)) {
-    otu_matrix <- t(otu_matrix)
+  if (phyloseq::taxa_are_rows(otu)) {
+    otu <- t(otu)
   }
+
+  otu_matrix <- as(otu, "matrix")
 
   # Determine minimal sampling depth
   min_sample <- min(phyloseq::sample_sums(physeq_rmp))
@@ -128,8 +131,8 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
   # rarefaction taking mean of n iterations
   rarefied_matrix <- avgrarefy(cl_object = cl, x = otu_matrix, rarefy_to = min_sample, iterations = iteration, seed = 711)
 
-  rownames(rarefied_matrix) <- rownames(otu_matrix)  # samples
-  colnames(rarefied_matrix) <- colnames(otu_matrix)  # taxa
+  # rownames(rarefied_matrix) <- rownames(otu_matrix)  # samples
+  # colnames(rarefied_matrix) <- colnames(otu_matrix)  # taxa
 
   # Reconstruct phyloseq object with rarefied counts
   rarefied_otu_table <- phyloseq::otu_table(rarefied_matrix, taxa_are_rows = FALSE)
@@ -196,14 +199,11 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
       sample_counts <- otu_matrix[sample_name, , drop = FALSE]
 
       if (!is.na(rarefy_to[i]) && rarefy_to[i] > 0) {
-        rarefied_sample <- avgrarefy(cl_object = cl, x = sample_counts, rarefy_to = rarefy_to[i], iterations = iteration, seed = 711)
-        rarefied_matrix[sample_name, ] <- as.numeric(rarefied_sample)
+        rarefied_matrix[sample_name, ] <- avgrarefy(cl_object = cl, x = sample_counts, rarefy_to = rarefy_to[i], iterations = iteration, seed = 711)
       }
     }
 
     rarefied_matrix_t <- t(rarefied_matrix)
-    colnames(rarefied_matrix_t) <- phyloseq::sample_names(physeq_qmp) # samples
-    rownames(rarefied_matrix_t) <- phyloseq::taxa_names(physeq_qmp) # taxa
 
     # Extract scale factor
     scale_factor_df <- data.frame(phyloseq::sample_data(physeq_qmp))
@@ -218,9 +218,9 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
     }
 
     # Reconstruct biomass normalised phyloseq object
-    otu_rescaled <- phyloseq::otu_table(rarefied_matrix_t, taxa_are_rows = TRUE)
+    rarefied_otu_table <- phyloseq::otu_table(rarefied_matrix_t, taxa_are_rows = TRUE)
     physeq_qmp_rarefied <- physeq_qmp
-    phyloseq::otu_table(physeq_qmp_rarefied) <- otu_rescaled
+    phyloseq::otu_table(physeq_qmp_rarefied) <- rarefied_otu_table
 
     saveRDS(file = file.path(clean_rds_folder, glue::glue("{project_id}_phyloseq_biomass_normalised_counts_rarefied.rds")), object = physeq_qmp_rarefied)
 
