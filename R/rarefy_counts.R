@@ -123,6 +123,8 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
     otu <- t(otu)
   }
 
+  log_message("Test of het werkt 1", status = "info", log_file)
+
   otu_matrix <- as(otu, "matrix")
 
   # Determine minimal sampling depth
@@ -130,6 +132,8 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
 
   # rarefaction taking mean of n iterations
   rarefied_matrix <- avgrarefy(cl_object = cl, x = otu_matrix, rarefy_to = min_sample, iterations = iteration, seed = 711)
+
+  log_message("Test of het werkt 2", status = "info", log_file)
 
   # rownames(rarefied_matrix) <- rownames(otu_matrix)  # samples
   # colnames(rarefied_matrix) <- colnames(otu_matrix)  # taxa
@@ -141,8 +145,12 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
     rarefied_otu_table <- t(rarefied_otu_table)
   }
 
+  log_message("Test of het werkt 3", status = "info", log_file)
+
   physeq_rmp_rarefied <- physeq_rmp
   phyloseq::otu_table(physeq_rmp_rarefied) <- rarefied_otu_table
+
+  log_message("Test of het werkt 4", status = "info", log_file)
 
   # Define path names based on the copy correction status
   if (copy_correction == FALSE) {
