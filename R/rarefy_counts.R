@@ -139,7 +139,7 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
   # colnames(rarefied_matrix) <- colnames(otu_matrix)  # taxa
 
   # Reconstruct phyloseq object with rarefied counts
-  rarefied_otu_table <- phyloseq::otu_table(rarefied_matrix, taxa_are_rows = FALSE)
+  rarefied_otu_table <- phyloseq::otu_table(rarefied_matrix, taxa_are_rows = TRUE)
 
   if (!phyloseq::taxa_are_rows(rarefied_otu_table)) {
     rarefied_otu_table <- t(rarefied_otu_table)
