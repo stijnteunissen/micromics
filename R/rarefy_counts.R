@@ -149,7 +149,9 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
   min_sample <- min(phyloseq::sample_sums(physeq_rmp))
 
   # rarefaction taking mean of n iterations
-  rarefied_matrix <- avgrarefy(cl_object = cl, x = otu_matrix, rarefy_to = min_sample, iterations = iteration, seed = 711)
+  # rarefied_matrix <- avgrarefy(cl_object = cl, x = otu_matrix, rarefy_to = min_sample, iterations = iteration, seed = 711)
+  rarefied_matrix <- avgrarefy(x = otu_matrix, rarefy_to = min_sample, iterations = iteration, seed = 711)
+
 
   log_message("Test of het werkt 2", status = "info", log_file)
 
@@ -243,7 +245,9 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
       sample_counts <- otu_matrix[sample_name, , drop = FALSE]
 
       if (!is.na(rarefy_to[i]) && rarefy_to[i] > 0) {
-        rarefied_matrix[sample_name, ] <- avgrarefy(cl_object = cl, x = sample_counts, rarefy_to = rarefy_to[i], iterations = iteration, seed = 711)
+        # rarefied_matrix[sample_name, ] <- avgrarefy(cl_object = cl, x = sample_counts, rarefy_to = rarefy_to[i], iterations = iteration, seed = 711)
+        rarefied_matrix[sample_name, ] <- avgrarefy(x = sample_counts, rarefy_to = rarefy_to[i], iterations = iteration, seed = 711)
+
       }
     }
 
