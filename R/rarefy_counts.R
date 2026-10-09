@@ -147,8 +147,23 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
 
   log_message("Test of het werkt 3", status = "info", log_file)
 
-  taxa_names(rarefied_otu_table)
-  taxa_names(physeq_rmp)
+  names_new <- phyloseq::taxa_names(rarefied_otu_table)
+  names_orig <- phyloseq::taxa_names(physeq_rmp)
+
+  aantal_nieuw <- length(names_new)
+  aantal_orig  <- length(names_orig)
+  aantal_match <- length(intersect(names_new, names_orig))
+
+  # 3. Schrijf dit overzichtelijk naar je logbestand
+  log_message(paste0("CHECK - Aantal taxa in nieuwe tabel: ", aantal_nieuw), status = "info", log_file)
+  log_message(paste0("CHECK - Aantal taxa in origineel: ", aantal_orig), status = "info", log_file)
+  log_message(paste0("CHECK - Aantal taxa dat EXACT overeenkomt: ", aantal_match), status = "info", log_file)
+
+  if (aantal_match < aantal_orig) {
+    missend_in_nieuw <- setdiff(names_orig, names_new)
+    log_message(paste0("CHECK - Eerste 5 missende taxa in nieuwe tabel: ",
+                       paste(head(missend_in_nieuw, 5), collapse = ", ")), status = "warning", log_file)
+  }
 
   physeq_rmp_rarefied <- physeq_rmp
   phyloseq::otu_table(physeq_rmp_rarefied) <- rarefied_otu_table
