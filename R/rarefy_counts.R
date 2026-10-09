@@ -147,6 +147,9 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
 
   log_message("Test of het werkt 3", status = "info", log_file)
 
+  taxa_names(physeq_rmp_rarefied)
+  taxa_names(physeq_rmp)
+
   physeq_rmp_rarefied <- physeq_rmp
   phyloseq::otu_table(physeq_rmp_rarefied) <- rarefied_otu_table
 
