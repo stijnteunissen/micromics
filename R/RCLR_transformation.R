@@ -1,3 +1,4 @@
+#' @export
 RCLR_transformation <- function(physeq, taxrank, facet_var, color_var, shape_var, time_var, project_id, base_path, log_file) {
 
   # Setup folder paths
