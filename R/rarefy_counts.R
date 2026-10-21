@@ -110,23 +110,23 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
     return(round(output, 0))
   }
 
-  # Internal function to calculate averaged rarefactions (Sequential version)
-  avgrarefy <- function(x, rarefy_to, iterations, seed = 711) {
-    set.seed(seed)
-
-    # Voer rarefactions sequentieel uit met een normale lapply
-    tablist <- lapply(seq_len(iterations), function(i) {
-      suppressWarnings(vegan::rrarefy(x, sample = rarefy_to))
-    })
-
-    # Average the results
-    afunc  <- array(unlist(tablist), c(dim(tablist[[1]]), iterations))
-    output <- apply(afunc, 1:2, mean)
-
-    # Behoud gegarandeerd de exact originele dimensienamen
-    dimnames(output) <- dimnames(x)
-    return(round(output, 0))
-  }
+  # # Internal function to calculate averaged rarefactions (Sequential version)
+  # avgrarefy <- function(x, rarefy_to, iterations, seed = 711) {
+  #   set.seed(seed)
+  #
+  #   # Voer rarefactions sequentieel uit met een normale lapply
+  #   tablist <- lapply(seq_len(iterations), function(i) {
+  #     suppressWarnings(vegan::rrarefy(x, sample = rarefy_to))
+  #   })
+  #
+  #   # Average the results
+  #   afunc  <- array(unlist(tablist), c(dim(tablist[[1]]), iterations))
+  #   output <- apply(afunc, 1:2, mean)
+  #
+  #   # Behoud gegarandeerd de exact originele dimensienamen
+  #   dimnames(output) <- dimnames(x)
+  #   return(round(output, 0))
+  # }
 
   # Process standard rarefaction
   log_message("Performing standard rarefaction.", status = "info", log_file)
