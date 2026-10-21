@@ -74,41 +74,41 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
   library(vegan)
   library(phyloseq)
 
-  # # Determine number of workers
-  # ncores <- parallel::detectCores()
-  # nworkers <- max(1, ncores - 2)
-  # cl <- parallel::makeCluster(nworkers)
-  #
-  # # Stop the global running cluster safely after function stops
-  # on.exit(parallel::stopCluster(cl))
-  #
-  # # Prepare all workers once at the beginning
-  # parallel::clusterEvalQ(cl, {
-  #   if (!requireNamespace("vegan", quietly = TRUE)) {
-  #     install.packages("vegan", repos = "https://cloud.r-project.org", quiet = TRUE)
-  #   }
-  #   library(vegan)
-  #   library(phyloseq)
-  # })
-#
-#   # Internal function to calculate averaged rarefactions
-#   avgrarefy <- function(cl_object, x, rarefy_to, iterations, seed = 711) {
-#     set.seed(seed)
-#
-#     # Export data and target depth to workers
-#     parallel::clusterExport(cl_object, varlist = c("x", "rarefy_to"), envir = environment())
-#
-#     # Perform parallel rarefactions
-#     tablist <- parallel::parLapply(cl_object, seq_len(iterations), function(i) {
-#       suppressWarnings(vegan::rrarefy(x, sample = rarefy_to))
-#     })
-#
-#     # Average the results
-#     afunc  <- array(unlist(tablist), c(dim(tablist[[1]]), iterations))
-#     output <- apply(afunc, 1:2, mean)
-#     dimnames(output) <- dimnames(x)
-#     return(round(output, 0))
-#   }
+  # Determine number of workers
+  ncores <- parallel::detectCores()
+  nworkers <- max(1, ncores - 2)
+  cl <- parallel::makeCluster(nworkers)
+
+  # Stop the global running cluster safely after function stops
+  on.exit(parallel::stopCluster(cl))
+
+  # Prepare all workers once at the beginning
+  parallel::clusterEvalQ(cl, {
+    if (!requireNamespace("vegan", quietly = TRUE)) {
+    install.packages("vegan", repos = "https://cloud.r-project.org", quiet = TRUE)
+      }
+    library(vegan)
+    library(phyloseq)
+    })
+
+  # Internal function to calculate averaged rarefactions
+  avgrarefy <- function(cl_object, x, rarefy_to, iterations, seed = 711) {
+    set.seed(seed)
+
+    # Export data and target depth to workers
+    parallel::clusterExport(cl_object, varlist = c("x", "rarefy_to"), envir = environment())
+
+    # Perform parallel rarefactions
+    tablist <- parallel::parLapply(cl_object, seq_len(iterations), function(i) {
+      suppressWarnings(vegan::rrarefy(x, sample = rarefy_to))
+    })
+
+    # Average the results
+    afunc  <- array(unlist(tablist), c(dim(tablist[[1]]), iterations))
+    output <- apply(afunc, 1:2, mean)
+    dimnames(output) <- dimnames(x)
+    return(round(output, 0))
+  }
 
   # Internal function to calculate averaged rarefactions (Sequential version)
   avgrarefy <- function(x, rarefy_to, iterations, seed = 711) {
@@ -141,19 +141,14 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
     otu <- t(otu)
   }
 
-  log_message("Test of het werkt 1", status = "info", log_file)
-
   otu_matrix <- as(otu, "matrix")
 
   # Determine minimal sampling depth
   min_sample <- min(phyloseq::sample_sums(physeq_rmp))
 
   # rarefaction taking mean of n iterations
-  # rarefied_matrix <- avgrarefy(cl_object = cl, x = otu_matrix, rarefy_to = min_sample, iterations = iteration, seed = 711)
-  rarefied_matrix <- avgrarefy(x = otu_matrix, rarefy_to = min_sample, iterations = iteration, seed = 711)
-
-
-  log_message("Test of het werkt 2", status = "info", log_file)
+  rarefied_matrix <- avgrarefy(cl_object = cl, x = otu_matrix, rarefy_to = min_sample, iterations = iteration, seed = 711)
+  # rarefied_matrix <- avgrarefy(x = otu_matrix, rarefy_to = min_sample, iterations = iteration, seed = 711)
 
   # rownames(rarefied_matrix) <- rownames(otu_matrix)  # samples
   # colnames(rarefied_matrix) <- colnames(otu_matrix)  # taxa
@@ -165,30 +160,8 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
     rarefied_otu_table <- t(rarefied_otu_table)
   }
 
-  log_message("Test of het werkt 3", status = "info", log_file)
-
-  names_new <- phyloseq::taxa_names(rarefied_otu_table)
-  names_orig <- phyloseq::taxa_names(physeq_rmp)
-
-  aantal_nieuw <- length(names_new)
-  aantal_orig  <- length(names_orig)
-  aantal_match <- length(intersect(names_new, names_orig))
-
-  # 3. Schrijf dit overzichtelijk naar je logbestand
-  log_message(paste0("CHECK - Aantal taxa in nieuwe tabel: ", aantal_nieuw), status = "info", log_file)
-  log_message(paste0("CHECK - Aantal taxa in origineel: ", aantal_orig), status = "info", log_file)
-  log_message(paste0("CHECK - Aantal taxa dat EXACT overeenkomt: ", aantal_match), status = "info", log_file)
-
-  if (aantal_match < aantal_orig) {
-    missend_in_nieuw <- setdiff(names_orig, names_new)
-    log_message(paste0("CHECK - Eerste 5 missende taxa in nieuwe tabel: ",
-                       paste(head(missend_in_nieuw, 5), collapse = ", ")), status = "warning", log_file)
-  }
-
   physeq_rmp_rarefied <- physeq_rmp
   phyloseq::otu_table(physeq_rmp_rarefied) <- rarefied_otu_table
-
-  log_message("Test of het werkt 4", status = "info", log_file)
 
   # Define path names based on the copy correction status
   if (copy_correction == FALSE) {
@@ -203,10 +176,6 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
     log_message(glue::glue("Starting biomass rarefaction"), status = "info", log_file)
 
     physeq_qmp <- physeq[["physeq_biomass_normalised"]]
-
-    # # Clean empty profiles form the phyloseq object
-    # physeq_qmp <- phyloseq::prune_samples(phyloseq::sample_sums(physeq_qmp) > 0, physeq_qmp) # Remove samples with zero counts
-    # physeq_qmp <- phyloseq::prune_taxa(rowSums(phyloseq::otu_table(physeq_qmp)) > 0, physeq_qmp) # Remove taxa with zero counts across all samples
 
     # Convert phyloseq sample data to data frame
     sample_data <- data.frame(phyloseq::sample_data(physeq_qmp))
@@ -245,8 +214,8 @@ rarefy_counts = function(physeq, norm_method = NULL, copy_correction = TRUE, ite
       sample_counts <- otu_matrix[sample_name, , drop = FALSE]
 
       if (!is.na(rarefy_to[i]) && rarefy_to[i] > 0) {
-        # rarefied_matrix[sample_name, ] <- avgrarefy(cl_object = cl, x = sample_counts, rarefy_to = rarefy_to[i], iterations = iteration, seed = 711)
-        rarefied_matrix[sample_name, ] <- avgrarefy(x = sample_counts, rarefy_to = rarefy_to[i], iterations = iteration, seed = 711)
+        rarefied_matrix[sample_name, ] <- avgrarefy(cl_object = cl, x = sample_counts, rarefy_to = rarefy_to[i], iterations = iteration, seed = 711)
+        # rarefied_matrix[sample_name, ] <- avgrarefy(x = sample_counts, rarefy_to = rarefy_to[i], iterations = iteration, seed = 711)
 
       }
     }
