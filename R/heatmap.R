@@ -109,15 +109,28 @@ heatmap = function(psdata, taxrank, ntaxa = 23, facet_vars, plot_width, project_
     other_label <- glue("Other max.<{round(legend_cutoff_value_rmp, 2)}%")
 
     # Reorder and lump lower abundace taxa into other cateory
+    top_taxa_names <- legend_cutoff_rmp %>% dplyr::pull(!!sym(tax))
+
     plot_data_rmp <- abund_rmp %>%
       dplyr::group_by(!!sym(tax)) %>%
       dplyr::mutate(total_genus_abund = mean(rel_abund, na.rm = TRUE)) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(
-        !!sym(tax) := fct_reorder(!!sym(tax), total_genus_abund, .desc = TRUE),
-        !!sym(tax) := fct_lump_n(!!sym(tax), n = ntaxa, w = total_genus_abund, other_level = other_label)) %>%
-      dplyr::group_by(Sample, !!sym(tax), na_type, across(-c(total_genus_abund, rel_abund))) %>%
+        !!sym(tax) := ifelse(!!sym(tax) %in% top_taxa_names, as.character(!!sym(tax)), other_label),
+        !!sym(tax) := fct_reorder(factor(!!sym(tax)), total_genus_abund, .desc = TRUE)
+      ) %>%
+      dplyr::group_by(Sample, !!sym(tax), na_type, across(-c(total_genus_abund, rel_abund, abund))) %>%
       dplyr::summarise(rel_abund = sum(rel_abund), .groups = "drop")
+
+    # plot_data_rmp <- abund_rmp %>%
+    #   dplyr::group_by(!!sym(tax)) %>%
+    #   dplyr::mutate(total_genus_abund = mean(rel_abund, na.rm = TRUE)) %>%
+    #   dplyr::ungroup() %>%
+    #   dplyr::mutate(
+    #     !!sym(tax) := fct_reorder(!!sym(tax), total_genus_abund, .desc = TRUE),
+    #     !!sym(tax) := fct_lump_n(!!sym(tax), n = ntaxa, w = total_genus_abund, other_level = other_label)) %>%
+    #   dplyr::group_by(Sample, !!sym(tax), na_type, across(-c(total_genus_abund, rel_abund))) %>%
+    #   dplyr::summarise(rel_abund = sum(rel_abund), .groups = "drop")
 
     # Clean an italicize names specifically for genus level
     if (tax == "Genus") {
