@@ -80,7 +80,7 @@ remove_mock = function(physeq, mock_genera, mock = TRUE, project_id, base_path, 
       phyloseq::subset_taxa(Genus %in% mock_genera) %>%
       phyloseq::taxa_names()
 
-    log_message(glue::glue("Identified {length(mock_asvs)} unique ASVs matching the specified mock community genera."), status = "info", log_file)
+    log_message(glue::glue("Identified {length(mock_ASVs)} unique ASVs matching the specified mock community genera."), status = "info", log_file)
 
     # Prune mock control samples and completely strip out their corresponding ASVs from samples
     physeq_filtered <- physeq %>%
