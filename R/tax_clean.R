@@ -112,10 +112,20 @@ tax_clean = function(physeq, tax_filter = TRUE, project_id, base_path, log_file)
 
   # Apply taxonomic filters to remove off-target host or unassigned reads
   if (tax_filter) {
+    # physeq <- physeq %>%
+    #   phyloseq::subset_taxa(
+    #     Class != "Chloroplast" &
+    #       Order != "Chloroplast" &
+    #       Family != "Mitochondria" &
+    #       Kingdom != "d__Eukaryota" &
+    #       Kingdom != "Unassigned" &
+    #       Phylum != "Phylum of d__Bacteria" &
+    #       Phylum != "Phylum of d__Archaea" &
+    #       Phylum != "Phylum of Bacteria"
+    #   )
+
     physeq <- physeq %>%
       phyloseq::subset_taxa(
-        Class != "Chloroplast" &
-          Order != "Chloroplast" &
           Family != "Mitochondria" &
           Kingdom != "d__Eukaryota" &
           Kingdom != "Unassigned" &
